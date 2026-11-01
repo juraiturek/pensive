@@ -388,15 +388,15 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     add.addEventListener('click', beginItem);
     const emptyFactor = Swot.factors.includes(section) && !items.length;
     container.classList.toggle('empty-factor', emptyFactor);
-    // Replace the handler on re-render; the second click in a double-click must not add another item.
+    // Replace on re-render so clicks never accumulate handlers.
     container.onclick = Swot.factors.includes(section) ? event => {
-      if (event.target.closest('button, textarea')) return;
+      if (event.target.closest('button, textarea, .item, .cell-heading')) return;
       const current = Swot.collection(state, section);
-      if (!current.length) beginItem();
-      else if (event.detail === 2 && current.length === 1 && current[0].text === '') {
-        // A second click in the blank area can blur the editor created by the first.
-        container.querySelector('textarea').focus();
-      }
+      const last = current.at(-1);
+      if (last && last.text.trim() === '') {
+        // Reuse an unfinished draft, including the second click of a double-click.
+        container.querySelector('li.item:last-child textarea').focus();
+      } else beginItem();
     } : null;
     container.append(add);
     container.querySelectorAll('textarea').forEach(resize);

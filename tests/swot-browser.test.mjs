@@ -217,3 +217,24 @@ test('empty SWOT quadrants create exactly one focused draft on click or double-c
     assert.equal(await group.locator('textarea').count(), 1);
   }
 });
+
+test('blank space below existing SWOT factors adds the next focused bullet', async t => {
+  const page = await openCanvas(t);
+  for (const section of ['strengths', 'weaknesses', 'opportunities', 'threats']) {
+    const group = page.locator(`[data-section="${section}"]`);
+    const firstId = await add(page, section, 'First factor');
+    for (const gesture of ['click', 'dblclick']) {
+      const box = await group.boundingBox();
+      const last = await group.locator('li.item').last().boundingBox();
+      await group[gesture]({ position: { x: 100, y: last.y + last.height - box.y + 12 } });
+      const expected = gesture === 'click' ? 2 : 3;
+      assert.equal(await group.locator('textarea').count(), expected);
+      const input = group.locator('textarea').last();
+      assert.equal(await input.evaluate(el => el === document.activeElement), true);
+      await input.fill(`Next factor ${expected}`);
+      assert.equal((await copiedState(page)).content[section][0].id, firstId);
+    }
+    await group.locator('textarea').first().click();
+    assert.equal(await group.locator('textarea').count(), 3);
+  }
+});
