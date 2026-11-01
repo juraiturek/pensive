@@ -18,3 +18,5 @@ Future packages live at `../frameworks/<id>/` relative to this reference directo
 Generic action reuse requires an explicit mapping from method concepts and targets to framework semantics. Matching action names alone do not establish compatibility. Keep substantial reasoning in Markdown, with shared methods in future `../prompts/` and specialized interpretation in the package. The manifest introduces neither a template runtime nor a generic canvas engine.
 
 Future organization-specific packages can satisfy this contract through an explicitly configured local path. Discovery, permissions, installation, registries, and commercial distribution are deferred. No private package is implicitly trusted or loaded.
+
+Acceptance granularity: The initial implementation supports accepting or rejecting an entire AI transformation at canvas level. Section-level acceptance, corresponding to a declared framework field or collection, may be introduced later. Acceptance of individual items within a section is outside the current scope. Node-level action targeting does not imply node-level acceptance.
