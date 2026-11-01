@@ -30,8 +30,6 @@ p { margin: 0; }
 .brand { display: flex; align-items: baseline; gap: 1.5rem; min-width: 0; }
 .wordmark { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 2rem; letter-spacing: -.07em; color: var(--ink); text-decoration: none; }
 .wordmark span { color: var(--accent); }
-.local-label { color: var(--muted); font-size: .75rem; letter-spacing: .03em; }
-.local-label > span { color: #517859; font-size: .65rem; margin-right: .5rem; }
 .eyebrow { text-transform: uppercase; font-size: .67rem; letter-spacing: .14em; font-weight: 600; color: var(--muted); }
 .framing { display: grid; grid-template-columns: 1fr 1.4fr; gap: .9rem 2rem; padding: 1.3rem 0; }
 .framing label { display: block; font-size: .75rem; font-weight: 600; }
@@ -100,7 +98,6 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem
   .context.opportunities, .context.threats { grid-column: 1 / -1; }
 }
 @media (max-width: 560px) {
-  .local-label { font-size: .65rem; }
   .framing { grid-template-columns: 1fr; gap: .85rem; }
   .toolbar { flex-wrap: wrap; }
   .export-actions { width: 100%; }
@@ -119,7 +116,6 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem
 <div class="shell">
   <header class="masthead">
     <div class="brand"><a class="wordmark" href="#main" aria-label="Pensive, skip to canvas">pensive<span aria-hidden="true">.</span></a><p class="eyebrow">SWOT &amp; TOWS: STRATEGIC ANALYSIS</p></div>
-    <span class="local-label"><span aria-hidden="true">●</span> A local thinking space</span>
   </header>
   <main id="main">
     <section class="framing" aria-label="Analysis context">
