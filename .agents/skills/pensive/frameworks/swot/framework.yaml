@@ -1,0 +1,35 @@
+id: swot
+name: SWOT / TOWS
+package_version: "0.1.0"
+schema_version: "1.0"
+state_schema: canvas.schema.json
+canvas: canvas.html
+semantics:
+  framing: [focal_entity, objective, environment]
+  internal: [strengths, weaknesses]
+  external: [opportunities, threats]
+  helpful: [strengths, opportunities]
+  harmful: [weaknesses, threats]
+  strategies:
+    so: Use strengths to pursue opportunities.
+    st: Use strengths to respond to threats.
+    wo: Use opportunities to overcome weaknesses.
+    wt: Reduce weaknesses and exposure to threats.
+manual_capabilities:
+  - edit_framing
+  - add_edit_delete_factors
+  - add_edit_delete_strategies
+  - toggle_swot_tows
+  - export_json_to_clipboard
+  - save_standalone_html
+ai_actions: []
+target_types:
+  factor: Stable item ID in one of the four SWOT collections.
+  strategy: Stable item ID in one of the four TOWS collections.
+action_compatibility: []
+quality_criteria:
+  - Distinguish internal factors from external conditions.
+  - Relate factors to the stated entity and objective.
+  - Use the named factor categories for each strategy pairing.
+  - Prefer concrete factors and actionable strategies over vague claims.
+acceptance: Not implemented; manual edits are direct user operations.

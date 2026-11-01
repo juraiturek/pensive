@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Pensive — SWOT / TOWS</title>
+<!--pensive-style-->
+</head>
+<body>
+<div class="shell">
+  <header class="masthead">
+    <a class="wordmark" href="#main" aria-label="Pensive, skip to canvas">pensive<span aria-hidden="true">.</span></a>
+    <span class="local-label"><span aria-hidden="true">●</span> A local thinking space</span>
+  </header>
+  <main id="main">
+    <div class="heading-row">
+      <div><p class="eyebrow">01 / Strategic analysis</p><h1>See the situation.<br><em>Find your next move.</em></h1></div>
+      <p class="intro">Start with what is true.<br> Then turn the connections into strategy.</p>
+    </div>
+    <section class="framing" aria-label="Analysis context">
+      <label for="focal-entity">Focal entity<textarea id="focal-entity" data-framing="focal_entity" rows="1" placeholder="What are you analyzing?"></textarea></label>
+      <label for="objective">Strategic objective<textarea id="objective" data-framing="objective" rows="1" placeholder="What are you working toward?"></textarea></label>
+      <details><summary>Environment <span class="optional">/ optional</span></summary><label class="environment-label" for="environment">External environment<textarea id="environment" data-framing="environment" rows="2" placeholder="What is happening around you?"></textarea></label></details>
+    </section>
+    <div class="toolbar">
+      <div class="view-tabs" role="group" aria-label="Canvas view">
+        <button id="swot-toggle" type="button" aria-pressed="true" aria-controls="swot-view">SWOT</button>
+        <button id="tows-toggle" type="button" aria-pressed="false" aria-controls="tows-view">TOWS <span id="tows-count" class="count" title="No strategies yet">0</span></button>
+      </div>
+      <div class="export-actions"><button id="copy" type="button">Export to clipboard</button><button id="save" type="button" class="primary">Save to File <span aria-hidden="true">↗</span></button></div>
+    </div>
+    <div class="view-heading"><p id="view-description">A clear view of your internal and external landscape.</p><span id="view-hint">Add one factor at a time</span></div>
+    <section id="swot-view" aria-label="SWOT factors">
+      <div class="swot-grid">
+        <div class="axis corner" aria-hidden="true"></div>
+        <p class="axis helpful">Helpful <span>to your objective</span></p><p class="axis harmful">Harmful <span>to your objective</span></p>
+        <p class="axis internal">Internal <span>your organization</span></p>
+        <section class="cell strengths" data-section="strengths" aria-label="Strengths"></section>
+        <section class="cell weaknesses" data-section="weaknesses" aria-label="Weaknesses"></section>
+        <p class="axis external">External <span>your environment</span></p>
+        <section class="cell opportunities" data-section="opportunities" aria-label="Opportunities"></section>
+        <section class="cell threats" data-section="threats" aria-label="Threats"></section>
+      </div>
+    </section>
+    <section id="tows-view" aria-label="TOWS strategies" hidden>
+      <div class="tows-grid">
+        <div class="tows-guide"><span class="eyebrow">From insight to action</span><p>Read the factors.<br>Work at the intersections.</p><small>Factors are read-only here.<br>Edit them in SWOT.</small></div>
+        <section class="context strengths" data-context="strengths" aria-label="Strengths context"></section>
+        <section class="context weaknesses" data-context="weaknesses" aria-label="Weaknesses context"></section>
+        <section class="context opportunities" data-context="opportunities" aria-label="Opportunities context"></section>
+        <section class="cell so" data-section="so" aria-label="SO strategies"></section>
+        <section class="cell wo" data-section="wo" aria-label="WO strategies"></section>
+        <section class="context threats" data-context="threats" aria-label="Threats context"></section>
+        <section class="cell st" data-section="st" aria-label="ST strategies"></section>
+        <section class="cell wt" data-section="wt" aria-label="WT strategies"></section>
+      </div>
+    </section>
+    <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden>
+      <label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p>
+      <textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button>
+    </section>
+    <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
+  </main>
+  <footer><span>Less conversation. More thinking.</span><span>SWOT / TOWS <span aria-hidden="true">·</span> Pensive</span></footer>
+</div>
+<noscript>This canvas requires JavaScript for local editing and export. No server is needed.</noscript>
+<!--pensive-state-start-->
+<script id="canvas-state" type="application/json">{}</script>
+<!--pensive-state-end-->
+<!--pensive-core-->
+<!--pensive-runtime-->
+</body>
+</html>

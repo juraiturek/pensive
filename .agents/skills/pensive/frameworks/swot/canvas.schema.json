@@ -1,0 +1,134 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pensive SWOT/TOWS state 1.0",
+  "$comment": "Item IDs must additionally be unique across all factor and strategy collections; state.js enforces this semantic invariant.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "framework",
+    "schema_version",
+    "content"
+  ],
+  "properties": {
+    "framework": {
+      "const": "swot"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "framing",
+        "strengths",
+        "weaknesses",
+        "opportunities",
+        "threats",
+        "strategies"
+      ],
+      "properties": {
+        "framing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "focal_entity",
+            "objective",
+            "environment"
+          ],
+          "properties": {
+            "focal_entity": {
+              "type": "string"
+            },
+            "objective": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            }
+          }
+        },
+        "strengths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "opportunities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "threats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "strategies": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "so",
+            "st",
+            "wo",
+            "wt"
+          ],
+          "properties": {
+            "so": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/item"
+              }
+            },
+            "st": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/item"
+              }
+            },
+            "wo": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/item"
+              }
+            },
+            "wt": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/item"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

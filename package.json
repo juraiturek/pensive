@@ -1,0 +1,14 @@
+{
+  "name": "pensive",
+  "private": true,
+  "scripts": {
+    "build": "node .agents/skills/pensive/scripts/package-swot.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:state": "node --test tests/swot-state.test.mjs",
+    "test:browser": "node --test tests/swot-browser.test.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "playwright": "^1.56.1"
+  }
+}

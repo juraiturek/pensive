@@ -1,0 +1,165 @@
+/* UI for this SWOT/TOWS canvas only. No storage or network operations. */
+(() => {
+  'use strict';
+  const labels = {
+    strengths: ['Strengths', 'S', 'Internal advantages you can build on.'],
+    weaknesses: ['Weaknesses', 'W', 'Internal limitations to address.'],
+    opportunities: ['Opportunities', 'O', 'External conditions you could use.'],
+    threats: ['Threats', 'T', 'External risks to prepare for.'],
+    so: ['SO strategies', 'S × O', 'Use strengths to pursue opportunities.'],
+    st: ['ST strategies', 'S × T', 'Use strengths to respond to threats.'],
+    wo: ['WO strategies', 'W × O', 'Use opportunities to overcome weaknesses.'],
+    wt: ['WT strategies', 'W × T', 'Reduce weaknesses and exposure to threats.']
+  };
+  const $ = selector => document.querySelector(selector);
+  // Capture before rendering. Exports reuse this pristine implementation, never the edited DOM.
+  const source = '<!doctype html>\n' + document.documentElement.outerHTML;
+  let state;
+  let mode = 'swot';
+  function status(message, error = false) {
+    $('#status').textContent = message;
+    $('#status').classList.toggle('error', error);
+  }
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function resize(input) {
+    input.style.height = 'auto';
+    input.style.height = `${Math.max(input.scrollHeight, 30)}px`;
+  }
+  function countStrategies() {
+    const count = Swot.strategies.reduce((total, key) => total + state.content.strategies[key].length, 0);
+    const indicator = $('#tows-count');
+    indicator.textContent = String(count);
+    indicator.classList.toggle('has-content', count > 0);
+    indicator.title = count ? `${count} ${count === 1 ? 'strategy' : 'strategies'} in TOWS` : 'No strategies yet';
+    indicator.setAttribute('aria-label', indicator.title);
+  }
+  function edited() {
+    $('#clipboard-fallback').hidden = true;
+    status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
+    countStrategies();
+  }
+  function renderSection(section) {
+    const container = $(`[data-section="${section}"]`);
+    const [label, symbol, description] = labels[section];
+    container.replaceChildren();
+    const heading = element('div', 'cell-heading');
+    heading.append(element('h2', '', label), element('span', 'cell-symbol', symbol));
+    container.append(heading, element('p', 'cell-description', description));
+    const items = Swot.collection(state, section);
+    const list = element('ul', 'items');
+    items.forEach((item, index) => {
+      const row = element('li', 'item');
+      const input = element('textarea');
+      input.rows = 1;
+      input.value = item.text;
+      input.dataset.id = item.id;
+      input.setAttribute('aria-label', `${label} ${index + 1}`);
+      input.placeholder = Swot.factors.includes(section) ? 'Write a factor…' : 'Write a strategy…';
+      input.addEventListener('input', () => {
+        Swot.editItem(state, section, item.id, input.value);
+        resize(input);
+        edited();
+      });
+      const remove = element('button', 'delete', '×');
+      remove.type = 'button';
+      remove.setAttribute('aria-label', `Delete ${label.toLowerCase()} ${index + 1}`);
+      remove.addEventListener('click', () => {
+        Swot.deleteItem(state, section, item.id);
+        renderSection(section);
+        container.querySelector('.add').focus();
+        edited();
+      });
+      row.append(input, remove);
+      list.append(row);
+    });
+    container.append(list);
+    if (!items.length) container.append(element('p', 'empty', Swot.factors.includes(section) ? 'What belongs here?' : 'What could you do?'));
+    const add = element('button', 'add', 'Add');
+    add.setAttribute('aria-label', 'Add');
+    add.type = 'button';
+    add.addEventListener('click', () => {
+      const id = Swot.addItem(state, section);
+      renderSection(section);
+      const input = Array.from(container.querySelectorAll('textarea')).find(node => node.dataset.id === id);
+      input.focus();
+      edited();
+    });
+    container.append(add);
+    container.querySelectorAll('textarea').forEach(resize);
+  }
+  function renderContext() {
+    for (const section of Swot.factors) {
+      const container = $(`[data-context="${section}"]`);
+      container.replaceChildren(element('h2', '', labels[section][0]), element('p', 'readonly-label', 'Read-only context'));
+      const list = element('ul');
+      for (const item of state.content[section]) list.append(element('li', '', item.text || '(Blank factor)'));
+      container.append(list);
+      if (!state.content[section].length) container.append(element('p', 'empty', 'No factors yet. Add them in SWOT.'));
+    }
+  }
+  function setMode(next) {
+    mode = next;
+    if (mode === 'tows') renderContext();
+    $('#swot-view').hidden = mode !== 'swot';
+    $('#tows-view').hidden = mode !== 'tows';
+    $('#swot-toggle').setAttribute('aria-pressed', String(mode === 'swot'));
+    $('#tows-toggle').setAttribute('aria-pressed', String(mode === 'tows'));
+    $('#view-description').textContent = mode === 'swot' ? 'A clear view of your internal and external landscape.' : 'Connect your factors to deliberate, practical moves.';
+    $('#view-hint').textContent = mode === 'swot' ? 'Add one factor at a time' : 'Write strategies manually · no AI required';
+    document.querySelectorAll(`#${mode}-view textarea`).forEach(resize);
+  }
+  async function copyState() {
+    const json = JSON.stringify(Swot.validate(state), null, 2);
+    try {
+      await navigator.clipboard.writeText(json);
+      $('#clipboard-fallback').hidden = true;
+      status('Copied complete canvas JSON to clipboard.');
+    } catch {
+      $('#clipboard-fallback').hidden = false;
+      $('#clipboard-json').value = json;
+      $('#clipboard-json').focus();
+      $('#clipboard-json').select();
+      status('Clipboard access blocked. Copy the selected JSON below.', true);
+    }
+  }
+  function saveFile() {
+    try {
+      const html = Swot.packageHtml(source, state);
+      const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+      const link = element('a');
+      link.href = url;
+      link.download = 'pensive-swot.html';
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      status('HTML download started. Keep the downloaded file to preserve your work.');
+    } catch (error) { status(`Could not save: ${error.message}`, true); }
+  }
+  try {
+    state = Swot.parseState($('#canvas-state').textContent);
+    for (const field of Swot.framing) {
+      const input = $(`[data-framing="${field}"]`);
+      input.value = state.content.framing[field];
+      input.addEventListener('input', () => { state.content.framing[field] = input.value; resize(input); edited(); });
+    }
+    for (const section of [...Swot.factors, ...Swot.strategies]) renderSection(section);
+    countStrategies();
+    setMode('swot');
+    $('#swot-toggle').addEventListener('click', () => setMode('swot'));
+    $('#tows-toggle').addEventListener('click', () => setMode('tows'));
+    $('#copy').addEventListener('click', copyState);
+    $('#save').addEventListener('click', saveFile);
+    $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });
+    $('details').addEventListener('toggle', () => $('#environment').hidden || resize($('#environment')));
+    document.querySelectorAll('[data-framing]').forEach(resize);
+  } catch (error) {
+    document.querySelectorAll('button, textarea').forEach(node => { node.disabled = true; });
+    status(`Invalid canvas: ${error.message} The embedded state has not been changed.`, true);
+  }
+})();
