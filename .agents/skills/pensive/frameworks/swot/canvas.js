@@ -49,7 +49,8 @@
     container.replaceChildren();
     const heading = element('div', 'cell-heading');
     heading.append(element('h2', '', label), element('span', 'cell-symbol', symbol));
-    container.append(heading, element('p', 'cell-description', description));
+    container.append(heading);
+    if (Swot.strategies.includes(section)) container.append(element('p', 'cell-description', description));
     const items = Swot.collection(state, section);
     const list = element('ul', 'items');
     items.forEach((item, index) => {
