@@ -194,3 +194,26 @@ test('mobile view has no horizontal overflow and visible keyboard focus', async 
   await mkdir('test-results', { recursive: true });
   await page.screenshot({ path: 'test-results/swot-mobile.png', fullPage: true, animations: 'disabled' });
 });
+
+test('empty SWOT quadrants create exactly one focused draft on click or double-click', async t => {
+  const page = await openCanvas(t);
+  for (const section of ['strengths', 'weaknesses', 'opportunities', 'threats']) {
+    const group = page.locator(`[data-section="${section}"]`);
+    assert.equal(await group.getByText('What belongs here?', { exact: true }).count(), 0);
+    for (const gesture of ['click', 'dblclick']) {
+      await group[gesture]({ position: { x: 100, y: gesture === 'dblclick' ? 170 : 110 } });
+      assert.equal(await group.locator('textarea').count(), 1);
+      assert.equal(await group.locator('textarea').evaluate(el => el === document.activeElement), true);
+      await group.locator('textarea').fill(`${section} ${gesture}`);
+      const exported = await copiedState(page);
+      assert.equal(exported.content[section].length, 1);
+      assert.equal(exported.content[section][0].text, `${section} ${gesture}`);
+      await group.getByRole('button', { name: /Delete/ }).click();
+    }
+    // The original Add control still creates one item, without a bubbling duplicate.
+    await group.getByRole('button', { name: 'Add', exact: true }).click();
+    assert.equal(await group.locator('textarea').count(), 1);
+    await group.click({ position: { x: 100, y: 110 } });
+    assert.equal(await group.locator('textarea').count(), 1);
+  }
+});

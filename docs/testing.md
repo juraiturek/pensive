@@ -63,3 +63,9 @@ Executed on 2026-11-01: 14 tests passed (7 state/packaging, 7 Chromium browser);
 Limits: Chromium was exercised, not Safari or Firefox, and mobile checks use a desktop browser viewport rather than a physical phone. Clipboard success is tested with test-context permissions; real browser permissions vary, so the tested manual-copy fallback remains available. No page file-loading test applies because loading was explicitly deferred. JSON import is a validated developer packaging operation, not a product UI. No legacy server suites were run: their server/application dependencies are intentionally absent; regression coverage here exercises the adapted capabilities in the destination implementation. No LLM methodology evaluations apply without AI methods.
 
 If sources change after a recorded run, rerun the relevant tests and refresh the results. The initial tests failed before state operations and canvas implementation existed. Later tests exposed a file-URL decoding bug in paths with spaces and an Add button name polluted by decorative CSS content; both are covered by the final suite.
+
+## Slice-1 UI refinement
+
+The browser-comment refinement removes the introductory paragraph, view-description/hint row, and SWOT empty-state prompts; clipboard JSON export is now primary. Empty SWOT quadrant clicks enter Add mode, with double-clicks creating one draft and retaining editor focus even when the second click lands below the input. Existing Add buttons remain keyboard-accessible. The heading label is now SWOT & TOWS: STRATEGIC ANALYSIS. Contextual help is deferred.
+
+The updated full suite executes 15 tests (7 state/packaging and 8 offline Chromium browser tests), including empty-quadrant editing across all four SWOT sections, deletion/reset, populated-quadrant clicks, and export persistence. README is unchanged; runtime and cross-browser limits above still apply.

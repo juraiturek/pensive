@@ -78,17 +78,30 @@
       list.append(row);
     });
     container.append(list);
-    if (!items.length) container.append(element('p', 'empty', Swot.factors.includes(section) ? 'What belongs here?' : 'What could you do?'));
+    if (!items.length && Swot.strategies.includes(section)) container.append(element('p', 'empty', 'What could you do?'));
     const add = element('button', 'add', 'Add');
     add.setAttribute('aria-label', 'Add');
     add.type = 'button';
-    add.addEventListener('click', () => {
+    function beginItem() {
       const id = Swot.addItem(state, section);
       renderSection(section);
       const input = Array.from(container.querySelectorAll('textarea')).find(node => node.dataset.id === id);
       input.focus();
       edited();
-    });
+    }
+    add.addEventListener('click', beginItem);
+    const emptyFactor = Swot.factors.includes(section) && !items.length;
+    container.classList.toggle('empty-factor', emptyFactor);
+    // Replace the handler on re-render; the second click in a double-click must not add another item.
+    container.onclick = Swot.factors.includes(section) ? event => {
+      if (event.target.closest('button, textarea')) return;
+      const current = Swot.collection(state, section);
+      if (!current.length) beginItem();
+      else if (event.detail === 2 && current.length === 1 && current[0].text === '') {
+        // A second click in the blank area can blur the editor created by the first.
+        container.querySelector('textarea').focus();
+      }
+    } : null;
     container.append(add);
     container.querySelectorAll('textarea').forEach(resize);
   }
@@ -109,8 +122,6 @@
     $('#tows-view').hidden = mode !== 'tows';
     $('#swot-toggle').setAttribute('aria-pressed', String(mode === 'swot'));
     $('#tows-toggle').setAttribute('aria-pressed', String(mode === 'tows'));
-    $('#view-description').textContent = mode === 'swot' ? 'A clear view of your internal and external landscape.' : 'Connect your factors to deliberate, practical moves.';
-    $('#view-hint').textContent = mode === 'swot' ? 'Add one factor at a time' : 'Write strategies manually · no AI required';
     document.querySelectorAll(`#${mode}-view textarea`).forEach(resize);
   }
   async function copyState() {
