@@ -1,8 +1,8 @@
 # Minimal framework package contract
 
-Status: architecture contract. No framework packages exist yet. Implement concrete manifest fields with the first slice and explicitly version breaking contract changes.
+Status: the SWOT/TOWS package implements this contract for manual capabilities. Explicitly version breaking contract changes.
 
-Future packages live at `../frameworks/<id>/` relative to this reference directory. Each owns `framework.yaml`, `canvas.schema.json`, `canvas.html`, and specialized Markdown methods in `prompts/` as needed. Manifest resource paths stay inside the package, except explicit references to shared methods within the skill.
+Packages live at `../frameworks/<id>/` relative to this reference directory. Each owns `framework.yaml`, `canvas.schema.json`, `canvas.html`, and specialized Markdown methods in `prompts/` as needed. Manifest resource paths stay inside the package, except explicit references to shared methods within the skill.
 
 | Declaration | Meaning |
 | --- | --- |
@@ -19,4 +19,10 @@ Generic action reuse requires an explicit mapping from method concepts and targe
 
 Future organization-specific packages can satisfy this contract through an explicitly configured local path. Discovery, permissions, installation, registries, and commercial distribution are deferred. No private package is implicitly trusted or loaded.
 
-Acceptance granularity: The initial implementation supports accepting or rejecting an entire AI transformation at canvas level. Section-level acceptance, corresponding to a declared framework field or collection, may be introduced later. Acceptance of individual items within a section is outside the current scope. Node-level action targeting does not imply node-level acceptance.
+Future AI acceptance granularity: The first AI implementation will support accepting or rejecting an entire AI transformation at canvas level. Section-level acceptance, corresponding to a declared framework field or collection, may be introduced later. Acceptance of individual items within a section is outside the current scope. Node-level action targeting does not imply node-level acceptance.
+
+## Slice-1 manifest convention
+
+`framework.yaml` uses `id`, `name`, `package_version`, `schema_version`, `state_schema`, `canvas`, `semantics`, `manual_capabilities`, `ai_actions`, `target_types`, `action_compatibility`, `quality_criteria`, and `acceptance`. Schema/canvas paths are package-local. In SWOT, `ai_actions` and `action_compatibility` are empty; there are no reasoning methods or acceptance operations yet. A declaration is not a runtime discovery mechanism.
+
+The committed `canvas.html` is standalone. Separate source markup, styles, state operations, and UI runtime are assembled by the small SWOT-specific packaging script. No source file is loaded over the network when opening HTML.

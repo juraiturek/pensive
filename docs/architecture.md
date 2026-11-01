@@ -4,7 +4,7 @@
 
 README.md remains the unchanged authoritative product vision and design reference. This document records the approved slice-0 architecture and refines its illustrative layout and sequencing. The user reports V1/V2 audits complete; source folders and audit artifacts are unavailable here. No extraction findings are invented.
 
-Slice 0 delivers an instruction-only skill and contracts. No framework can yet be initialized or transformed.
+Slice 0 established the skill and contracts. Slice 1 adds a working, manually editable standalone SWOT/TOWS package. AI transformations remain unavailable.
 
 ## Responsibilities
 
@@ -55,3 +55,17 @@ Preserve and checksum README.md; initialize local Git; create the approved devel
 - Installed skill-creator guidance informs concise orchestration and conditional references.
 
 Use `references/` instead of the README's illustrative `guidance/`. Defer example frameworks, assets, examples, extraction map, and license until needed. Do not rewrite the README's status or roadmap wording to reflect these implementation details.
+
+## Slice 1: standalone SWOT/TOWS
+
+V1 supplies the default SWOT / expanded TOWS interaction model; V2 supplies selected visual and semantic cues. See [extraction-map.md](extraction-map.md) for provenance and adaptations. The README remains unchanged.
+
+- Canonical state is `framework: swot`, `schema_version: 1.0`, and framework-owned `content`: framing, four factor collections, and four strategy collections. Items use stable `{id, text}` objects. JSON Schema defines structural validity; the shared Node/browser state utility additionally rejects duplicate IDs across collections.
+- Empty framing, empty collections, and blank draft text are structurally valid. No legacy character/item caps or text-based identity/deduplication are inherited. IDs use an ASCII letter/digit prefix followed by letters, digits, underscores, or hyphens, at most 128 characters. New IDs use prefixed UUIDs.
+- SWOT starts as a 2×2 editable factor matrix. An explicit toggle opens TOWS with read-only factor context around editable SO/WO/ST/WT intersections. The subtle count indicates strategy items, including drafts. View selection is transient; every HTML opens in SWOT.
+- The only export controls are complete JSON to clipboard and standalone HTML to file. Clipboard denial exposes selected JSON for manual copying. File loading/import UI and local storage were explicitly deferred by the user after plan approval. JSON round-trip is verified through parsing and deterministic packaging instead of a page importer.
+- Source markup (`canvas.template.html`), CSS (`canvas.css`), state/packaging operations (`state.js`), and UI (`canvas.js`) are separate. The small Node packager builds a committed, directly usable `canvas.html`. Development builds are deterministic; user-state packaging exclusively creates new files and changes only the state slot in established HTML.
+- Browser saving takes a pristine DOM serialization before rendering or event wiring, then replaces only its designated state slot. This preserves script and stylesheet text across successive saves; browser-normalized markup can differ from original source formatting. It never serializes the edited canvas DOM as a replacement implementation.
+- State serialization escapes HTML-sensitive characters, while content rendering uses text nodes and textarea values. Invalid initial state disables editing/export visibly. No backend, template runtime, generic rendering engine, AI integration, proposal machinery, or history is included.
+
+Tests use Node's built-in runner, Ajv and Playwright as development-only dependencies, and a pnpm lockfile. Exported HTML has no external dependencies. See [testing.md](testing.md) for reproducible commands and current limitations.

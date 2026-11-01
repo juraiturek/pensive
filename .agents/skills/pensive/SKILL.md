@@ -7,11 +7,22 @@ description: Create and transform standalone visual thinking canvases using Pens
 
 ## Availability
 
-This repository currently defines architecture only. No framework packages, reasoning actions, canvases, or deterministic utilities are implemented. Explain this limitation for operational requests; do not invent capabilities or generate a substitute canvas. Repository development requires a separately authorized implementation slice.
+SWOT/TOWS is available for manual local editing only. No AI reasoning actions, proposal acceptance, history, file-loading UI, or other frameworks are implemented. Explain unsupported requests without inventing capabilities. Future implementation slices require separate authorization.
+
+## Create or package a SWOT canvas
+
+Read [frameworks/swot/framework.yaml](frameworks/swot/framework.yaml) for SWOT semantics and capabilities. Use the established [canvas.html](frameworks/swot/canvas.html); never regenerate its HTML/CSS/JS with the model.
+
+- For a new blank canvas, copy that standalone file to a new user output path. Never overwrite an existing artifact silently.
+- For supplied complete SWOT JSON, read [canvas.schema.json](frameworks/swot/canvas.schema.json) and [state-action-contract.md](references/state-action-contract.md). Package through `node scripts/package-swot.mjs state.json new-output.html` from this skill directory. The utility validates state, enforces unique identities, and exclusively creates the output file. Invalid input fails without creating output.
+- Return a link to the resulting standalone HTML. It opens locally without a server. The page starts in SWOT; TOWS has read-only factor context and editable strategies. Its count indicator includes blank draft strategies.
+- Explain the two export controls when helpful: Export to clipboard copies complete state JSON (with selectable JSON if clipboard access is blocked); Save to File downloads editable standalone HTML. Edits exist only in the current tab until exported. File loading and local storage are intentionally absent.
+
+The package source is separated into `canvas.template.html`, `canvas.css`, `state.js`, and `canvas.js`. `node scripts/package-swot.mjs` rebuilds the committed blank `canvas.html` deterministically during development; it is not needed to open a canvas.
 
 ## Orchestration
 
-When implementations become available:
+For future supported AI actions (none are available in Slice 1):
 
 1. Interpret the outcome and recognize the framework from explicit user intent or submitted canvas identity. Resolve consequential ambiguity before choosing a framework or action.
 2. Inspect only the selected package. Read [framework-contract.md](references/framework-contract.md) when resolving resources, actions, targets, or compatibility. Report unsupported capabilities; do not silently substitute a framework or action.
