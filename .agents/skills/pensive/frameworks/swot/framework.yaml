@@ -1,6 +1,6 @@
 id: swot
 name: SWOT / TOWS
-package_version: "0.2.0"
+package_version: "0.3.0"
 schema_version: "1.0"
 state_schema: canvas.schema.json
 canvas: canvas.html
@@ -27,13 +27,28 @@ ai_actions:
     method: prompts/create.md
     effect: Initialize a new SWOT draft from available context and brief elicitation.
     required_context: Identifiable entity; agreement to a sparse draft when evidence is limited.
+  - id: strategize
+    method: prompts/strategize.md
+    effect: Propose extending or regenerating TOWS strategies while preserving SWOT factors and framing.
+    required_context: Complete submitted canvas and strategy mode; sparse factors may limit grounded choices.
+  - id: evaluate
+    method: prompts/evaluate.md
+    effect: Add a grounded evaluation thought without modifying analytical content.
+    required_context: Complete submitted canvas and evaluation scope.
+  - id: improve
+    method: prompts/improve.md
+    effect: Propose coherent improvements to factors and strategies with an explanatory thought.
+    required_context: Complete submitted canvas; steering guidance is optional.
 target_types:
   factor: Stable item ID in one of the four SWOT collections.
   strategy: Stable item ID in one of the four TOWS collections.
-action_compatibility: []
+action_compatibility:
+  - {action: strategize, target: canvas}
+  - {action: evaluate, target: canvas}
+  - {action: improve, target: canvas}
 quality_criteria:
   - Distinguish internal factors from external conditions.
   - Relate factors to the stated entity and objective.
   - Use the named factor categories for each strategy pairing.
   - Prefer concrete factors and actionable strategies over vague claims.
-acceptance: Creation produces a reviewable draft without proposals; transformation acceptance is unavailable. Manual edits are direct user operations.
+acceptance: Creation and evaluation require no content acceptance. Strategize and Improve require atomic whole-canvas acceptance or rejection; stale proposals cannot be accepted. Manual edits remain direct user operations.

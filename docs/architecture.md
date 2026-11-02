@@ -74,4 +74,14 @@ Tests use Node's built-in runner, Ajv and Playwright as development-only depende
 
 SKILL.md routes new analysis to framework-specific `prompts/create.md`; the manifest declares create without a dispatcher. One adaptive method uses available conversation and supplied materials, with zero to two question turns total. Sparse stubs require agreement unless already requested; unsupported quadrants may be empty. No objective defaults to a disclosed general assessment lens.
 
-Creation initializes a reviewable AI-authored draft without an action envelope or proposals. The existing schema, state utility, canvas, and two-argument packager stay unchanged. Research recognition/execution, existing-SWOT transformations, and AI TOWS remain future work.
+Creation initializes a reviewable AI-authored draft without an action envelope or proposals. The existing schema, state utility, canvas, and two-argument packager stay unchanged. Research recognition/execution remain future work. Existing-SWOT actions and AI TOWS are implemented in Slice 2B below.
+
+## Slice 2B: guided AI actions
+
+The approved implementation plan is [SWOT AI actions](plans/2026-11-02-swot-ai-actions.md). Three compact controls open a single local dialog: steering guidance, current-thought consideration, strategy extend/replace mode or evaluation scope. It prepares full `{canvas, action}` JSON to paste into a skill-enabled Codex/ChatGPT conversation; there is no API client, background inference, or persistence service.
+
+Three progressively loaded methods derive grounded SO/ST/WO/WT choices, diagnose SWOT/TOWS quality, and improve coherence with an explanatory thought. V1 supplies the TOWS mapping and progressive/input-dialog pattern; V2 supplies canvas-grounded methodological criteria and explaining why/how. Hard item quotas and Jinja/server flows were rejected. Provenance is in [extraction-map.md](extraction-map.md).
+
+The small envelope has optional current `thoughts` and at most one pending `proposals` entry. Existing version-1.0 states remain valid. Evaluate adds a message above the matrix without changing content. Strategize/Improve keep accepted content intact while displaying a candidate explanation and before/after review. The user accepts or rejects the entire transformation locally. A temporary base-content snapshot prevents stale acceptance after local edits and is discarded on resolution; it is not history. Existing annotations remain in the current state.
+
+The deterministic `--result` packager validates the original request, model response shape, framework/action boundaries, exact-text identity preservation, and full result state before creating a new standalone HTML file. Models output data, not proposal internals or UI code. Framing stays unchanged; Strategize leaves all factors unchanged and defaults to preserving existing strategies. Improve relies on methodology for semantic identity across rewritten text, with deterministic checks for unchanged text. No generic action engine, research, section/item acceptance, or node-level actions were introduced.

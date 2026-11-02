@@ -70,3 +70,39 @@ Read-only research used the same V1 snapshot and V2 revision identified above. N
 | V2 `app/services/canvas_ai_service.py:47–84,406–453` | Any nonempty framing enables generation; four outputs merge into saved state. Too permissive as analytical sufficiency. | Adapt framing preservation and output checks; reject gate, replacement, persistence infrastructure. |
 
 Original destination choices: one phased Markdown method, maximum two question turns including sparse-draft agreement, empty unsupported quadrants, evidence-aware generation, initial-draft exception to transformation acceptance, no research. Provenance review is distinct from methodology evaluation and deterministic packaging checks; see testing.md.
+
+## Slice 2B: action methodology and steering
+
+Reviewed on 2026-11-02. V1 remains an unversioned read-only snapshot. V2 is still at revision `a75617205cf342ebe851379ab43db52e35a07a5e`. Only action/wizard/prompt-related material was inspected; no legacy code or dependencies were copied wholesale.
+
+| Source | Useful material / limitation | Adaptation |
+| --- | --- | --- |
+| V1 `static/wizard/wizard.js`, `templates/wizard/wizard.html` | One field at a time, framing retained across steps; tied to schema fetch and server creation. | Compact optional steering dialog, reusing current framing instead of another creation wizard; no fetch/server flow. |
+| V1 `static/swot/swot.js`: initializeStrategyFields, showImproveModal, Strategize/Improve handlers | Manual strategies, free-form instruction and thoughts option; Strategize has no steering and server responses mutate state. | Three local guided request dialogs, full JSON export; reject server calls and automatic mutation. |
+| V1 `prompts/strategize/swot_strategize.j2` | TOWS cross-matching, four named strategy collections; minimal reasoning and arbitrary max-three count. | Markdown Strategize with explicit mechanisms, constraints, uncertainty and extend/replace policy; reject quota. |
+| V1 `prompts/improve/swot_improve.j2`, `prompts/reflect/swot_reflect.j2` | Revised state plus linked thought, or standalone reflection. Very broad instructions. | Explanatory thought and separate Evaluate/Improve effects, typed response contracts and proposal-first delivery. |
+| V2 `templates/partials/canvas_detail_body.html`: reflection/improvement modal sections | Instruction field and recent-thought consideration; HTMX/Alpine backend coupling. | Scope/mode/guidance/consider-thoughts in native local dialog; no framework/server dependencies. |
+| V2 `prompt_templates/user/swot_improve.j2` | Concrete nonduplicative factors, framing preservation, explanation of changes; SWOT-only, mandatory counts/length limits. | Improve factors and existing TOWS coherently, retain IDs, explain meaningful changes; reject quotas. |
+| V2 `prompt_templates/user/swot_guidance.j2`, `docs/decisions/ADR-0002-guidance-method-vs-content.md` | Method-focused but grounded evidence; why/how; no replacement values. | Evaluate selected SWOT/TOWS scope, concrete observations and concise next steps without content replacement. |
+| V2 `prompt_templates/user/swot_reflect.j2` | Optional reflection focus and thoughts, strategic insight; arbitrary short limit. | Useful distinction between thought and content update; use grounded evaluation instead of generic reflection. |
+
+New destination decisions: `{canvas, action}` protocol, current thoughts, temporary whole-canvas proposal/base guard, atomic local acceptance/rejection, explicit extend/replace, stable IDs, and deterministic `--result` packaging. These are new code supporting the approved architecture, not an extraction of legacy application state management. RrEAC: inspect relevant methods/UI, compare methodological value, extract concepts, adjust for stateless explicit JSON and human agency, compile concise Markdown methods. See the [plan](plans/2026-11-02-swot-ai-actions.md) and [methodology observations](../tests/methodology/swot-actions.md).
+
+### Additional exact source identities
+
+| Source | SHA-256 |
+| --- | --- |
+| V1 `static/wizard/wizard.js` | `cba2a2b4c9fbca22e56ded15717c19ca1d6f923d4cc383613abdc09fcc1b6bd1` |
+| V1 `templates/wizard/wizard.html` | `72f489f63ce098706c8ded522672bc441e1ce5ebcfe23de88dd2c1d837841f05` |
+| V1 `app/service/wizard.py` | `dc2139927e13a561ff6322aef704d075893aaeacdb4b5ebd94460f55818eae78` |
+| V1 `static/swot/swot.js` | `bc7519b6dd04be4e3f2b2d575b28a7cdb539390d549d4297a2033358f9e136d3` |
+| V1 `prompts/strategize/swot_strategize.j2` | `49fae33d24ed77327201a633ca6f63b14492b0fcd9077839c62fde79f6e9a662` |
+| V1 `prompts/improve/swot_improve.j2` | `3509908e6f5666d07f0353a7f1cc07694949efe43b6953dfc7cafc41934da9ae` |
+| V1 `prompts/reflect/swot_reflect.j2` | `331d88111f6f327d728cbf1e482e9a225ef40b9a52344a5c80b4fad0d840eb51` |
+| V2 `templates/partials/canvas_detail_body.html` | `d54c90b3e6bf36a550b3949b159e30775ecfdbe5e0f3fd814c29280283e8bbab` |
+| V2 `prompt_templates/user/swot_improve.j2` | `a04682dd84c756016447d32bccc7119460d2250bb2365f887bdb38dcc116fe27` |
+| V2 `prompt_templates/user/swot_guidance.j2` | `4c8d70b5901627ca8aa481fb96124ec23171c97aa76037caefae220a4b66feeb` |
+| V2 `prompt_templates/user/swot_reflect.j2` | `a9db8c1e33bfc38684ed160c56451f2c8eac2b457987488656944beba6afb824` |
+| V2 `docs/decisions/ADR-0002-guidance-method-vs-content.md` | `197c793824a092ea326241ff64d4cfb33cf4bd605f84af3400f3d73b4300667c` |
+
+Verification: full destination tests, observed methodology sample, skill validation, and reference/integrity checks are recorded in [testing.md](testing.md). Legacy server suites were not run; destination regressions exercise the adapted behavior without obsolete infrastructure.

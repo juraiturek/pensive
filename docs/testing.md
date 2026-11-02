@@ -86,3 +86,20 @@ Executed checks:
 - `git diff --check`: passed. README SHA-256 matches the documented unchanged value.
 
 No schema, state utility, packager, HTML, CSS, or canvas JavaScript changed. Browser results cover the existing Chromium workflow, not other browser engines. No research, legacy server tests, acceptance machinery, or live-user elicitation tests were performed. No commit or push was made.
+
+## Slice 2B: guided Strategize / Evaluate / Improve
+
+Executed on 2026-11-02:
+
+- `PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright node --test tests/*.test.mjs`: **28 passed, 0 failed/skipped** (15 state/result-packaging, 13 offline Chromium browser tests). The actual command used the bundled Node executable and elevated macOS process access, as in prior browser runs.
+- Skill-creator `quick_validate.py` with temporary PyYAML dependency path: passed.
+- Local Markdown references: 34 links resolved before adding this record. README SHA-256 unchanged; `git diff --check` passed. V2 tracked diff is empty at the recorded revision; V1 files remain read-only with recorded source hashes.
+- Desktop/mobile screenshots for the action dialog and proposal review were generated and visually inspected.
+
+New automated coverage verifies complete cloned requests and steering/scope/mode, actual clipboard plus denied-copy fallback, cancel/Escape, evaluation-only thoughts above the matrix, current annotation preservation, candidate-before-acceptance behavior, whole-canvas acceptance/rejection, stale acceptance leaving local edits intact, Strategize boundaries and extend preservation, exact-text stable IDs, malformed metadata, adversarial thoughts/candidates, result CLI validity/no-output-on-error, and multiple action cycles. Existing manual editing, view, identity, offline operation, safe embedding and saved-file regressions remain in the full run.
+
+An independent code review found an exact-text re-identification gap in Improve. A failing test reproduced it; the deterministic boundary now rejects replacing unchanged text with a new ID while allowing consolidation onto an existing matching ID. Semantic identity across rewritten text still requires methodological judgment.
+
+Separately, an independent read-only methodology forward-test applied all three methods to one synthetic constrained pottery-studio scenario. The first Evaluate output was overly long; after narrowing the default guidance, a second run returned a compact five-sentence assessment. Actual retained inputs/outputs are in `tests/methodology/swot-actions-observed.json`, with observations and remaining scenarios in `tests/methodology/swot-actions.md`. The deterministic suite also composes/packages those observed responses, which establishes protocol compatibility, not analytical quality in general.
+
+Limits: no live API calls are made by this product or these tests. One synthetic methodological case is not a statistical model evaluation or live-user study. Browser behavior was exercised in Chromium at desktop/mobile widths, not Safari/Firefox or physical devices. No old server regression suites were run; required adapted behavior is covered in destination tests. Research, generic node actions, section/item acceptance, history, file loading and local storage remain out of scope. The original creation workflow remains available and its methodological routing scenarios were updated to recognize the separately implemented transformations.

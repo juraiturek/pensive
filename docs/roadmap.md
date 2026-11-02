@@ -6,8 +6,8 @@ This approved sequence refines the README's broad phases without editing the aut
 | --- | --- | --- |
 | 0 | Independent local repository, skill skeleton, minimal contracts, documented testing infrastructure strategy. | Skill validation, reference checks, unchanged README, scope review; no legacy code. |
 | 1 — delivered | Standalone manually editable SWOT/TOWS canvas. | Offline editing, stable IDs, validation, clipboard JSON, saved HTML round-trip, safe embedding, extraction provenance. File-loading UI deferred by user. |
-| 2A | New SWOT from context and at most two question turns; agreed sparse drafts. | Methodology scenarios, complete-state packaging, existing canvas regressions. |
-| 2B | SWOT/TOWS Strategize and proposal acceptance. | Full requests, content/proposal preservation, explicit acceptance/rejection, invalid/stale acceptance safety, second transformation cycle. |
+| 2A — delivered | New SWOT from context and at most two question turns; agreed sparse drafts. | Methodology scenarios, complete-state packaging, existing canvas regressions. |
+| 2B — delivered | Guided Strategize, Evaluate, Improve; current thoughts and whole-canvas proposal acceptance. | Full requests, content/proposal preservation, explicit acceptance/rejection, invalid/stale acceptance safety, second transformation cycle. |
 | 3 | First generic node-level reasoning action. | Explicit targets, compatibility enforcement, methodology evaluation, SWOT regressions. |
 | 4 | Standalone VPC canvas. | Distinctive semantics and visuals, offline editing and round-trip, SWOT/VPC regressions. |
 | 5 | Generic action reuse and VPC fit assessment. | Explicit concept/target mapping, fit evaluation, cross-framework proposal regressions. |
@@ -17,6 +17,6 @@ This approved sequence refines the README's broad phases without editing the aut
 
 For each vertical slice, inspect relevant read-only references, integrate minimal material, test, and record provenance. Avoid premature framework packages, generic runtimes, package discovery, distribution, or history. Choose licensing before public release. Remote creation and pushes require explicit authorization.
 
-Slice 1 includes manual SO/ST/WO/WT strategies and read-only factor context in TOWS. Slice 2B still owns AI Strategize and proposal acceptance; none of that functionality was brought forward.
+Slice 1 includes manual SO/ST/WO/WT strategies and read-only factor context in TOWS. Slice 2B adds the separately authorized AI actions and whole-canvas proposal acceptance; Slice 1 did not include them.
 
 Future user story: recognize when external research would improve SWOT creation and execute appropriate web searches. Slice 2A uses available conversation and supplied materials only.

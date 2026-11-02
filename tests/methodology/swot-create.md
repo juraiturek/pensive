@@ -12,8 +12,8 @@ Run in a fresh skill-loaded conversation; assess behavior, not identical wording
 | Conflict: earlier goal new region; latest user says “Correction: stay local.” | Use explicit correction without a redundant confirmation. Ask only for an unresolved consequential conflict. |
 | Budget: after two assistant question turns, answers remain thin. | Generate if sparse-draft intent is already clear. Otherwise the second turn must have offered the sparse fallback; wait for that answer, never ask a third question. |
 | No entity: “Make a SWOT,” followed by “I don't know; no questions.” | Offer/create the existing blank canvas; do not choose an entity. |
-| Existing state: complete edited SWOT plus “improve this.” | Explain unsupported refinement; never route to creation or replace edits. |
-| Boundary: request SWOT creation plus TOWS or automatic research. | Explain those parts are unsupported; create only the requested SWOT if enough supplied context or agreed stub intent. |
+| Existing state: complete edited SWOT plus “improve this.” | Route to Improve using the submitted state; never route to creation or silently replace edits. |
+| Boundary: request SWOT creation plus TOWS or automatic research. | Creation initializes SWOT only; TOWS can follow via the separate Strategize action after state exists. Research remains unsupported. Use sufficient supplied context or agreed stub intent. |
 
 Rubric: correct routing; zero questions for sufficient context; at most two question turns; explicit agreement for limited-information fallback unless already requested; no fabricated factors; internal/external fidelity; uncertainty survives in text/framing; complete schema-valid state; globally unique IDs; empty strategy arrays; new artifact; established canvas preserved.
 
