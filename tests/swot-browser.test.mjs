@@ -238,3 +238,102 @@ test('blank space below existing SWOT factors adds the next focused bullet', asy
     assert.equal(await group.locator('textarea').count(), 3);
   }
 });
+
+test('all three AI dialogs export complete current state with steering and action options offline', async t => {
+  const page = await openCanvas(t);
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await add(page, 'strengths', 'Current manual edit');
+  for (const id of ['strategize', 'evaluate', 'improve']) {
+    const title = { strategize: 'Strategize', evaluate: 'Evaluate', improve: 'Improve' }[id];
+    await page.getByRole('button', { name: title, exact: true }).click();
+    await page.getByLabel('Steering guidance').fill(`Prioritize practical ${id}`);
+    if (id === 'evaluate') await page.locator('#ai-form').getByLabel('Evaluate', { exact: true }).selectOption('tows');
+    if (id === 'strategize') await page.getByLabel('Strategy mode').selectOption('replace');
+    await page.getByLabel('Use existing thoughts as guidance').uncheck();
+    if (id === 'improve') await page.screenshot({ path: 'test-results/ai-dialog-desktop.png', fullPage: true, animations: 'disabled' });
+    await page.getByRole('button', { name: 'Copy AI request', exact: true }).click();
+    await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Copied AI request'));
+    const request = JSON.parse(await page.evaluate(() => navigator.clipboard.readText()));
+    assert.deepEqual(Object.keys(request), ['canvas', 'action']);
+    assert.equal(request.canvas.content.strengths[0].text, 'Current manual edit');
+    assert.equal(request.action.id, id);
+    assert.equal(request.action.comment, `Prioritize practical ${id}`);
+    assert.equal(request.action.use_thoughts, false);
+    if (id === 'evaluate') assert.equal(request.action.scope, 'tows');
+    if (id === 'strategize') assert.equal(request.action.mode, 'replace');
+    assert.equal(await page.locator('#ai-dialog').isVisible(), false);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Evaluate', exact: true }).click();
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await page.screenshot({ path: 'test-results/ai-dialog-mobile.png', fullPage: true, animations: 'disabled' });
+});
+
+test('evaluation thought appears above the matrix and survives HTML save without changing factors', async t => {
+  const core = require(fileURLToPath(new URL('state.js', root)));
+  const initial = core.initialState(); initial.content.strengths.push({ id: 's1', text: 'Expert staff' });
+  const state = core.composeResult(core.buildRequest(initial, { id: 'evaluate', scope: 'both', comment: '', use_thoughts: true }), { thought: '</script><img src=x onerror=alert(1)> Check evidence for the external risk.' });
+  const page = await openCanvas(t, state);
+  assert.ok((await page.locator('#thoughts').textContent()).includes('Check evidence'));
+  assert.equal(await page.locator('img').count(), 0);
+  const thoughtsBox = await page.locator('#thoughts').boundingBox();
+  const matrixBox = await page.locator('#swot-view').boundingBox();
+  assert.ok(thoughtsBox.y < matrixBox.y);
+  assert.deepEqual((await copiedState(page)).content, initial.content);
+  const path = await save(page, 'thought.html'); await page.goto(pathToFileURL(path).href);
+  assert.deepEqual((await copiedState(page)).thoughts, state.thoughts);
+});
+
+test('whole-canvas proposals can be reviewed, accepted or rejected and remain safe after local edits', async t => {
+  const core = require(fileURLToPath(new URL('state.js', root)));
+  const initial = core.initialState(); initial.content.strengths.push({ id: 's1', text: 'Original' });
+  const content = structuredClone(initial.content); content.strengths[0].text = 'Improved';
+  const proposed = core.composeResult(core.buildRequest(initial, { id: 'improve', comment: '', use_thoughts: true }), { content, thought: 'Improved specificity while preserving the factor identity.' });
+  const page = await openCanvas(t, proposed);
+  assert.equal(await page.locator('[data-section="strengths"] textarea').inputValue(), 'Original');
+  assert.equal(await page.getByRole('button', { name: 'Improve', exact: true }).isDisabled(), true);
+  await page.getByText('Review proposed changes', { exact: true }).click();
+  assert.ok((await page.locator('#proposal-panel').textContent()).includes('Improved'));
+  await page.screenshot({ path: 'test-results/ai-proposal-desktop.png', fullPage: true, animations: 'disabled' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await page.screenshot({ path: 'test-results/ai-proposal-mobile.png', fullPage: true, animations: 'disabled' });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const saved = await save(page, 'proposal.html');
+  await page.getByRole('button', { name: 'Accept transformation', exact: true }).click();
+  assert.equal(await page.locator('[data-section="strengths"] textarea').inputValue(), 'Improved');
+  assert.ok((await page.locator('#thoughts').textContent()).includes('Improved specificity'));
+  assert.equal((await copiedState(page)).content.strengths[0].id, 's1');
+  await page.goto(pathToFileURL(saved).href);
+  await page.locator('[data-section="strengths"] textarea').fill('Later user edit');
+  await page.getByRole('button', { name: 'Accept transformation', exact: true }).click();
+  assert.ok((await page.locator('#status').textContent()).includes('changed'));
+  assert.equal(await page.locator('[data-section="strengths"] textarea').inputValue(), 'Later user edit');
+  await page.getByRole('button', { name: 'Reject transformation', exact: true }).click();
+  assert.equal(await page.locator('#proposal-panel').isVisible(), false);
+  assert.equal(await page.locator('[data-section="strengths"] textarea').inputValue(), 'Later user edit');
+  assert.equal((await copiedState(page)).thoughts?.length || 0, 0);
+});
+
+test('AI dialog cancellation and denied clipboard leave canvas unchanged and expose the complete request', async t => {
+  const page = await openCanvas(t);
+  await add(page, 'strengths', 'Keep this factor');
+  const before = await copiedState(page);
+  await page.getByRole('button', { name: 'Improve', exact: true }).click();
+  await page.getByLabel('Steering guidance').fill('Canceled guidance');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  assert.deepEqual(await copiedState(page), before);
+  await page.getByRole('button', { name: 'Evaluate', exact: true }).click();
+  assert.equal(await page.getByLabel('Steering guidance').inputValue(), '');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#ai-dialog').isVisible(), false);
+  await page.evaluate(() => { Object.defineProperty(navigator, 'clipboard', { value: { writeText: async () => { throw new Error('Denied'); } } }); });
+  await page.getByRole('button', { name: 'Strategize', exact: true }).click();
+  await page.getByLabel('Steering guidance').fill('Preserve our constraints');
+  await page.getByRole('button', { name: 'Copy AI request', exact: true }).click();
+  await page.waitForSelector('#clipboard-fallback:not([hidden])');
+  const request = JSON.parse(await page.getByLabel('Canvas JSON').inputValue());
+  assert.deepEqual(request.canvas, before);
+  assert.equal(request.action.comment, 'Preserve our constraints');
+  assert.equal(request.action.mode, 'extend');
+});

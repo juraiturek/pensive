@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Pensive SWOT/TOWS state 1.0",
-  "$comment": "Item IDs must additionally be unique across all factor and strategy collections; state.js enforces this semantic invariant.",
+  "$comment": "Item IDs must additionally be unique across all factor and strategy collections; state.js enforces this semantic invariant. Optional thoughts/proposals extend version 1.0 without invalidating prior states. Action boundaries, cross-collection identity uniqueness and stale-acceptance checks are additionally enforced by state.js.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,6 +15,72 @@
     },
     "schema_version": {
       "const": "1.0"
+    },
+    "content": {
+      "$ref": "#/$defs/content"
+    },
+    "thoughts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/thought"
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "action",
+          "base_content",
+          "content",
+          "thought"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+          },
+          "action": {
+            "enum": [
+              "strategize",
+              "improve"
+            ]
+          },
+          "base_content": {
+            "$ref": "#/$defs/content"
+          },
+          "content": {
+            "$ref": "#/$defs/content"
+          },
+          "thought": {
+            "$ref": "#/$defs/thought"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
     },
     "content": {
       "type": "object",
@@ -109,14 +175,13 @@
           }
         }
       }
-    }
-  },
-  "$defs": {
-    "item": {
+    },
+    "thought": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "id",
+        "kind",
         "text"
       ],
       "properties": {
@@ -125,8 +190,16 @@
           "maxLength": 128,
           "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
         },
+        "kind": {
+          "enum": [
+            "evaluation",
+            "improvement",
+            "strategize"
+          ]
+        },
         "text": {
-          "type": "string"
+          "type": "string",
+          "pattern": "\\S"
         }
       }
     }

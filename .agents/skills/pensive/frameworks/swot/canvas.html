@@ -110,6 +110,32 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem
   footer { flex-direction: column; gap: .2rem; }
 }
 @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+
+/* Local AI request preparation and whole-canvas review, not an API client. */
+.toolbar { flex-wrap: wrap; }
+.ai-actions { display: flex; flex-wrap: wrap; gap: .35rem; font-size: .76rem; }
+.thoughts, .proposal-panel { margin: .5rem 0 1.25rem; }
+.thought, .proposal-panel { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 5px; padding: 1rem 1.2rem; }
+.thought + .thought { margin-top: .5rem; }
+.thought h3, .proposal-panel h3 { font-size: .8rem; margin: 0 0 .4rem; color: var(--accent); }
+.thought p, .proposal-panel p { font-size: .85rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.proposal-panel summary { font-size: .8rem; padding: .8rem 0; }
+.proposal-actions { display: flex; flex-wrap: wrap; gap: .5rem; font-size: .8rem; margin-top: .6rem; }
+.proposal-diff { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; border-top: 1px solid var(--line); padding: .8rem 0; }
+.proposal-diff h4 { grid-column: 1 / -1; margin: 0; font-size: .85rem; }
+.proposal-diff ul { padding-left: 1.2rem; font-size: .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.proposal-diff strong { font-size: .75rem; }
+dialog { width: min(540px, calc(100% - 2rem)); max-height: calc(100% - 2rem); overflow: auto; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1.5rem; }
+dialog::backdrop { background: #26332866; }
+dialog h2 { margin-bottom: .7rem; }
+dialog label { display: block; font-size: .8rem; font-weight: 600; margin: 1rem 0 .4rem; }
+dialog .dialog-note { font-size: .8rem; color: var(--muted); }
+dialog select { width: 100%; padding: .55rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: .85rem; }
+dialog select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+dialog textarea { display: block; font-size: .9rem; }
+.checkbox-label { display: flex; align-items: center; gap: .5rem; font-weight: 400; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1.2rem; font-size: .8rem; }
+@media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
 <body>
@@ -128,8 +154,15 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem
         <button id="swot-toggle" type="button" aria-pressed="true" aria-controls="swot-view">SWOT</button>
         <button id="tows-toggle" type="button" aria-pressed="false" aria-controls="tows-view">TOWS <span id="tows-count" class="count" title="No strategies yet">0</span></button>
       </div>
+      <div class="ai-actions" role="group" aria-label="Request AI action">
+        <button type="button" data-ai="strategize" title="Derive SO/ST/WO/WT strategies from SWOT">Strategize</button>
+        <button type="button" data-ai="evaluate" title="Evaluate SWOT, TOWS, or both">Evaluate</button>
+        <button type="button" data-ai="improve" title="Improve the current SWOT/TOWS">Improve</button>
+      </div>
       <div class="export-actions"><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
+    <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
     <section id="swot-view" aria-label="SWOT factors">
       <div class="swot-grid">
         <div class="axis corner" aria-hidden="true"></div>
@@ -163,6 +196,18 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem
   </main>
   <footer><span>Less conversation. More thinking.</span><span>SWOT / TOWS <span aria-hidden="true">·</span> Pensive</span></footer>
 </div>
+<dialog id="ai-dialog" aria-labelledby="ai-title">
+  <form id="ai-form">
+    <h2 id="ai-title">Request AI action</h2>
+    <p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill. No AI runs in this page.</p>
+    <div id="strategy-options"><label for="strategy-mode">Strategy mode</label><select id="strategy-mode"><option value="extend">Add to existing strategies</option><option value="replace">Regenerate all strategies</option></select></div>
+    <div id="evaluation-options"><label for="evaluation-scope">Evaluate</label><select id="evaluation-scope"><option value="both">SWOT and TOWS</option><option value="swot">SWOT only</option><option value="tows">TOWS only</option></select></div>
+    <label for="ai-guidance">Steering guidance</label>
+    <textarea id="ai-guidance" rows="4" placeholder="Focus, constraints, trade-offs, evidence to consider…"></textarea>
+    <label class="checkbox-label"><input id="use-thoughts" type="checkbox" checked> Use existing thoughts as guidance</label>
+    <div class="dialog-actions"><button type="button" id="cancel-ai">Cancel</button><button type="submit" class="primary">Copy AI request</button></div>
+  </form>
+</dialog>
 <noscript>This canvas requires JavaScript for local editing and export. No server is needed.</noscript>
 <!--pensive-state-start-->
 <script id="canvas-state" type="application/json">{
@@ -207,27 +252,23 @@ const Swot = (() => {
       }
     };
   }
-  function objectWithKeys(value, keys, path) {
+  function objectWithKeys(value, keys, path, optional = []) {
     if (!value || typeof value !== 'object' || Array.isArray(value) ||
-        Object.keys(value).length !== keys.length ||
+        Object.keys(value).some(key => !keys.includes(key) && !optional.includes(key)) ||
         !keys.every(key => Object.hasOwn(value, key))) {
       throw new Error(`${path}: expected exactly ${keys.join(', ')}.`);
     }
   }
-  function validate(state) {
-    objectWithKeys(state, ['framework', 'schema_version', 'content'], 'Canvas');
-    if (state.framework !== 'swot' || state.schema_version !== '1.0') {
-      throw new Error('Unsupported framework or schema version. Expected swot / 1.0.');
-    }
-    objectWithKeys(state.content, ['framing', ...factors, 'strategies'], 'Content');
-    objectWithKeys(state.content.framing, framing, 'Framing');
+  function validateContent(content) {
+    objectWithKeys(content, ['framing', ...factors, 'strategies'], 'Content');
+    objectWithKeys(content.framing, framing, 'Framing');
     for (const field of framing) {
-      if (typeof state.content.framing[field] !== 'string') throw new Error(`${field}: expected text.`);
+      if (typeof content.framing[field] !== 'string') throw new Error(`${field}: expected text.`);
     }
-    objectWithKeys(state.content.strategies, strategies, 'Strategies');
+    objectWithKeys(content.strategies, strategies, 'Strategies');
     const ids = new Set();
     for (const section of [...factors, ...strategies]) {
-      const items = collection(state, section);
+      const items = collection({ content }, section);
       if (!Array.isArray(items)) throw new Error(`${section}: expected an array.`);
       for (const item of items) {
         objectWithKeys(item, ['id', 'text'], section);
@@ -237,6 +278,39 @@ const Swot = (() => {
         if (typeof item.text !== 'string') throw new Error(`${section}: item text must be a string.`);
         if (ids.has(item.id)) throw new Error(`Duplicate item ID: ${item.id}.`);
         ids.add(item.id);
+      }
+    }
+    return ids;
+  }
+  function validateThought(thought, ids) {
+    objectWithKeys(thought, ['id', 'kind', 'text'], 'Thought');
+    if (typeof thought.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(thought.id) || ids.has(thought.id)) throw new Error('Invalid or duplicate thought ID.');
+    if (!['evaluation', 'improvement', 'strategize'].includes(thought.kind) || typeof thought.text !== 'string' || !thought.text.trim()) throw new Error('Thought requires a supported kind and nonempty text.');
+    ids.add(thought.id);
+  }
+  function validate(state) {
+    objectWithKeys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals']);
+    if (state.framework !== 'swot' || state.schema_version !== '1.0') throw new Error('Unsupported framework or schema version. Expected swot / 1.0.');
+    const ids = validateContent(state.content);
+    if (state.thoughts !== undefined) {
+      if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
+      for (const thought of state.thoughts) validateThought(thought, ids);
+    }
+    if (state.proposals !== undefined) {
+      if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one whole-canvas proposal is supported.');
+      for (const proposal of state.proposals) {
+        objectWithKeys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal');
+        if (typeof proposal.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(proposal.id) || ids.has(proposal.id)) throw new Error('Invalid or duplicate proposal ID.');
+        ids.add(proposal.id);
+        if (!['strategize', 'improve'].includes(proposal.action)) throw new Error('Unsupported proposal action.');
+        validateContent(proposal.base_content);
+        const nextIds = validateContent(proposal.content);
+        for (const thought of state.thoughts || []) if (nextIds.has(thought.id)) throw new Error('Proposed item collides with a thought ID.');
+        if (nextIds.has(proposal.id)) throw new Error('Proposed item collides with proposal ID.');
+        validateThought(proposal.thought, ids);
+        if (nextIds.has(proposal.thought.id)) throw new Error('Proposed item collides with proposal thought ID.');
+        if (proposal.thought.kind !== (proposal.action === 'improve' ? 'improvement' : 'strategize')) throw new Error('Proposal thought kind must match its action.');
+        checkBoundary(proposal.base_content, proposal.content, proposal.action);
       }
     }
     return state;
@@ -272,6 +346,84 @@ const Swot = (() => {
     const { items, index } = locate(state, section, id);
     items.splice(index, 1);
   }
+  function same(a, b) {
+    if (a === b) return true;
+    if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
+    const keys = Object.keys(a);
+    return keys.length === Object.keys(b).length && keys.every(key => Object.hasOwn(b, key) && same(a[key], b[key]));
+  }
+  function checkBoundary(before, after, action) {
+    const previous = [...factors, ...strategies].flatMap(key => collection({ content: before }, key));
+    const next = [...factors, ...strategies].flatMap(key => collection({ content: after }, key));
+    for (const item of next) {
+      const matching = previous.filter(old => old.text === item.text);
+      if (matching.length && !matching.some(old => old.id === item.id)) throw new Error('Retained item text must preserve an existing matching ID.');
+    }
+    if (!same(before.framing, after.framing)) throw new Error('AI actions must preserve framing.');
+    if (action === 'strategize' && factors.some(key => !same(before[key], after[key]))) throw new Error('Strategize must preserve all SWOT factors.');
+  }
+  function buildRequest(state, action) {
+    validate(state);
+    if (state.proposals?.length) throw new Error('Accept or reject the pending proposal before requesting another AI action.');
+    const id = action?.id;
+    if (!['strategize', 'evaluate', 'improve'].includes(id)) throw new Error('Unsupported AI action.');
+    const optional = ['comment', 'use_thoughts', ...(id === 'strategize' ? ['mode'] : id === 'evaluate' ? ['scope'] : [])];
+    objectWithKeys(action, ['id'], 'Action', optional);
+    const normalized = { id, comment: action.comment === undefined ? '' : action.comment, use_thoughts: action.use_thoughts === undefined ? true : action.use_thoughts };
+    if (typeof normalized.comment !== 'string' || typeof normalized.use_thoughts !== 'boolean') throw new Error('Invalid action guidance.');
+    if (id === 'strategize') {
+      normalized.mode = action.mode === undefined ? 'extend' : action.mode;
+      if (!['extend', 'replace'].includes(normalized.mode)) throw new Error('Unsupported strategy mode.');
+    }
+    if (id === 'evaluate') {
+      normalized.scope = action.scope === undefined ? 'both' : action.scope;
+      if (!['swot', 'tows', 'both'].includes(normalized.scope)) throw new Error('Unsupported evaluation scope.');
+    }
+    return { canvas: structuredClone(state), action: normalized };
+  }
+  function validateRequest(request) {
+    objectWithKeys(request, ['canvas', 'action'], 'Request');
+    return buildRequest(request.canvas, request.action);
+  }
+  function composeResult(input, response) {
+    const request = validateRequest(input);
+    const { canvas, action } = request;
+    objectWithKeys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'AI response');
+    if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('A nonempty explanatory thought is required.');
+    const thought = { id: `thought-${globalThis.crypto.randomUUID()}`, kind: action.id === 'evaluate' ? 'evaluation' : action.id === 'improve' ? 'improvement' : 'strategize', text: response.thought };
+    if (action.id === 'evaluate') {
+      canvas.thoughts = [...(canvas.thoughts || []), thought];
+    } else {
+      validateContent(response.content);
+      checkBoundary(canvas.content, response.content, action.id);
+      if (action.id === 'strategize' && action.mode === 'extend') {
+        for (const key of strategies) {
+          for (const item of canvas.content.strategies[key]) {
+            if (!response.content.strategies[key].some(next => same(next, item))) throw new Error('Extend mode must preserve every existing strategy unchanged.');
+          }
+        }
+      }
+      canvas.proposals = [{ id: `proposal-${globalThis.crypto.randomUUID()}`, action: action.id, base_content: structuredClone(canvas.content), content: structuredClone(response.content), thought }];
+    }
+    return validate(canvas);
+  }
+  function acceptProposal(state) {
+    validate(state);
+    const proposal = state.proposals?.[0];
+    if (!proposal) throw new Error('No pending proposal.');
+    if (!same(state.content, proposal.base_content)) throw new Error('Canvas content changed after this proposal; reject it and request a fresh transformation.');
+    const next = structuredClone(state);
+    next.content = structuredClone(proposal.content);
+    next.thoughts = [...(next.thoughts || []), structuredClone(proposal.thought)];
+    next.proposals = [];
+    validate(next);
+    Object.assign(state, next);
+  }
+  function rejectProposal(state) {
+    validate(state);
+    if (!state.proposals?.length) throw new Error('No pending proposal.');
+    state.proposals = [];
+  }
   function safeJson(state) {
     validate(state);
     return JSON.stringify(state, null, 2).replace(/[<>&\u2028\u2029]/g,
@@ -288,7 +440,7 @@ const Swot = (() => {
     const slot = `${start}\n<script id="canvas-state" type="application/json">${json}<${'/script>'}\n${end}`;
     return html.slice(0, first) + slot + html.slice(last + end.length);
   }
-  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, safeJson, packageHtml });
+  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, buildRequest, validateRequest, composeResult, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
 </script>
@@ -311,6 +463,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
   let state;
   let mode = 'swot';
+  let requestedAction = null;
   function status(message, error = false) {
     $('#status').textContent = message;
     $('#status').classList.toggle('error', error);
@@ -420,12 +573,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     $('#tows-toggle').setAttribute('aria-pressed', String(mode === 'tows'));
     document.querySelectorAll(`#${mode}-view textarea`).forEach(resize);
   }
-  async function copyState() {
-    const json = JSON.stringify(Swot.validate(state), null, 2);
+  async function copyJson(json, message) {
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
-      status('Copied complete canvas JSON to clipboard.');
+      status(message);
     } catch {
       $('#clipboard-fallback').hidden = false;
       $('#clipboard-json').value = json;
@@ -433,6 +585,77 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
       $('#clipboard-json').select();
       status('Clipboard access blocked. Copy the selected JSON below.', true);
     }
+  }
+  function copyState() {
+    return copyJson(JSON.stringify(Swot.validate(state), null, 2), 'Copied complete canvas JSON to clipboard.');
+  }
+  function openAction(id) {
+    if (state.proposals?.length) { status('Accept or reject the pending proposal first.', true); return; }
+    requestedAction = id;
+    $('#ai-form').reset();
+    $('#ai-title').textContent = { strategize: 'Strategize', evaluate: 'Evaluate', improve: 'Improve' }[id];
+    $('#strategy-options').hidden = id !== 'strategize';
+    $('#evaluation-options').hidden = id !== 'evaluate';
+    $('#ai-dialog').showModal();
+    $('#ai-guidance').focus();
+  }
+  function refreshCanvas() {
+    for (const field of Swot.framing) $(`[data-framing="${field}"]`).value = state.content.framing[field];
+    for (const section of [...Swot.factors, ...Swot.strategies]) renderSection(section);
+    countStrategies();
+    setMode(mode);
+    renderAI();
+  }
+  function renderAI() {
+    const thoughts = $('#thoughts');
+    thoughts.replaceChildren();
+    thoughts.hidden = !state.thoughts?.length;
+    for (const thought of state.thoughts || []) {
+      const card = element('article', 'thought');
+      card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', strategize: 'Strategy rationale' }[thought.kind]), element('p', '', thought.text));
+      thoughts.append(card);
+    }
+    const proposal = state.proposals?.[0];
+    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
+    const panel = $('#proposal-panel');
+    panel.replaceChildren();
+    panel.hidden = !proposal;
+    if (!proposal) return;
+    panel.append(element('h3', '', proposal.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements'), element('p', '', proposal.thought.text));
+    const review = element('details');
+    review.append(element('summary', '', 'Review proposed changes'));
+    for (const section of [...Swot.factors, ...Swot.strategies]) {
+      const before = Swot.collection(state, section);
+      const after = Swot.collection({ content: proposal.content }, section);
+      if (JSON.stringify(before) === JSON.stringify(after)) continue;
+      const diff = element('div', 'proposal-diff');
+      diff.append(element('h4', '', labels[section][0]));
+      for (const [label, items] of [['Current', before], ['Proposed', after]]) {
+        const column = element('div');
+        column.append(element('strong', '', label));
+        const list = element('ul');
+        for (const item of items) list.append(element('li', '', item.text || '(Blank draft)'));
+        if (!items.length) list.append(element('li', '', '(Empty)'));
+        column.append(list); diff.append(column);
+      }
+      review.append(diff);
+    }
+    panel.append(review);
+    const actions = element('div', 'proposal-actions');
+    for (const [label, apply] of [['Accept transformation', Swot.acceptProposal], ['Reject transformation', Swot.rejectProposal]]) {
+      const button = element('button', label.startsWith('Accept') ? 'primary' : '', label);
+      button.type = 'button';
+      button.addEventListener('click', () => {
+        try {
+          apply(state);
+          refreshCanvas();
+          $('#clipboard-fallback').hidden = true;
+          status(label.startsWith('Accept') ? 'Transformation accepted. Export or save to keep this state.' : 'Transformation rejected. Your current content is unchanged.');
+        } catch (error) { status(error.message, true); }
+      });
+      actions.append(button);
+    }
+    panel.append(actions);
   }
   function saveFile() {
     try {
@@ -458,6 +681,20 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     for (const section of [...Swot.factors, ...Swot.strategies]) renderSection(section);
     countStrategies();
     setMode('swot');
+    renderAI();
+    document.querySelectorAll('[data-ai]').forEach(button => button.addEventListener('click', () => openAction(button.dataset.ai)));
+    $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());
+    $('#ai-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      try {
+        const action = { id: requestedAction, comment: $('#ai-guidance').value, use_thoughts: $('#use-thoughts').checked };
+        if (requestedAction === 'strategize') action.mode = $('#strategy-mode').value;
+        if (requestedAction === 'evaluate') action.scope = $('#evaluation-scope').value;
+        const request = Swot.buildRequest(state, action);
+        $('#ai-dialog').close();
+        await copyJson(JSON.stringify(request, null, 2), 'Copied AI request. Paste it into Codex or ChatGPT with the Pensive skill.');
+      } catch (error) { status(error.message, true); }
+    });
     $('#swot-toggle').addEventListener('click', () => setMode('swot'));
     $('#tows-toggle').addEventListener('click', () => setMode('tows'));
     $('#copy').addEventListener('click', copyState);

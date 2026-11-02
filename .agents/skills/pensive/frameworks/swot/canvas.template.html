@@ -23,8 +23,15 @@
         <button id="swot-toggle" type="button" aria-pressed="true" aria-controls="swot-view">SWOT</button>
         <button id="tows-toggle" type="button" aria-pressed="false" aria-controls="tows-view">TOWS <span id="tows-count" class="count" title="No strategies yet">0</span></button>
       </div>
+      <div class="ai-actions" role="group" aria-label="Request AI action">
+        <button type="button" data-ai="strategize" title="Derive SO/ST/WO/WT strategies from SWOT">Strategize</button>
+        <button type="button" data-ai="evaluate" title="Evaluate SWOT, TOWS, or both">Evaluate</button>
+        <button type="button" data-ai="improve" title="Improve the current SWOT/TOWS">Improve</button>
+      </div>
       <div class="export-actions"><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
+    <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
     <section id="swot-view" aria-label="SWOT factors">
       <div class="swot-grid">
         <div class="axis corner" aria-hidden="true"></div>
@@ -58,6 +65,18 @@
   </main>
   <footer><span>Less conversation. More thinking.</span><span>SWOT / TOWS <span aria-hidden="true">·</span> Pensive</span></footer>
 </div>
+<dialog id="ai-dialog" aria-labelledby="ai-title">
+  <form id="ai-form">
+    <h2 id="ai-title">Request AI action</h2>
+    <p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill. No AI runs in this page.</p>
+    <div id="strategy-options"><label for="strategy-mode">Strategy mode</label><select id="strategy-mode"><option value="extend">Add to existing strategies</option><option value="replace">Regenerate all strategies</option></select></div>
+    <div id="evaluation-options"><label for="evaluation-scope">Evaluate</label><select id="evaluation-scope"><option value="both">SWOT and TOWS</option><option value="swot">SWOT only</option><option value="tows">TOWS only</option></select></div>
+    <label for="ai-guidance">Steering guidance</label>
+    <textarea id="ai-guidance" rows="4" placeholder="Focus, constraints, trade-offs, evidence to consider…"></textarea>
+    <label class="checkbox-label"><input id="use-thoughts" type="checkbox" checked> Use existing thoughts as guidance</label>
+    <div class="dialog-actions"><button type="button" id="cancel-ai">Cancel</button><button type="submit" class="primary">Copy AI request</button></div>
+  </form>
+</dialog>
 <noscript>This canvas requires JavaScript for local editing and export. No server is needed.</noscript>
 <!--pensive-state-start-->
 <script id="canvas-state" type="application/json">{}</script>

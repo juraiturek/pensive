@@ -1,0 +1,182 @@
+{
+  "observed_on": "2026-11-02",
+  "context": "Independent read-only skill-loaded forward-test; synthetic pottery-studio scenario. Evaluate is the second run after a concision refinement; the other actions are the first run. Not a claim of general model reliability.",
+  "canvas": {
+    "framework": "swot",
+    "schema_version": "1.0",
+    "content": {
+      "framing": {
+        "focal_entity": "Small pottery studio",
+        "objective": "Grow sales through regional retailers without hiring",
+        "environment": "Current local operating context"
+      },
+      "strengths": [
+        {
+          "id": "s1",
+          "text": "Experienced production team"
+        }
+      ],
+      "weaknesses": [
+        {
+          "id": "w1",
+          "text": "One kiln; peak production already at capacity"
+        }
+      ],
+      "opportunities": [
+        {
+          "id": "o1",
+          "text": "Two regional retailers have invited product proposals"
+        }
+      ],
+      "threats": [
+        {
+          "id": "t1",
+          "text": "Clay supplier has announced a price increase"
+        }
+      ],
+      "strategies": {
+        "so": [
+          {
+            "id": "so1",
+            "text": "Open five overseas stores immediately"
+          }
+        ],
+        "st": [],
+        "wo": [],
+        "wt": []
+      }
+    }
+  },
+  "cases": [
+    {
+      "action": {
+        "id": "strategize",
+        "mode": "extend",
+        "comment": "Prefer low-cost practical moves; respect production capacity.",
+        "use_thoughts": false
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "focal_entity": "Small pottery studio",
+            "objective": "Grow sales through regional retailers without hiring",
+            "environment": "Current local operating context"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Experienced production team"
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "One kiln; peak production already at capacity"
+            }
+          ],
+          "opportunities": [
+            {
+              "id": "o1",
+              "text": "Two regional retailers have invited product proposals"
+            }
+          ],
+          "threats": [
+            {
+              "id": "t1",
+              "text": "Clay supplier has announced a price increase"
+            }
+          ],
+          "strategies": {
+            "so": [
+              {
+                "id": "so1",
+                "text": "Open five overseas stores immediately"
+              },
+              {
+                "id": "so2",
+                "text": "Use the experienced production team to select a small range of existing products for the two regional retailer proposals, quoting only quantities and lead times that fit verified kiln capacity."
+              }
+            ],
+            "st": [
+              {
+                "id": "st1",
+                "text": "Have the experienced production team review clay use and production losses for the proposed range, and check costs against the announced supplier increase before quoting; adopt practical waste reductions only where the review identifies them."
+              }
+            ],
+            "wo": [
+              {
+                "id": "wo1",
+                "text": "Use the retailer proposal discussions to seek small, phased orders with flexible delivery dates; accept orders only if a production schedule shows they fit alongside existing commitments without hiring."
+              }
+            ],
+            "wt": []
+          }
+        },
+        "thought": "The additions connect production experience to the two regional invitations (SO), production review to the clay price increase (ST), and retailer negotiations to the kiln bottleneck (WO). They prioritize a limited existing range and conditional, phased commitments rather than assuming spare capacity or adding equipment or staff. Retailer willingness to accept flexible dates, available production time, and opportunities to reduce waste remain unverified. If capacity cannot accommodate an order, defer the commitment; these choices do not guarantee growth. Extend mode preserves so1 unchanged, although opening five overseas stores immediately conflicts with the regional objective and known capacity constraint. The additions do not resolve that existing conflict; so1 needs separate review before implementation."
+      }
+    },
+    {
+      "action": {
+        "id": "evaluate",
+        "scope": "both",
+        "comment": "Focus on fit and conflicting commitments.",
+        "use_thoughts": false
+      },
+      "response": {
+        "thought": "The SWOT correctly distinguishes internal conditions from external developments, and the objective clearly specifies regional retailers and no hiring. However, 'Open five overseas stores immediately' does not connect the experienced team to the two regional retailer invitations; it changes geography and sales channel while leaving staffing demands unexplained. Peak production is already at capacity, making additional sales commitments a material conflict, although capacity outside peak periods remains unknown. The team's relevant capabilities and the effect of the announced clay price increase on margins also need clarification before feasibility can be judged. Next, resolve the existing strategy's mismatch with the objective and verify available production capacity, workload, and updated costs before committing; empty strategy collections alone are not defects."
+      }
+    },
+    {
+      "action": {
+        "id": "improve",
+        "comment": "Sharpen coherence and make the existing strategy realistic; do not invent facts.",
+        "use_thoughts": false
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "focal_entity": "Small pottery studio",
+            "objective": "Grow sales through regional retailers without hiring",
+            "environment": "Current local operating context"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Experienced production team"
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "One kiln; peak production already at capacity"
+            }
+          ],
+          "opportunities": [
+            {
+              "id": "o1",
+              "text": "Two regional retailers have invited product proposals"
+            }
+          ],
+          "threats": [
+            {
+              "id": "t1",
+              "text": "Clay supplier has announced a price increase"
+            }
+          ],
+          "strategies": {
+            "so": [
+              {
+                "id": "so2",
+                "text": "Use the experienced production team to prepare a focused proposal of existing products for the two regional retailers. Offer a small initial order only if verified kiln availability and staff workload can accommodate it alongside existing commitments without hiring, and check costs against the announced clay price increase before quoting."
+              }
+            ],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        },
+        "thought": "Replaced 'Open five overseas stores immediately' with a focused regional retailer proposal that explicitly uses the experienced production team and the two invitations. Removed so1 because overseas owned-store expansion conflicts with the stated channel and geography and has no supported resource basis; the replacement is a distinct strategic idea and therefore receives the new ID so2. The replacement makes any order conditional on verified kiln availability, existing commitments, staff workload, and updated clay costs. Framing, factor wording, and factor IDs remain unchanged because the supplied evidence does not justify stronger claims. Empty strategy areas remain empty to keep this revision focused. Retailer terms, available capacity outside peak periods, and profitable order quantities still need checking; no additional capacity or retailer acceptance is assumed."
+      }
+    }
+  ]
+}

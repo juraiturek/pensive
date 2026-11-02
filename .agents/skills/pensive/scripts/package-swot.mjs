@@ -32,6 +32,12 @@ async function main(args) {
   if (args.length === 0) {
     await writeFile(new URL('canvas.html', framework), await buildCanvas());
     console.log('Built frameworks/swot/canvas.html');
+  } else if (args.length === 4 && args[0] === '--result') {
+    const [, requestPath, responsePath, output] = args;
+    const result = Swot.composeResult(JSON.parse(await readFile(requestPath, 'utf8')), JSON.parse(await readFile(responsePath, 'utf8')));
+    const template = await readFile(new URL('canvas.html', framework), 'utf8');
+    await writeFile(output, Swot.packageHtml(template, result), { flag: 'wx' });
+    console.log(`Created ${output}`);
   } else if (args.length === 2) {
     const [input, output] = args;
     const template = await readFile(new URL('canvas.html', framework), 'utf8');
@@ -40,7 +46,7 @@ async function main(args) {
     await writeFile(output, result, { flag: 'wx' });
     console.log(`Created ${output}`);
   } else {
-    throw new Error('Usage: node package-swot.mjs [state.json new-output.html]');
+    throw new Error('Usage: node package-swot.mjs [state.json new-output.html | --result request.json response.json new-output.html]');
   }
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
