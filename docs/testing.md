@@ -71,3 +71,18 @@ The browser-comment refinement removes the introductory paragraph, view-descript
 The updated full suite executes 15 tests (7 state/packaging and 8 offline Chromium browser tests), including empty-quadrant editing across all four SWOT sections, deletion/reset, populated-quadrant clicks, and export persistence. README is unchanged; runtime and cross-browser limits above still apply.
 
 Next-bullet refinement: clicking blank space below populated SWOT factors adds and focuses the next item across all four quadrants. An unfinished trailing draft is focused rather than duplicated, including double-clicks. Existing rows, headers, and controls do not trigger background additions. The executed full suite now passes 16 tests (7 state/packaging, 9 offline Chromium), including multiple successive factors and stable existing IDs.
+
+## Slice 2A: creation methodology verification
+
+On 2026-11-01, a read-only baseline evaluation of the old skill rejected all four creation scenarios because AI creation was explicitly unavailable. After the change, instruction-following simulations exercised rich nonprofit context (zero questions), sparse pottery context (offer stub and wait), explicit stub authorization (zero questions), mixed expansion scope (one question), explicit correction, the two-question ceiling, and unsupported existing-state refinement. Expected routing and sparse-draft behavior were observed. See `tests/methodology/swot-create.md` for repeatable inputs and rubric. These were manual subagent simulations, not independent live-user conversations or statistical model evaluations.
+
+The evaluator actually generated the rich-case complete state through existing initialState/addItem/editItem utilities and packaged it using the unchanged CLI. Ajv and runtime validation passed; embedded JSON exactly matched input; all strategies were empty; HTML outside the state slot was identical to the established canvas. This checks the artifact handoff, not broad analytical validity.
+
+Executed checks:
+
+- `PYTHONPATH=/tmp/pensive-validator-deps python3 /Users/juraj/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/pensive`: passed. The initial default Python attempt lacked PyYAML; reused existing local validator dependencies without installing project dependencies.
+- Local Markdown link check across the skill: no missing targets.
+- `PATH=/Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright pnpm test`: 16 passed, zero failures/skips (7 state/packaging, 9 offline Chromium). Plain pnpm initially lacked Node on PATH. The sandboxed retry passed state tests but blocked Chromium process registration; the final full run used elevated process access as documented above.
+- `git diff --check`: passed. README SHA-256 matches the documented unchanged value.
+
+No schema, state utility, packager, HTML, CSS, or canvas JavaScript changed. Browser results cover the existing Chromium workflow, not other browser engines. No research, legacy server tests, acceptance machinery, or live-user elicitation tests were performed. No commit or push was made.

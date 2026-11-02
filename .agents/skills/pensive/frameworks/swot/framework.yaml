@@ -1,6 +1,6 @@
 id: swot
 name: SWOT / TOWS
-package_version: "0.1.0"
+package_version: "0.2.0"
 schema_version: "1.0"
 state_schema: canvas.schema.json
 canvas: canvas.html
@@ -22,7 +22,11 @@ manual_capabilities:
   - toggle_swot_tows
   - export_json_to_clipboard
   - save_standalone_html
-ai_actions: []
+ai_actions:
+  - id: create
+    method: prompts/create.md
+    effect: Initialize a new SWOT draft from available context and brief elicitation.
+    required_context: Identifiable entity; agreement to a sparse draft when evidence is limited.
 target_types:
   factor: Stable item ID in one of the four SWOT collections.
   strategy: Stable item ID in one of the four TOWS collections.
@@ -32,4 +36,4 @@ quality_criteria:
   - Relate factors to the stated entity and objective.
   - Use the named factor categories for each strategy pairing.
   - Prefer concrete factors and actionable strategies over vague claims.
-acceptance: Not implemented; manual edits are direct user operations.
+acceptance: Creation produces a reviewable draft without proposals; transformation acceptance is unavailable. Manual edits are direct user operations.

@@ -53,3 +53,20 @@ V1 `tests/views/test_canvas_swot.py` checks server-rendered page labels. V2 `tes
 On 2026-11-01, `node --test tests/*.test.mjs` executed 14 destination tests: 7 deterministic state/packaging and 7 offline Chromium tests, all passing, none skipped. Desktop and mobile screenshots were visually inspected. See [testing.md](testing.md) for commands and limits. Legacy files were read-only throughout; source identity checks and unchanged README checksum are part of delivery verification.
 
 Deferred: AI Strategize, generic actions, proposal acceptance at any granularity, history, import UI, and local storage. No methodological prompts were extracted in Slice 1. The README's RrEAC process remains applicable to future methodology extraction.
+
+## Slice 2A: creation methodology
+
+Read-only research used the same V1 snapshot and V2 revision identified above. No legacy runtime or source was copied. RrEAC: research creation paths and prompts; review against destination contracts; extract useful concepts; adjust for Codex conversation and evidence limits; compile into `frameworks/swot/prompts/create.md` within the skill.
+
+| Source / relevant location | Original behavior; strengths and limits | Decision / destination adaptation |
+| --- | --- | --- |
+| V1 `templates/wizard/chooser.html`; `static/wizard/wizard.js:74–219` | Framework selection, schema-ordered fields, one input at a time, prior answers visible, submission and redirect. Progressive but fixed; no conversation extraction or adaptive questions. | Adapt progressive elicitation in create.md; reject form/server flow. |
+| V1 `schemas/swot.yml:4–37` | Required entity/objective, optional environment; internal/external tags. Clear framing but rigid requirements. | Adapt framing and classification; allow disclosed general lens. |
+| V1 `prompts/generate/swot_generate.j2:1–15` | Framing to short JSON lists; minimum one item per declared node. Sparse methodology; declaration includes strategies. | Adapt concise framed generation; reject mandatory population and strategy generation. |
+| V1 `app/service/wizard.py:107–170` | Validate framing, template selection, model call, parse, store canvas and separate framing. Basic checks do not assess analytical quality. | Adapt validation boundary; reject Jinja, client, stores, assertion-based validation. |
+| V2 `app/routes/canvas_pages.py:696–718`; `templates/partials/canvas_detail_body.html:215–242` | Blank creation enters Problem view; generate from editable framing, confirm replacement. No adaptive elicitation in inspected path. | Adapt explicit framing; reject app wizard and replacement confirmation for initial artifacts. |
+| V2 `app/frameworks/registry.py:91–173,490–588` | Framing/core roles, typed lists, caps and normalization. Useful semantics, arbitrary caps and string coercion. | Preserve destination semantics and validator; reject legacy normalization/caps. |
+| V2 `prompt_templates/user/swot_generate.j2:1–26`; `system/generate_base.j2` | Four concrete lists, framing preserved by app; 3–8 items, 80-character limits. | Adapt distinct concrete factors; reject quotas and legacy nodes contract. |
+| V2 `app/services/canvas_ai_service.py:47–84,406–453` | Any nonempty framing enables generation; four outputs merge into saved state. Too permissive as analytical sufficiency. | Adapt framing preservation and output checks; reject gate, replacement, persistence infrastructure. |
+
+Original destination choices: one phased Markdown method, maximum two question turns including sparse-draft agreement, empty unsupported quadrants, evidence-aware generation, initial-draft exception to transformation acceptance, no research. Provenance review is distinct from methodology evaluation and deterministic packaging checks; see testing.md.

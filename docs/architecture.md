@@ -4,7 +4,7 @@
 
 README.md remains the unchanged authoritative product vision and design reference. This document records the approved slice-0 architecture and refines its illustrative layout and sequencing. The user reports V1/V2 audits complete; source folders and audit artifacts are unavailable here. No extraction findings are invented.
 
-Slice 0 established the skill and contracts. Slice 1 adds a working, manually editable standalone SWOT/TOWS package. AI transformations remain unavailable.
+Slice 0 established the skill and contracts. Slice 1 adds a working, manually editable standalone SWOT/TOWS package. AI transformations of existing state remain unavailable. Slice 2A adds Markdown-driven SWOT initialization.
 
 ## Responsibilities
 
@@ -69,3 +69,9 @@ V1 supplies the default SWOT / expanded TOWS interaction model; V2 supplies sele
 - State serialization escapes HTML-sensitive characters, while content rendering uses text nodes and textarea values. Invalid initial state disables editing/export visibly. No backend, template runtime, generic rendering engine, AI integration, proposal machinery, or history is included.
 
 Tests use Node's built-in runner, Ajv and Playwright as development-only dependencies, and a pnpm lockfile. Exported HTML has no external dependencies. See [testing.md](testing.md) for reproducible commands and current limitations.
+
+## Slice 2A: SWOT creation
+
+SKILL.md routes new analysis to framework-specific `prompts/create.md`; the manifest declares create without a dispatcher. One adaptive method uses available conversation and supplied materials, with zero to two question turns total. Sparse stubs require agreement unless already requested; unsupported quadrants may be empty. No objective defaults to a disclosed general assessment lens.
+
+Creation initializes a reviewable AI-authored draft without an action envelope or proposals. The existing schema, state utility, canvas, and two-argument packager stay unchanged. Research recognition/execution, existing-SWOT transformations, and AI TOWS remain future work.

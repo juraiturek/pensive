@@ -4,6 +4,8 @@ Status: minimal semantic contract. Concrete schemas and utilities arrive with th
 
 ## Request
 
+New SWOT creation initializes complete state directly without a request envelope or proposal acceptance. The following request/proposal rules apply to future transformations of existing state.
+
 Retain exactly two top-level fields: `canvas` and `action`.
 
 - `canvas` contains the complete current state: `framework`, `schema_version`, framework-specific `content`, and `proposals` when supported. Complete state includes pending proposals. Framework and version must be recognized by the selected package.
