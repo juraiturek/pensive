@@ -1,9 +1,11 @@
 /* VPC-specific geometry; common Pensive controls and typography come from SWOT. */
-.vpc-halves { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.vpc-half { min-width: 0; }
+.vpc-halves { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(210px, auto) minmax(210px, auto); column-gap: 18px; }
+.vpc-half { min-width: 0; display: grid; grid-row: 1 / 4; grid-template-rows: subgrid; }
+.value-map { grid-column: 1; }
+.customer-profile { grid-column: 2; }
 .half-title { margin: 0; padding: 10px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; border-bottom: 1px solid var(--line); }
 .value-map .half-title { color: var(--accent); }
-.half-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(210px, auto) minmax(210px, auto); }
+.half-grid { display: grid; grid-template-columns: 1fr 1fr; grid-row: 2 / 4; grid-template-rows: subgrid; }
 .vpc-cell { min-width: 0; padding: 18px 14px; border-bottom: 1px solid var(--line); }
 .vpc-cell h3 { margin: 0; font-size: 16px; }
 .vpc-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -17,7 +19,9 @@
 .vpc-cell .items { min-height: 30px; }
 .framing details label { margin-top: 12px; }
 @media (max-width: 850px) {
-  .vpc-halves { grid-template-columns: 1fr; gap: 24px; }
+  .vpc-halves { grid-template-columns: 1fr; grid-template-rows: none; gap: 24px; }
+  .vpc-half { display: block; grid-column: 1; grid-row: auto; }
+  .half-grid { grid-row: auto; grid-template-rows: minmax(210px, auto) minmax(210px, auto); }
 }
 @media (max-width: 480px) {
   .half-grid { grid-template-columns: 1fr; grid-template-rows: auto; }

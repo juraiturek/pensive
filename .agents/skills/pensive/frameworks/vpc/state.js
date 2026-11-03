@@ -3,6 +3,8 @@ const Vpc = (() => {
   'use strict';
   const sections = Object.freeze(['jobs', 'pains', 'gains', 'products_services', 'pain_relievers', 'gain_creators']);
   const framing = Object.freeze(['product_offering', 'customer_segment', 'scenario_job_context', 'current_alternative', 'success_metric']);
+  const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
+  const review = Review.create({ sections, collection: (content, section) => collection({ content }, section), validateContent });
   const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
   function keys(value, required, path, optional = []) {
     if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(k => !required.includes(k) && !optional.includes(k)) || required.some(k => !Object.hasOwn(value, k))) throw new Error(`${path}: expected exactly ${required.join(', ')}.`);
@@ -53,7 +55,7 @@ const Vpc = (() => {
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one pending proposal is supported.');
       for (const proposal of state.proposals) {
-        keys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal');
+        keys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal', ['resolutions']);
         if (proposal.action !== 'improve') throw new Error('Unsupported proposal action.');
         const baseIds = validateContent(proposal.base_content), candidateIds = validateContent(proposal.content);
         boundary(proposal.base_content, proposal.content);
@@ -63,6 +65,7 @@ const Vpc = (() => {
         if (typeof proposal.id !== 'string' || !idPattern.test(proposal.id) || ids.has(proposal.id)) throw new Error('Invalid or duplicate proposal ID.');
         ids.add(proposal.id); validateThought(proposal.thought, ids);
         if (proposal.thought.kind !== 'improvement') throw new Error('Improve proposal needs an improvement thought.');
+        review.validate(proposal);
       }
     }
     return state;
@@ -121,16 +124,15 @@ const Vpc = (() => {
     else result.proposals = [{ id: fresh('proposal'), action: 'improve', base_content: structuredClone(result.content), content: structuredClone(response.content), thought }];
     return validate(result);
   }
-  function acceptProposal(state) {
+  function proposalSections(state) { validate(state); return state.proposals?.length ? review.entries(state.proposals[0]) : []; }
+  function resolveProposal(state, selected, decision) {
     validate(state); const proposal = state.proposals?.[0]; if (!proposal) throw new Error('No pending proposal.');
-    if (!same(state.content, proposal.base_content)) throw new Error('Canvas content or framing changed; reject and request a fresh proposal.');
-    const next = structuredClone(state); next.content = structuredClone(proposal.content);
-    next.thoughts = [...(next.thoughts || []), structuredClone(proposal.thought)]; next.proposals = [];
+    if (decision === 'accept' && !same(state.content, review.expected(proposal))) throw new Error('Canvas content or framing changed; reject remaining changes and request again.');
+    const next = review.apply(state, selected, decision);
     validate(next); Object.assign(state, next);
   }
-  function rejectProposal(state) {
-    validate(state); if (!state.proposals?.length) throw new Error('No pending proposal.'); state.proposals = [];
-  }
+  function acceptProposal(state) { resolveProposal(state, undefined, 'accept'); }
+  function rejectProposal(state) { resolveProposal(state, undefined, 'reject'); }
   function parseState(json) { return validate(JSON.parse(json)); }
   function safeJson(state) { validate(state); return JSON.stringify(state, null, 2).replace(/[<>&\u2028\u2029]/g, c => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`); }
   function packageHtml(html, state) {
@@ -139,6 +141,6 @@ const Vpc = (() => {
     if (first < 0 || last < first || html.indexOf(start, first + start.length) !== -1 || html.indexOf(end, last + end.length) !== -1) throw new Error('Expected one complete state slot.');
     return html.slice(0, first) + `${start}\n<script id="canvas-state" type="application/json">${safeJson(state)}<${'/script>'}\n${end}` + html.slice(last + end.length);
   }
-  return Object.freeze({ sections, framing, initialState, validate, validateContent, collection, addItem, editItem, deleteItem, validateRequest, buildRequest, composeResult, acceptProposal, rejectProposal, parseState, safeJson, packageHtml });
+  return Object.freeze({ sections, framing, initialState, validate, validateContent, collection, addItem, editItem, deleteItem, validateRequest, buildRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, parseState, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Vpc;

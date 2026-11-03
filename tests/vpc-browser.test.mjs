@@ -291,7 +291,7 @@ function proposalState(){
     content,thought:'Clarified a job and proposed a hypothesis.'
   });
 }
-test('VPC Improve exports its action and supports only whole-canvas review with saved pending state',async t => {
+test('VPC Improve exports its action and supports shared collection review with saved pending state',async t => {
   const page=await open(t);
   page.setDefaultTimeout(3000);
   await page.context().grantPermissions(['clipboard-read','clipboard-write']);
@@ -306,7 +306,7 @@ test('VPC Improve exports its action and supports only whole-canvas review with 
   const pendingState=proposalState();
   await importing(page,pendingState,true);
   const panel=page.locator('#proposal-panel');
-  assert.equal(await panel.locator('input[type="checkbox"]').count(),0);
+  assert.equal(await panel.locator('input[type="checkbox"]').count(),2);
   assert.equal(await page.getByRole('button',{
     name:'Evaluate',exact:true
   }).isDisabled(),true);
@@ -323,7 +323,7 @@ test('VPC Improve exports its action and supports only whole-canvas review with 
   await page.goto(pathToFileURL(path).href);
   assert.deepEqual(await exported(page),pendingState);
   await page.getByRole('button',{
-    name:'Accept transformation',exact:true
+    name:'Accept All',exact:true
   }).click();
   const accepted=await exported(page);
   assert.equal(accepted.content.jobs[0].text,'Choose next step using evidence');
@@ -339,12 +339,12 @@ test('VPC stale whole acceptance preserves manual edits and rejection leaves the
   await page.locator('[data-section="jobs"] textarea').fill('Local choice');
   const before=await exported(page);
   await page.getByRole('button',{
-    name:'Accept transformation',exact:true
+    name:'Accept All',exact:true
   }).click();
-  assert.ok((await page.locator('#status').textContent()).includes('changed'));
+  assert.ok((await page.locator('#proposal-panel [role="alert"]').textContent()).includes('changed'));
   assert.deepEqual(await exported(page),before);
   await page.getByRole('button',{
-    name:'Reject',exact:true
+    name:'Reject All',exact:true
   }).click();
   const rejected=await exported(page);
   assert.equal(rejected.content.jobs[0].text,'Local choice');
@@ -360,4 +360,48 @@ test('VPC framing remains fully visible after desktop-to-mobile resizing', async
   const input = page.getByLabel('Product / Offering', { exact: true });
   const sizes = await input.evaluate(node => ({ visible: node.clientHeight, needed: node.scrollHeight }));
   assert.ok(sizes.visible >= sizes.needed, JSON.stringify(sizes));
+});
+
+test('VPC blank cell clicks add and focus one draft across all six collections', async t => {
+  const page = await open(t);
+  for (const section of ['products_services', 'gain_creators', 'pain_relievers', 'jobs', 'pains', 'gains']) {
+    const cell = page.locator(`[data-section="${section}"]`);
+    await cell.click({ position: { x: 12, y: 110 } });
+    assert.equal(await cell.locator('textarea').count(), 1);
+    assert.equal(await cell.locator('textarea').evaluate(node => node === document.activeElement), true);
+    const id = await cell.locator('textarea').getAttribute('data-id');
+    await cell.dblclick({ position: { x: 12, y: 150 } });
+    assert.equal(await cell.locator('textarea').count(), 1);
+    assert.equal(await cell.locator('textarea').getAttribute('data-id'), id);
+    assert.equal(await cell.locator('textarea').evaluate(node => node === document.activeElement), true);
+    await cell.locator('h3').click();
+    assert.equal(await cell.locator('textarea').count(), 1);
+    await cell.locator('textarea').fill('A concrete idea');
+    await cell.click({ position: { x: 12, y: 150 } });
+    assert.equal(await cell.locator('textarea').count(), 2);
+    assert.equal(await cell.locator('textarea').last().evaluate(node => node === document.activeElement), true);
+    assert.equal(await cell.locator('textarea').first().getAttribute('data-id'), id);
+  }
+  const state = await exported(page);
+  for (const items of Object.values(state.content).filter(Array.isArray)) assert.equal(items.length, 2);
+});
+
+test('VPC pain rows stay aligned as either upper row grows', async t => {
+  const page = await open(t);
+  async function aligned() {
+    const left = await page.locator('[data-section="pain_relievers"]').boundingBox();
+    const right = await page.locator('[data-section="pains"]').boundingBox();
+    assert.ok(Math.abs(left.y - right.y) <= 1, `Pain Relievers ${left.y}, Pains ${right.y}`);
+  }
+  await aligned();
+  await add(page, 'gain_creators', 'A longer gain creation mechanism with meaningful detail. '.repeat(35));
+  await aligned();
+  await add(page, 'gains', 'A desired customer outcome and its context. '.repeat(70));
+  await aligned();
+  await page.locator('[data-section="gain_creators"] textarea').fill('Short mechanism');
+  await aligned();
+  await page.locator('[data-section="pains"]').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'test-results/vpc-aligned-rows.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
 });

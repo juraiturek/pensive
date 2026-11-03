@@ -305,23 +305,21 @@ test('VPC stale content or framing acceptance is atomic; rejection preserves loc
   }
 });
 
-test('VPC imported proposals reject tampering, partial metadata and reserved identity collisions',() => {
+test('VPC imported proposals reject tampering, invalid partial metadata and reserved identity collisions',() => {
   const v=core(),s=v.initialState();
   s.thoughts=[{
     id:'current-thought',kind:'evaluation',text:'Prior'
   }];
   const valid=improved(v,s),check=new Ajv().compile(JSON.parse(readFileSync(new URL('canvas.schema.json',root))));
   assert.equal(check(valid),true);
-  for(const mutate of [s=>s.proposals[0].resolutions={
-  },s=>s.proposals[0].base_baseline={
+  for(const mutate of [s=>s.proposals[0].resolutions={unknown:'accepted'},s=>s.proposals[0].base_baseline={
   },s=>s.proposals[0].action='ripple',s=>s.proposals.push(structuredClone(s.proposals[0])),s=>s.proposals[0].thought.kind='evaluation',s=>s.proposals[0].content.framing.product_offering='Other',s=>s.proposals[0].content.pains[0].id='current-thought',s=>s.proposals[0].thought.id=s.proposals[0].id]){
     const bad=structuredClone(valid);
     mutate(bad);
     assert.throws(()=>v.validate(bad));
   }
   const withResolution=structuredClone(valid);
-  withResolution.proposals[0].resolutions={
-  };
+  withResolution.proposals[0].resolutions={unknown:'accepted'};
   assert.equal(check(withResolution),false);
   const original=crypto.randomUUID;
   let n=0;

@@ -104,3 +104,8 @@ Six Thinking Hats remains a cross-framework future tool producing both reflectio
 The [approved VPC audit](plans/2026-11-03-vpc-phase-a-review.md) selects V2's five framing fields and the six standard customer-profile/value-map collections. Framework-owned state and static HTML preserve the destination contract; V1/V2 supply selected semantics and four-column geometry, not server infrastructure. `references/framing-content.md` describes context → framing → content and how discrepancies can call either framing or content into question. VPC specializes it; existing methods are unchanged.
 
 The approved initial sequence is core/creation → Evaluate → Improve. Evaluate is thought-only and includes fit/evidence/coherence; Improve preserves framing and proposes content. VPC review is whole-canvas only, with stale-content guards and no shared partial-resolution metadata. It has no Ripple baseline or automatic framing rewrite. `docs/roadmap.md` records VPC Ripple/Restate follow-ups and cross-framework thinking tools. Implementation verification and limitations are recorded in `docs/testing.md` when exercised.
+
+
+## VPC review harmonization — user authorization, 2026-11-03
+
+The user explicitly extended VPC review to match SWOT/PAGES. This supersedes the initial whole-canvas-only restriction: reuse the shared collection resolver and UI for per-collection Accept/Reject, selection and bulk decisions, persisted resolutions, stale-edit checks and labeled mixed-result rationale. Existing proposals without resolutions remain valid. Framing stays fixed; bullet acceptance, Ripple, Restate and generic thinking tools remain deferred. No existing framework implementation changes are required.

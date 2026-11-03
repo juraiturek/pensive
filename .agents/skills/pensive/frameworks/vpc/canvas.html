@@ -151,11 +151,13 @@ dialog textarea { display: block; font-size: .9rem; }
 @media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
 
 /* VPC-specific geometry; common Pensive controls and typography come from SWOT. */
-.vpc-halves { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.vpc-half { min-width: 0; }
+.vpc-halves { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(210px, auto) minmax(210px, auto); column-gap: 18px; }
+.vpc-half { min-width: 0; display: grid; grid-row: 1 / 4; grid-template-rows: subgrid; }
+.value-map { grid-column: 1; }
+.customer-profile { grid-column: 2; }
 .half-title { margin: 0; padding: 10px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; border-bottom: 1px solid var(--line); }
 .value-map .half-title { color: var(--accent); }
-.half-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(210px, auto) minmax(210px, auto); }
+.half-grid { display: grid; grid-template-columns: 1fr 1fr; grid-row: 2 / 4; grid-template-rows: subgrid; }
 .vpc-cell { min-width: 0; padding: 18px 14px; border-bottom: 1px solid var(--line); }
 .vpc-cell h3 { margin: 0; font-size: 16px; }
 .vpc-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -169,7 +171,9 @@ dialog textarea { display: block; font-size: .9rem; }
 .vpc-cell .items { min-height: 30px; }
 .framing details label { margin-top: 12px; }
 @media (max-width: 850px) {
-  .vpc-halves { grid-template-columns: 1fr; gap: 24px; }
+  .vpc-halves { grid-template-columns: 1fr; grid-template-rows: none; gap: 24px; }
+  .vpc-half { display: block; grid-column: 1; grid-row: auto; }
+  .half-grid { grid-row: auto; grid-template-rows: minmax(210px, auto) minmax(210px, auto); }
 }
 @media (max-width: 480px) {
   .half-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
@@ -229,11 +233,151 @@ dialog textarea { display: block; font-size: .9rem; }
 }</script>
 <!--pensive-state-end-->
 <script data-implementation>
+/* Collection-level proposal decisions, shared by Node and standalone canvases. */
+const ProposalReview = (() => {
+  'use strict';
+  function same(a, b) {
+    if (a === b) return true;
+    if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
+    const keys = Object.keys(a);
+    return keys.length === Object.keys(b).length && keys.every(k => Object.hasOwn(b, k) && same(a[k], b[k]));
+  }
+  function create({ sections, collection, validateContent }) {
+    function entries(proposal) {
+      return sections.filter(s => !same(collection(proposal.base_content, s), collection(proposal.content, s)))
+        .map(section => ({ section, status: proposal.resolutions?.[section] || 'pending' }));
+    }
+    function replace(content, proposal, section) {
+      const destination = collection(content, section);
+      destination.splice(0, destination.length, ...structuredClone(collection(proposal.content, section)));
+    }
+    function expected(proposal) {
+      const content = structuredClone(proposal.base_content);
+      for (const entry of entries(proposal)) if (entry.status === 'accepted') replace(content, proposal, entry.section);
+      return content;
+    }
+    function validate(proposal) {
+      if (proposal.resolutions !== undefined) {
+        const value = proposal.resolutions, changed = entries(proposal).map(e => e.section);
+        if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(s => !changed.includes(s) || !['pending', 'accepted', 'rejected'].includes(value[s]))) throw new Error('Invalid proposal resolutions; only changed nodes can be resolved.');
+        if (changed.length && entries(proposal).every(e => e.status !== 'pending')) throw new Error('Completed proposal must be cleared.');
+        validateContent(expected(proposal));
+      }
+    }
+    function apply(state, selected, decision) {
+      const original = state.proposals?.[0];
+      if (!original) throw new Error('No pending proposal.');
+      if (!['accept', 'reject'].includes(decision)) throw new Error('Unsupported review decision.');
+      const pending = entries(original).filter(e => e.status === 'pending').map(e => e.section);
+      const targets = selected === undefined ? pending : selected;
+      if (!Array.isArray(targets) || (selected !== undefined && !targets.length) || new Set(targets).size !== targets.length || targets.some(s => !pending.includes(s))) throw new Error('Select distinct pending changed nodes.');
+      const next = structuredClone(state), proposal = next.proposals[0];
+      proposal.resolutions = { ...(proposal.resolutions || {}) };
+      for (const section of targets) {
+        proposal.resolutions[section] = decision === 'accept' ? 'accepted' : 'rejected';
+        if (decision === 'accept') replace(next.content, proposal, section);
+      }
+      try { validateContent(next.content); }
+      catch (error) { throw new Error(`These node changes cannot be accepted independently. Select related nodes together. ${error.message}`); }
+      if (entries(proposal).every(e => e.status !== 'pending')) {
+        const accepted = entries(proposal).filter(e => e.status === 'accepted').map(e => e.section);
+        const rejected = entries(proposal).filter(e => e.status === 'rejected').map(e => e.section);
+        if (accepted.length) {
+          const label = section => section.replaceAll('_', ' ');
+          const text = `Accepted nodes: ${accepted.map(label).join(', ')}. Rejected nodes: ${rejected.length ? rejected.map(label).join(', ') : 'none'}.\nOriginal proposal rationale (not a reassessment of the mixed canvas):\n${proposal.thought.text}`;
+          next.thoughts = [...(next.thoughts || []), { ...proposal.thought, text }];
+        }
+        next.proposals = [];
+      }
+      return next;
+    }
+    return Object.freeze({ entries, expected, validate, apply });
+  }
+  return Object.freeze({ create, same });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = ProposalReview;
+</script>
+<script data-implementation>
+/* Shared collection review controls. Frameworks own state and action validation. */
+const ProposalReviewUI = (() => {
+  'use strict';
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function render({ state, core, panel, labels, title, onDecision }) {
+    const expanded = !!panel.querySelector('details')?.open;
+    const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
+    panel.replaceChildren();
+    const proposal = state.proposals?.[0]; panel.hidden = !proposal;
+    if (!proposal) return;
+    const entries = core.proposalSections(state);
+    const hasDecisions = entries.some(e => e.status !== 'pending');
+    panel.append(element('h3', '', title), element('p', '', proposal.thought.text), element('p', 'review-hint', 'Accept or reject each node, or select nodes to accept together. Unchecked nodes remain pending.'));
+    const review = element('details'); review.open = expanded;
+    review.append(element('summary', '', 'Review proposed changes'));
+    const error = element('p', 'review-error'); error.setAttribute('role', 'alert');
+    function decide(targets, decision) {
+      try {
+        onDecision(targets, decision);
+        panel.querySelector('input:not(:disabled), button:not(:disabled)')?.focus();
+      } catch (e) { error.textContent = e.message; }
+    }
+    function button(label, run, primary = false) {
+      const node = element('button', primary ? 'primary' : '', label); node.type = 'button'; node.addEventListener('click', run); return node;
+    }
+    const acceptSelected = button('Accept Selected', () => decide(Array.from(review.querySelectorAll('input:checked')).map(n => n.value), 'accept'));
+    const updateSelection = () => { acceptSelected.disabled = !review.querySelector('input:checked'); };
+    for (const { section, status } of entries) {
+      const label = labels[section][0], diff = element('div', 'proposal-diff'); diff.dataset.reviewSection = section;
+      const header = element('div', 'review-node-heading'); header.append(element('h4', '', label));
+      if (status === 'pending') {
+        const controls = element('div', 'review-node-controls'), select = element('label', 'review-select');
+        const input = element('input'); input.type = 'checkbox'; input.value = section; input.checked = selected.has(section);
+        input.setAttribute('aria-label', `Select ${label}`); input.addEventListener('change', updateSelection);
+        select.append(input, document.createTextNode('Select'));
+        const accept = button('Accept', () => decide([section], 'accept')); accept.setAttribute('aria-label', `Accept ${label}`);
+        const reject = button('Reject', () => decide([section], 'reject')); reject.setAttribute('aria-label', `Reject ${label}`);
+        controls.append(select, accept, reject); header.append(controls);
+      } else header.append(element('span', `node-status ${status}`, status === 'accepted' ? 'Accepted' : 'Rejected'));
+      diff.append(header);
+      const original = core.collection({ content: proposal.base_content }, section);
+      const before = status === 'accepted' ? original : core.collection(state, section);
+      const after = core.collection({ content: proposal.content }, section);
+      for (const [columnLabel, items] of [[status === 'accepted' ? 'Original' : 'Current', before], ['Proposed', after]]) {
+        const column = element('div'), list = element('ul'); column.append(element('strong', '', columnLabel));
+        for (const item of items) {
+          const bullet = element('li', '', item.text || '(Blank draft)');
+          if (columnLabel === 'Proposed') {
+            const previous = original.find(old => old.id === item.id);
+            if (!previous || previous.text !== item.text) bullet.append(element('span', 'proposal-tag', previous ? 'Updated' : 'New'));
+          }
+          list.append(bullet);
+        }
+        if (!items.length) list.append(element('li', '', '(Empty)'));
+        column.append(list); diff.append(column);
+      }
+      review.append(diff);
+    }
+    if (!entries.length) review.append(element('p', 'review-hint', 'No node content changes were proposed. Accept All or Reject All closes this review.'));
+    const actions = element('div', 'proposal-actions');
+    actions.append(button(hasDecisions ? 'Accept All Remaining' : 'Accept All', () => decide(undefined, 'accept'), true), acceptSelected,
+      button(hasDecisions ? 'Reject All Remaining' : 'Reject All', () => decide(undefined, 'reject')));
+    updateSelection(); panel.append(review, error, actions);
+  }
+  return Object.freeze({ render });
+})();
+</script>
+<script data-implementation>
 /* VPC-local state and safe packaging; shared by Node and standalone HTML. */
 const Vpc = (() => {
   'use strict';
   const sections = Object.freeze(['jobs', 'pains', 'gains', 'products_services', 'pain_relievers', 'gain_creators']);
   const framing = Object.freeze(['product_offering', 'customer_segment', 'scenario_job_context', 'current_alternative', 'success_metric']);
+  const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
+  const review = Review.create({ sections, collection: (content, section) => collection({ content }, section), validateContent });
   const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
   function keys(value, required, path, optional = []) {
     if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(k => !required.includes(k) && !optional.includes(k)) || required.some(k => !Object.hasOwn(value, k))) throw new Error(`${path}: expected exactly ${required.join(', ')}.`);
@@ -284,7 +428,7 @@ const Vpc = (() => {
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one pending proposal is supported.');
       for (const proposal of state.proposals) {
-        keys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal');
+        keys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal', ['resolutions']);
         if (proposal.action !== 'improve') throw new Error('Unsupported proposal action.');
         const baseIds = validateContent(proposal.base_content), candidateIds = validateContent(proposal.content);
         boundary(proposal.base_content, proposal.content);
@@ -294,6 +438,7 @@ const Vpc = (() => {
         if (typeof proposal.id !== 'string' || !idPattern.test(proposal.id) || ids.has(proposal.id)) throw new Error('Invalid or duplicate proposal ID.');
         ids.add(proposal.id); validateThought(proposal.thought, ids);
         if (proposal.thought.kind !== 'improvement') throw new Error('Improve proposal needs an improvement thought.');
+        review.validate(proposal);
       }
     }
     return state;
@@ -352,16 +497,15 @@ const Vpc = (() => {
     else result.proposals = [{ id: fresh('proposal'), action: 'improve', base_content: structuredClone(result.content), content: structuredClone(response.content), thought }];
     return validate(result);
   }
-  function acceptProposal(state) {
+  function proposalSections(state) { validate(state); return state.proposals?.length ? review.entries(state.proposals[0]) : []; }
+  function resolveProposal(state, selected, decision) {
     validate(state); const proposal = state.proposals?.[0]; if (!proposal) throw new Error('No pending proposal.');
-    if (!same(state.content, proposal.base_content)) throw new Error('Canvas content or framing changed; reject and request a fresh proposal.');
-    const next = structuredClone(state); next.content = structuredClone(proposal.content);
-    next.thoughts = [...(next.thoughts || []), structuredClone(proposal.thought)]; next.proposals = [];
+    if (decision === 'accept' && !same(state.content, review.expected(proposal))) throw new Error('Canvas content or framing changed; reject remaining changes and request again.');
+    const next = review.apply(state, selected, decision);
     validate(next); Object.assign(state, next);
   }
-  function rejectProposal(state) {
-    validate(state); if (!state.proposals?.length) throw new Error('No pending proposal.'); state.proposals = [];
-  }
+  function acceptProposal(state) { resolveProposal(state, undefined, 'accept'); }
+  function rejectProposal(state) { resolveProposal(state, undefined, 'reject'); }
   function parseState(json) { return validate(JSON.parse(json)); }
   function safeJson(state) { validate(state); return JSON.stringify(state, null, 2).replace(/[<>&\u2028\u2029]/g, c => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`); }
   function packageHtml(html, state) {
@@ -370,7 +514,7 @@ const Vpc = (() => {
     if (first < 0 || last < first || html.indexOf(start, first + start.length) !== -1 || html.indexOf(end, last + end.length) !== -1) throw new Error('Expected one complete state slot.');
     return html.slice(0, first) + `${start}\n<script id="canvas-state" type="application/json">${safeJson(state)}<${'/script>'}\n${end}` + html.slice(last + end.length);
   }
-  return Object.freeze({ sections, framing, initialState, validate, validateContent, collection, addItem, editItem, deleteItem, validateRequest, buildRequest, composeResult, acceptProposal, rejectProposal, parseState, safeJson, packageHtml });
+  return Object.freeze({ sections, framing, initialState, validate, validateContent, collection, addItem, editItem, deleteItem, validateRequest, buildRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, parseState, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Vpc;
 </script>
@@ -399,7 +543,18 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Vpc;
       row.append(input, remove); list.append(row);
     });
     const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
-    add.addEventListener('click', () => { const id = Vpc.addItem(state, section); renderSection(section); edited(); Array.from(container.querySelectorAll('textarea')).find(n => n.dataset.id === id).focus(); });
+    function beginItem() {
+      const id = Vpc.addItem(state, section); renderSection(section); edited();
+      Array.from(container.querySelectorAll('textarea')).find(n => n.dataset.id === id).focus();
+    }
+    add.addEventListener('click', beginItem);
+    // Replace on re-render so handlers do not accumulate; reuse unfinished drafts.
+    container.onclick = event => {
+      if (event.target.closest('button, textarea, .item, .vpc-heading')) return;
+      const last = Vpc.collection(state, section).at(-1);
+      if (last && !last.text.trim()) container.querySelector('li.item:last-child textarea').focus();
+      else beginItem();
+    };
     container.replaceChildren(heading, list, add); container.querySelectorAll('textarea').forEach(resize);
   }
   function renderThoughts() {
@@ -407,30 +562,14 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Vpc;
     for (const thought of state.thoughts || []) { const card = element('article', 'thought'); card.append(element('h3', '', thought.kind === 'evaluation' ? 'Evaluation' : 'What improved and why'), element('p', '', thought.text)); container.append(card); }
   }
   function renderProposal() {
-    const panel = $('#proposal-panel'), proposal = state.proposals?.[0]; panel.replaceChildren(); panel.hidden = !proposal;
-    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
-    if (!proposal) return;
-    panel.append(element('h3', '', 'Proposed improvements'), element('p', '', proposal.thought.text));
-    const details = element('details'), summary = element('summary', '', 'Review proposed changes'); details.append(summary);
-    for (const section of Vpc.sections) {
-      if (JSON.stringify(proposal.base_content[section]) === JSON.stringify(proposal.content[section])) continue;
-      const diff = element('div', 'proposal-diff'); diff.append(element('h4', '', labels[section][0]));
-      for (const [heading, items] of [['Current', proposal.base_content[section]], ['Proposed', proposal.content[section]]]) {
-        const column = element('div'), list = element('ul'); column.append(element('strong', '', heading));
-        for (const item of items) list.append(element('li', '', item.text || '(Blank draft)'));
-        if (!items.length) list.append(element('li', '', '(Empty)')); column.append(list); diff.append(column);
+    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!state.proposals?.length; });
+    ProposalReviewUI.render({ state, core: Vpc, panel: $('#proposal-panel'), labels,
+      title: 'Proposed improvements',
+      onDecision: (selected, decision) => {
+        Vpc.resolveProposal(state, selected, decision); refresh(); edited();
+        status('Review decision saved in this tab. Export or save to keep it.');
       }
-      details.append(diff);
-    }
-    const controls = element('div', 'proposal-actions');
-    for (const [label, action] of [['Accept transformation', Vpc.acceptProposal], ['Reject', Vpc.rejectProposal]]) {
-      const button = element('button', label === 'Accept transformation' ? 'primary' : '', label); button.type = 'button';
-      button.addEventListener('click', () => {
-        try { action(state); refresh(); edited(); status(label === 'Reject' ? 'Proposal rejected. Your current content is preserved.' : 'Transformation accepted. Save or export to keep it.'); }
-        catch (error) { status(error.message, true); }
-      }); controls.append(button);
-    }
-    panel.append(details, controls);
+    });
   }
   function refresh() { for (const field of Vpc.framing) { const input = $(`[data-framing="${field}"]`); input.value = state.content.framing[field]; resize(input); } Vpc.sections.forEach(renderSection); renderThoughts(); renderProposal(); }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {

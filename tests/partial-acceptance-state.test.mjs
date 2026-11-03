@@ -4,9 +4,9 @@ import {createRequire} from 'node:module';
 import {readFileSync} from 'node:fs';
 import Ajv from 'ajv';
 const require=createRequire(import.meta.url);
-for(const name of ['pages','swot']){
+for(const name of ['pages','swot','vpc']){
  const p=require(`../.agents/skills/pensive/frameworks/${name}/state.js`);
- const sections=name==='pages'?['parts','actions','goals']:['strengths','weaknesses','opportunities'];
+ const sections=name==='pages'?['parts','actions','goals']:name==='vpc'?['jobs','pains','gains']:['strengths','weaknesses','opportunities'];
  const [a,b,c]=sections;
  const list=(s,k)=>p.collection(s,k);
  const schema=new Ajv().compile(JSON.parse(readFileSync(new URL(`../.agents/skills/pensive/frameworks/${name}/canvas.schema.json`,import.meta.url))));

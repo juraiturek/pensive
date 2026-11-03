@@ -1,6 +1,6 @@
 # Review and resolve proposed node changes
 
-PAGES and SWOT/TOWS support local collection-level acceptance and rejection, plus bulk controls. A node here is one PAGES dimension, SWOT factor collection, or TOWS strategy collection. Individual bullets remain informational only; their New/Updated tags are not acceptance controls. Creation and thought-only Evaluate do not use this review flow.
+PAGES, SWOT/TOWS and VPC support local collection-level acceptance and rejection, plus bulk controls. A node here is one PAGES dimension, SWOT factor collection, TOWS strategy collection, or one of VPC’s six content collections. Individual bullets remain informational only; their New/Updated tags are not acceptance controls. Creation and thought-only Evaluate do not use this review flow.
 
 ## User interaction
 

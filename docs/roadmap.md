@@ -48,3 +48,8 @@ Implement the five-field V2-derived framing model and six standard VPC collectio
 - **Ripple for VPC:** adapt the general implications tool to explicit changes in customer profile/value map, including pains → relievers/offering. Requires an artifact-persisted comparison baseline, selected-source preservation, deletion/reorder handling and review. Never invent customer evidence or product capabilities to repair fit. No automatic cascade or implementation in the current slice.
 - **Restate framing:** a separate reviewed framing-only proposal informed by core evidence; do not silently infer a new customer, alternative or success metric. Requires explicit framing-change permissions and stale-state guards; user chooses whether the insight warrants reframing or content revision. Deferred from the approved initial actions.
 - **Structured fit links:** revisit only if readable mappings prove inadequate; no relationship graph or automatic fit score in the current slice.
+
+
+## VPC review harmonization — user authorization, 2026-11-03
+
+The user explicitly extended VPC review to match SWOT/PAGES. This supersedes the initial whole-canvas-only restriction: reuse the shared collection resolver and UI for per-collection Accept/Reject, selection and bulk decisions, persisted resolutions, stale-edit checks and labeled mixed-result rationale. Existing proposals without resolutions remain valid. Framing stays fixed; bullet acceptance, Ripple, Restate and generic thinking tools remain deferred. No existing framework implementation changes are required.

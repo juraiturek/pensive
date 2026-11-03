@@ -38,5 +38,5 @@ quality_criteria:
   - Framing-content mismatches are analytical signals, not automatic validation failures.
   - Empty collections are valid when evidence does not support a claim.
 acceptance:
-  granularity: whole_canvas_only
+  granularity: collection_and_bulk
   proposal_actions: [improve]

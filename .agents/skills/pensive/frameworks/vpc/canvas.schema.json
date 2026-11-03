@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Pensive VPC state 1.0",
-  "$comment": "Runtime additionally enforces globally unique item IDs.",
+  "$comment": "Runtime additionally enforces globally unique identities, action boundaries, valid partial decisions and stale acceptance.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -184,6 +184,54 @@
         },
         "thought": {
           "$ref": "#/$defs/thought"
+        },
+        "resolutions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "jobs": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            },
+            "pains": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            },
+            "gains": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            },
+            "products_services": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            },
+            "pain_relievers": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            },
+            "gain_creators": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
         }
       }
     }

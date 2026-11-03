@@ -9,10 +9,10 @@ import {chromium} from 'playwright';
 const require=createRequire(import.meta.url);let browser,temp;
 before(async()=>{temp=await mkdtemp(join(tmpdir(),'partial-review-'));await mkdir('test-results',{recursive:true});browser=await chromium.launch({...process.env.PENSIVE_BROWSER?{executablePath:process.env.PENSIVE_BROWSER}:{}});});
 after(async()=>{await browser?.close();if(temp)await rm(temp,{recursive:true,force:true});});
-for(const name of ['pages','swot']){
+for(const name of ['pages','swot','vpc']){
  const root=new URL(`../.agents/skills/pensive/frameworks/${name}/`,import.meta.url),p=require(`../.agents/skills/pensive/frameworks/${name}/state.js`);
- const keys=name==='pages'?['actions','goals','events']:['strengths','weaknesses','opportunities'];
- const labels=name==='pages'?['Actions','Goals','Events']:['Strengths','Weaknesses','Opportunities'];
+ const keys=name==='pages'?['actions','goals','events']:name==='vpc'?['jobs','pains','gains']:['strengths','weaknesses','opportunities'];
+ const labels=name==='pages'?['Actions','Goals','Events']:name==='vpc'?['Customer Jobs','Pains','Gains']:['Strengths','Weaknesses','Opportunities'];
  function fixture(){const initial=p.initialState();keys.forEach((k,i)=>p.collection(initial,k).push({id:`i${i}`,text:`Original ${k}`}));if(name==='pages')p.resetBaseline(initial);
   const content=structuredClone(initial.content);keys.forEach(k=>p.collection({content},k).push({id:`new-${k}`,text:`New ${k}`}));
   return p.composeResult(p.buildRequest(initial,{id:'improve'}),{content,thought:'Grounded proposal rationale.'});}

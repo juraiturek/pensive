@@ -7,7 +7,7 @@ description: Use for Pensive canvas requests, SWOT/TOWS, PAGES or Value Proposit
 
 ## Availability
 
-SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve requests, and manual SWOT/TOWS editing. PAGES supports creation, Evaluate/Improve/Ripple, five editable dimensions, JSON import/export and artifact-persisted Ripple baselines. VPC supports blank/context-based creation, Evaluate/Improve, six editable content collections and JSON import/export. Transformations use the full submitted state and return new standalone HTML; pages do not call AI. SWOT and PAGES support node-level and bulk acceptance/rejection; read [proposal review](references/proposal-review.md) when coordinating review. VPC uses whole-canvas acceptance/rejection only. Bullet-level acceptance, Six Hats, research, revision history and other frameworks are unavailable. SWOT has no import UI; PAGES and VPC import pasted complete JSON.
+SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve requests, and manual SWOT/TOWS editing. PAGES supports creation, Evaluate/Improve/Ripple, five editable dimensions, JSON import/export and artifact-persisted Ripple baselines. VPC supports blank/context-based creation, Evaluate/Improve, six editable content collections and JSON import/export. Transformations use the full submitted state and return new standalone HTML; pages do not call AI. SWOT, PAGES and VPC support node-level and bulk acceptance/rejection; read [proposal review](references/proposal-review.md) when coordinating review. Bullet-level acceptance, Six Hats, research, revision history and other frameworks are unavailable. SWOT has no import UI; PAGES and VPC import pasted complete JSON.
 
 ## Select a framework without imposing one
 
@@ -25,7 +25,7 @@ Read [VPC framework](frameworks/vpc/framework.yaml) and [VPC handoff](references
 - New draft: follow [Create](frameworks/vpc/prompts/create.md) and the [framing–content contract](references/framing-content.md). Extract framing first, clarify essential gaps adaptively, generate supported content, then check coherence. Unknown optional fields and weak fit are valid; do not fabricate customer evidence or offering capabilities.
 - Complete JSON: `node scripts/package-vpc.mjs state.json new-output.html` from the skill directory.
 - Existing state: validate the full `{canvas,action}` and load only [Evaluate](frameworks/vpc/prompts/evaluate.md) or [Improve](frameworks/vpc/prompts/improve.md). Evaluate adds a thought; Improve proposes core changes while preserving framing. Use `--result` as specified in the handoff. Resolve pending proposals before another action.
-- VPC supports whole-canvas Accept/Reject only. Ripple, Restate framing and thinking tools are deferred; no baseline or partial-resolution metadata is supported.
+- VPC uses the shared collection-level and bulk [proposal review](references/proposal-review.md). Ripple, Restate framing and thinking tools remain deferred; no baseline is supported.
 
 Return a new standalone HTML link. Import JSON confirms validated replacement; Export to clipboard copies complete state; Save to File preserves editable HTML, thoughts and proposals. Changes stay in the tab until exported.
 

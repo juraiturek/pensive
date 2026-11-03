@@ -22,7 +22,18 @@
       row.append(input, remove); list.append(row);
     });
     const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
-    add.addEventListener('click', () => { const id = Vpc.addItem(state, section); renderSection(section); edited(); Array.from(container.querySelectorAll('textarea')).find(n => n.dataset.id === id).focus(); });
+    function beginItem() {
+      const id = Vpc.addItem(state, section); renderSection(section); edited();
+      Array.from(container.querySelectorAll('textarea')).find(n => n.dataset.id === id).focus();
+    }
+    add.addEventListener('click', beginItem);
+    // Replace on re-render so handlers do not accumulate; reuse unfinished drafts.
+    container.onclick = event => {
+      if (event.target.closest('button, textarea, .item, .vpc-heading')) return;
+      const last = Vpc.collection(state, section).at(-1);
+      if (last && !last.text.trim()) container.querySelector('li.item:last-child textarea').focus();
+      else beginItem();
+    };
     container.replaceChildren(heading, list, add); container.querySelectorAll('textarea').forEach(resize);
   }
   function renderThoughts() {
@@ -30,30 +41,14 @@
     for (const thought of state.thoughts || []) { const card = element('article', 'thought'); card.append(element('h3', '', thought.kind === 'evaluation' ? 'Evaluation' : 'What improved and why'), element('p', '', thought.text)); container.append(card); }
   }
   function renderProposal() {
-    const panel = $('#proposal-panel'), proposal = state.proposals?.[0]; panel.replaceChildren(); panel.hidden = !proposal;
-    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
-    if (!proposal) return;
-    panel.append(element('h3', '', 'Proposed improvements'), element('p', '', proposal.thought.text));
-    const details = element('details'), summary = element('summary', '', 'Review proposed changes'); details.append(summary);
-    for (const section of Vpc.sections) {
-      if (JSON.stringify(proposal.base_content[section]) === JSON.stringify(proposal.content[section])) continue;
-      const diff = element('div', 'proposal-diff'); diff.append(element('h4', '', labels[section][0]));
-      for (const [heading, items] of [['Current', proposal.base_content[section]], ['Proposed', proposal.content[section]]]) {
-        const column = element('div'), list = element('ul'); column.append(element('strong', '', heading));
-        for (const item of items) list.append(element('li', '', item.text || '(Blank draft)'));
-        if (!items.length) list.append(element('li', '', '(Empty)')); column.append(list); diff.append(column);
+    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!state.proposals?.length; });
+    ProposalReviewUI.render({ state, core: Vpc, panel: $('#proposal-panel'), labels,
+      title: 'Proposed improvements',
+      onDecision: (selected, decision) => {
+        Vpc.resolveProposal(state, selected, decision); refresh(); edited();
+        status('Review decision saved in this tab. Export or save to keep it.');
       }
-      details.append(diff);
-    }
-    const controls = element('div', 'proposal-actions');
-    for (const [label, action] of [['Accept transformation', Vpc.acceptProposal], ['Reject', Vpc.rejectProposal]]) {
-      const button = element('button', label === 'Accept transformation' ? 'primary' : '', label); button.type = 'button';
-      button.addEventListener('click', () => {
-        try { action(state); refresh(); edited(); status(label === 'Reject' ? 'Proposal rejected. Your current content is preserved.' : 'Transformation accepted. Save or export to keep it.'); }
-        catch (error) { status(error.message, true); }
-      }); controls.append(button);
-    }
-    panel.append(details, controls);
+    });
   }
   function refresh() { for (const field of Vpc.framing) { const input = $(`[data-framing="${field}"]`); input.value = state.content.framing[field]; resize(input); } Vpc.sections.forEach(renderSection); renderThoughts(); renderProposal(); }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
