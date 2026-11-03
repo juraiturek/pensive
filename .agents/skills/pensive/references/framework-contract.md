@@ -28,3 +28,8 @@ New initialization produces a reviewable draft without proposals or acceptance c
 `framework.yaml` uses `id`, `name`, `package_version`, `schema_version`, `state_schema`, `canvas`, `semantics`, `manual_capabilities`, `ai_actions`, `target_types`, `action_compatibility`, `quality_criteria`, and `acceptance`. Schema/canvas paths are package-local. SWOT declares `create`, `strategize`, `evaluate`, and `improve` in `ai_actions` with package-local `method`, `effect`, and `required_context`. Create initializes state. The other three declare canvas-level compatibility. Evaluate adds an annotation only; Strategize/Improve require explicit local acceptance of changed collections, individually or in bulk. A declaration is not a runtime discovery mechanism.
 
 The committed `canvas.html` is standalone. Separate source markup, styles, state operations, and UI runtime are assembled by the small SWOT-specific packaging script. No source file is loaded over the network when opening HTML.
+
+
+## VPC specialization
+
+VPC keeps five framing strings and six content collections; see its [manifest](../frameworks/vpc/framework.yaml) and [handoff](vpc-workflow.md). The [framing–content contract](framing-content.md) supplies the lightweight creation/coherence principle specialized by VPC. This does not change existing SWOT/PAGES methods. VPC Evaluate is thought-only and Improve preserves framing. VPC proposals use whole-canvas acceptance/rejection only; shared collection-resolution support does not imply VPC compatibility. Ripple, framing restatement and generic thinking tools remain deferred.

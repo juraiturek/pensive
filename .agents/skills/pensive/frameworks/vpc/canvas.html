@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Pensive — Value Proposition Canvas</title>
+<style>
+:root {
+  --paper: #f6f1e8; --surface: #fffdf8; --ink: #2d3029; --muted: #66685f;
+  --line: #d9d7cc; --accent: #345c49; --danger: #a2392e;
+  --green: #e7edde; --orange: #f3e6d6; --blue: #e4eced; --rose: #f2e1dc;
+  font-family: "Avenir Next", "Segoe UI", sans-serif; color: var(--ink);
+  background: var(--paper); font-size: 15px; line-height: 1.5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(ellipse at 10% 0%, #fffdf7 0, transparent 55%); }
+[hidden] { display: none !important; }
+button, textarea { font: inherit; }
+button, summary { cursor: pointer; }
+button { color: var(--ink); border: 1px solid var(--line); background: var(--surface); border-radius: 5px; padding: .55rem .9rem; transition: background .15s; }
+button:hover { background: #eeeee5; }
+button:focus-visible, textarea:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button:disabled { opacity: .5; cursor: default; }
+textarea { width: 100%; min-width: 0; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: .5rem 0; resize: vertical; border-radius: 0; }
+textarea::placeholder { color: #777a70; }
+p { margin: 0; }
+.shell { width: min(1320px, calc(100% - 5rem)); margin: 0 auto; }
+.masthead { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1.5rem 0; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: baseline; gap: 1.5rem; min-width: 0; }
+.wordmark { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 2rem; letter-spacing: -.07em; color: var(--ink); text-decoration: none; }
+.wordmark span { color: var(--accent); }
+.eyebrow { text-transform: uppercase; font-size: .67rem; letter-spacing: .14em; font-weight: 600; color: var(--muted); }
+.framing { display: grid; grid-template-columns: 1fr 1.4fr; gap: .9rem 2rem; padding: 1.3rem 0; }
+.framing label { display: block; font-size: .75rem; font-weight: 600; }
+.framing textarea { display: block; font-size: .95rem; font-weight: 400; min-height: 2.25rem; }
+.framing details { grid-column: 1 / -1; font-size: .75rem; color: var(--muted); }
+.framing details[open] summary { margin-bottom: .8rem; }
+.optional { font-weight: 400; font-size: .7rem; margin-left: .3rem; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+.view-tabs { display: flex; gap: .2rem; padding: .2rem; border: 1px solid var(--line); border-radius: 6px; }
+.view-tabs button { border: 0; background: transparent; font-size: .78rem; font-weight: 600; min-width: 5.5rem; }
+.view-tabs button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.count { display: inline-flex; align-items: center; justify-content: center; min-width: 1.25rem; height: 1.25rem; padding: 0 .25rem; margin-left: .35rem; font-size: .65rem; border: 1px solid currentColor; border-radius: 1rem; opacity: .55; }
+.count.has-content { opacity: 1; background: #d7e5ce; color: #274c35; border-color: #a9bd9c; }
+.export-actions { display: flex; gap: .55rem; font-size: .76rem; }
+.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.primary:hover { background: #284a3a; }
+.primary span { margin-left: 1rem; }
+.swot-grid { display: grid; grid-template-columns: 5rem minmax(0, 1fr) minmax(0, 1fr); gap: .75rem; }
+.axis { font-size: .8rem; font-weight: 600; display: flex; flex-direction: column; justify-content: center; }
+.axis span { font-size: .65rem; font-weight: 400; color: var(--muted); }
+.axis.helpful, .axis.harmful { padding: 0 1.3rem .15rem; }
+.axis.internal, .axis.external { writing-mode: vertical-rl; transform: rotate(180deg); align-items: center; gap: .4rem; }
+.cell { min-width: 0; padding: 1.25rem 1.3rem 1rem; border: 1px solid #0000000d; border-radius: 5px; min-height: 230px; display: flex; flex-direction: column; }
+.strengths, .so { background: var(--green); --category: #4c6a43; }
+.weaknesses, .wo { background: var(--orange); --category: #8a6034; }
+.opportunities, .st { background: var(--blue); --category: #486c73; }
+.threats, .wt { background: var(--rose); --category: #905344; }
+.empty-factor { cursor: text; }
+.cell-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+h2 { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 1.55rem; line-height: 1.2; font-weight: 400; margin: 0; }
+.cell-symbol { color: var(--category); font-size: .75rem; font-weight: 600; }
+.cell-description { font-size: .7rem; color: #575d52; margin: .35rem 0 1rem; }
+.items { padding: 0; margin: 0 0 1rem; list-style: none; }
+.item { display: flex; align-items: start; gap: .6rem; border-top: 1px solid #00000014; padding: .55rem 0; }
+.item::before { content: "·"; color: var(--category); padding-top: .15rem; }
+.item textarea { border: none; min-height: 2rem; padding: .15rem 0; font-size: .9rem; line-height: 1.6; resize: vertical; overflow: hidden; }
+.delete { padding: .1rem .35rem; font-size: 1rem; background: transparent; border: 0; color: #6c6d63; }
+.delete:hover { color: var(--danger); background: #ffffff66; }
+.add { margin-top: auto; align-self: start; padding: .25rem 0; font-size: .75rem; border: 0; background: transparent; color: var(--category); font-weight: 600; }
+.add::before { content: "+"; margin-right: .4rem; font-size: 1rem; }
+.add:hover { background: transparent; text-decoration: underline; }
+.empty { font-size: .8rem; color: #707367; margin: .6rem 0 1rem; font-style: italic; }
+.tows-grid { display: grid; grid-template-columns: minmax(0, .8fr) repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.tows-guide { padding: 1rem .5rem; align-self: center; }
+.tows-guide > p { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 1.25rem; line-height: 1.35; margin: .5rem 0 .75rem; }
+.tows-guide small { font-size: .68rem; color: var(--muted); }
+.context { padding: 1rem 1.2rem; min-width: 0; border-radius: 5px; border: 1px solid #0000000d; }
+.context h2 { font-size: 1.2rem; }
+.context ul { padding-left: 1rem; margin: .7rem 0 0; font-size: .8rem; }
+.context li { margin: .3rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.context .readonly-label { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: .25rem; }
+.status { font-size: .75rem; color: var(--muted); padding: 1rem 0; min-height: 3rem; }
+.status.error { color: var(--danger); }
+.clipboard-fallback { background: var(--surface); border: 1px solid var(--line); padding: 1.25rem; margin-top: 1rem; border-radius: 5px; }
+.clipboard-fallback label { font-weight: 600; }
+.clipboard-fallback p { font-size: .8rem; margin-top: .4rem; }
+.clipboard-fallback textarea { display: block; font-family: monospace; font-size: .8rem; margin: 1rem 0; }
+footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 0 1.6rem; border-top: 1px solid var(--line); font-size: .65rem; color: var(--muted); }
+@media (max-width: 850px) {
+  .shell { width: calc(100% - 2rem); }
+  .swot-grid { grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1fr); }
+  .cell { padding: 1rem; }
+  .tows-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tows-guide { grid-column: 1 / -1; }
+  .context { min-height: 120px; }
+  .context.opportunities, .context.threats { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .framing { grid-template-columns: 1fr; gap: .85rem; }
+  .toolbar { flex-wrap: wrap; }
+  .export-actions { width: 100%; }
+  .export-actions button { flex: 1; padding-inline: .55rem; }
+  .swot-grid, .tows-grid { grid-template-columns: minmax(0, 1fr); }
+  .axis { display: none; }
+  .cell { min-height: 210px; }
+  .cell-description { margin-bottom: .75rem; }
+  .tows-guide { padding: .5rem 0; }
+  footer { flex-direction: column; gap: .2rem; }
+}
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
+
+/* Local AI request preparation and whole-canvas review, not an API client. */
+.toolbar { flex-wrap: wrap; }
+.ai-actions { display: flex; flex-wrap: wrap; gap: .35rem; font-size: .76rem; }
+.thoughts, .proposal-panel { margin: .5rem 0 1.25rem; }
+.thought, .proposal-panel { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 5px; padding: 1rem 1.2rem; }
+.thought + .thought { margin-top: .5rem; }
+.thought h3, .proposal-panel h3 { font-size: .8rem; margin: 0 0 .4rem; color: var(--accent); }
+.thought p, .proposal-panel p { font-size: .85rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.proposal-panel summary { font-size: .8rem; padding: .8rem 0; }
+.proposal-actions { display: flex; flex-wrap: wrap; gap: .5rem; font-size: .8rem; margin-top: .6rem; }
+.proposal-diff { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; border-top: 1px solid var(--line); padding: .8rem 0; }
+.proposal-diff h4 { grid-column: 1 / -1; margin: 0; font-size: .85rem; }
+.proposal-diff ul { padding-left: 1.2rem; font-size: .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.proposal-diff strong { font-size: .75rem; }
+.review-node-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; }
+.review-node-heading h4 { margin: 0; }
+.review-node-controls { display: flex; align-items: center; gap: .45rem; font-size: .75rem; flex-wrap: wrap; }
+.review-node-controls button { padding: .3rem .65rem; }
+.review-select { display: inline-flex; align-items: center; gap: .3rem; margin-right: .3rem; cursor: pointer; }
+.review-select input { accent-color: var(--accent); }
+.review-select input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.node-status { font-size: .7rem; border-radius: 3px; padding: .2rem .5rem; }
+.node-status.accepted { color: #34553c; background: var(--green); }
+.node-status.rejected { color: #804539; background: var(--rose); }
+.proposal-panel .review-hint { color: var(--muted); font-size: .75rem; margin-top: .6rem; }
+.proposal-panel .review-error { color: var(--danger); font-size: .8rem; }
+.proposal-tag { display: inline-block; margin-left: .5rem; padding: .1rem .4rem; border-radius: 3px; background: var(--green); color: #34553c; font-size: .65rem; font-weight: 600; line-height: 1.5; vertical-align: baseline; white-space: nowrap; }
+dialog { width: min(540px, calc(100% - 2rem)); max-height: calc(100% - 2rem); overflow: auto; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1.5rem; }
+dialog::backdrop { background: #26332866; }
+dialog h2 { margin-bottom: .7rem; }
+dialog label { display: block; font-size: .8rem; font-weight: 600; margin: 1rem 0 .4rem; }
+dialog .dialog-note { font-size: .8rem; color: var(--muted); }
+dialog select { width: 100%; padding: .55rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: .85rem; }
+dialog select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+dialog textarea { display: block; font-size: .9rem; }
+.checkbox-label { display: flex; align-items: center; gap: .5rem; font-weight: 400; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1.2rem; font-size: .8rem; }
+@media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
+
+/* VPC-specific geometry; common Pensive controls and typography come from SWOT. */
+.vpc-halves { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.vpc-half { min-width: 0; }
+.half-title { margin: 0; padding: 10px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; border-bottom: 1px solid var(--line); }
+.value-map .half-title { color: var(--accent); }
+.half-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(210px, auto) minmax(210px, auto); }
+.vpc-cell { min-width: 0; padding: 18px 14px; border-bottom: 1px solid var(--line); }
+.vpc-cell h3 { margin: 0; font-size: 16px; }
+.vpc-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.products { grid-column: 1; grid-row: 1 / 3; border-right: 1px solid var(--line); }
+.creators { grid-column: 2; grid-row: 1; }
+.relievers { grid-column: 2; grid-row: 2; }
+.gains { grid-column: 1; grid-row: 1; border-right: 1px solid var(--line); }
+.pains { grid-column: 1; grid-row: 2; border-right: 1px solid var(--line); }
+.jobs { grid-column: 2; grid-row: 1 / 3; }
+.vpc-guide { font-size: 12px; line-height: 1.6; color: var(--muted); margin: 18px 0 0; }
+.vpc-cell .items { min-height: 30px; }
+.framing details label { margin-top: 12px; }
+@media (max-width: 850px) {
+  .vpc-halves { grid-template-columns: 1fr; gap: 24px; }
+}
+@media (max-width: 480px) {
+  .half-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+  .vpc-cell { grid-column: 1; grid-row: auto; border-right: 0; min-height: 115px; }
+  .products { order: 0; } .creators { order: 1; } .relievers { order: 2; }
+  .jobs { order: 0; } .gains { order: 1; } .pains { order: 2; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="masthead"><div class="brand"><a class="wordmark" href="#main" aria-label="Pensive, skip to canvas">pensive<span aria-hidden="true">.</span></a><p class="eyebrow">VALUE PROPOSITION CANVAS: CUSTOMER &amp; OFFERING FIT</p></div></header>
+  <main id="main">
+    <section class="framing" aria-label="Analysis context">
+      <label for="product_offering">Product / Offering<textarea id="product_offering" data-framing="product_offering" rows="1" placeholder="Which offering are you considering?"></textarea></label>
+      <label for="customer_segment">Customer Segment<textarea id="customer_segment" data-framing="customer_segment" rows="1" placeholder="Which specific customer are you examining?"></textarea></label>
+      <label for="scenario_job_context">Scenario / Job Context<textarea id="scenario_job_context" data-framing="scenario_job_context" rows="1" placeholder="When and where does the customer need arise?"></textarea></label>
+      <details><summary>Alternative &amp; success criterion <span class="optional">/ optional</span></summary><label for="current_alternative">Current Alternative<textarea id="current_alternative" data-framing="current_alternative" rows="1" placeholder="What does the customer do instead?"></textarea></label><label for="success_metric">Success Metric<textarea id="success_metric" data-framing="success_metric" rows="1" placeholder="What would indicate progress? Leave unknown measures empty."></textarea></label></details>
+    </section>
+    <div class="toolbar"><div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button></div><div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div></div>
+    <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
+    <section id="vpc-view" aria-label="Value Proposition Canvas">
+      <div class="vpc-halves">
+        <section class="vpc-half value-map" aria-labelledby="value-map-title"><h2 class="half-title" id="value-map-title">Value Map</h2><div class="half-grid"><section class="vpc-cell products" data-section="products_services" aria-label="Products &amp; Services"></section><section class="vpc-cell creators" data-section="gain_creators" aria-label="Gain Creators"></section><section class="vpc-cell relievers" data-section="pain_relievers" aria-label="Pain Relievers"></section></div></section>
+        <section class="vpc-half customer-profile" aria-labelledby="customer-profile-title"><h2 class="half-title" id="customer-profile-title">Customer Profile</h2><div class="half-grid"><section class="vpc-cell jobs" data-section="jobs" aria-label="Customer Jobs"></section><section class="vpc-cell gains" data-section="gains" aria-label="Gains"></section><section class="vpc-cell pains" data-section="pains" aria-label="Pains"></section></div></section>
+      </div>
+      <p class="vpc-guide">Describe customer needs separately from the offering. A proposed match is a hypothesis until supported by evidence.</p>
+    </section>
+    <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden><label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p><textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button></section>
+    <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
+  </main>
+  <footer><span>Less conversation. More thinking.</span><span>VPC <span aria-hidden="true">·</span> Pensive</span></footer>
+</div>
+<dialog id="ai-dialog" aria-labelledby="ai-title"><form id="ai-form"><h2 id="ai-title">Evaluate VPC</h2><p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill.</p><label for="ai-guidance">Steering guidance</label><textarea id="ai-guidance" rows="3" placeholder="Focus, constraints, evidence to consider…"></textarea><label class="checkbox-label"><input id="use-thoughts" type="checkbox" checked> Use existing thoughts as guidance</label><p id="ai-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-ai" type="button">Cancel</button><button type="submit" class="primary">Copy AI request</button></div></form></dialog>
+<dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><h2 id="import-title">Import VPC JSON</h2><p class="dialog-note">Paste complete exported VPC state. Validation happens before replacement.</p><label for="import-json">Import canvas JSON</label><textarea id="import-json" rows="10" spellcheck="false"></textarea><p id="import-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-import" type="button">Cancel import</button><button type="submit" class="primary">Replace canvas</button></div></form></dialog>
+<noscript>This canvas requires JavaScript for local editing and export. No server is needed.</noscript>
+<!--pensive-state-start-->
+<script id="canvas-state" type="application/json">{
+  "framework": "vpc",
+  "schema_version": "1.0",
+  "content": {
+    "framing": {
+      "product_offering": "",
+      "customer_segment": "",
+      "scenario_job_context": "",
+      "current_alternative": "",
+      "success_metric": ""
+    },
+    "jobs": [],
+    "pains": [],
+    "gains": [],
+    "products_services": [],
+    "pain_relievers": [],
+    "gain_creators": []
+  }
+}</script>
+<!--pensive-state-end-->
+<script data-implementation>
+/* VPC-local state and safe packaging; shared by Node and standalone HTML. */
+const Vpc = (() => {
+  'use strict';
+  const sections = Object.freeze(['jobs', 'pains', 'gains', 'products_services', 'pain_relievers', 'gain_creators']);
+  const framing = Object.freeze(['product_offering', 'customer_segment', 'scenario_job_context', 'current_alternative', 'success_metric']);
+  const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
+  function keys(value, required, path, optional = []) {
+    if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(k => !required.includes(k) && !optional.includes(k)) || required.some(k => !Object.hasOwn(value, k))) throw new Error(`${path}: expected exactly ${required.join(', ')}.`);
+  }
+  function validateContent(content) {
+    keys(content, ['framing', ...sections], 'Content');
+    keys(content.framing, framing, 'Framing');
+    if (framing.some(k => typeof content.framing[k] !== 'string')) throw new Error('Framing must contain text.');
+    const ids = new Set();
+    for (const section of sections) {
+      if (!Array.isArray(content[section])) throw new Error(`${section}: expected array.`);
+      for (const item of content[section]) {
+        keys(item, ['id', 'text'], section);
+        if (typeof item.id !== 'string' || !idPattern.test(item.id) || typeof item.text !== 'string') throw new Error(`${section}: invalid item ID or text.`);
+        if (ids.has(item.id)) throw new Error(`Duplicate item ID: ${item.id}.`);
+        ids.add(item.id);
+      }
+    }
+    return ids;
+  }
+  function same(a, b) {
+    if (a === b) return true;
+    if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
+    return Object.keys(a).length === Object.keys(b).length && Object.keys(a).every(k => Object.hasOwn(b, k) && same(a[k], b[k]));
+  }
+  function validateThought(thought, ids) {
+    keys(thought, ['id', 'kind', 'text'], 'Thought');
+    if (typeof thought.id !== 'string' || !idPattern.test(thought.id) || ids.has(thought.id)) throw new Error('Invalid or duplicate thought ID.');
+    if (!['evaluation', 'improvement'].includes(thought.kind) || typeof thought.text !== 'string' || !thought.text.trim()) throw new Error('Invalid thought.');
+    ids.add(thought.id);
+  }
+  function boundary(before, after) {
+    if (!same(before.framing, after.framing)) throw new Error('Improve must preserve framing.');
+    const previous = sections.flatMap(section => before[section]);
+    for (const item of sections.flatMap(section => after[section])) {
+      const matches = previous.filter(old => old.text === item.text);
+      if (matches.length && !matches.some(old => old.id === item.id)) throw new Error('Retained text must preserve an existing matching ID.');
+    }
+  }
+  function validate(state) {
+    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals']);
+    if (state.framework !== 'vpc' || state.schema_version !== '1.0') throw new Error('Unsupported framework/version; expected vpc / 1.0.');
+    const ids = validateContent(state.content);
+    if (state.thoughts !== undefined) {
+      if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
+      for (const thought of state.thoughts) validateThought(thought, ids);
+    }
+    if (state.proposals !== undefined) {
+      if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one pending proposal is supported.');
+      for (const proposal of state.proposals) {
+        keys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal');
+        if (proposal.action !== 'improve') throw new Error('Unsupported proposal action.');
+        const baseIds = validateContent(proposal.base_content), candidateIds = validateContent(proposal.content);
+        boundary(proposal.base_content, proposal.content);
+        const annotationIds = new Set((state.thoughts || []).map(t => t.id));
+        if ([...annotationIds].some(id => baseIds.has(id) || candidateIds.has(id))) throw new Error('Proposed item collides with an annotation ID.');
+        for (const id of baseIds) ids.add(id); for (const id of candidateIds) ids.add(id);
+        if (typeof proposal.id !== 'string' || !idPattern.test(proposal.id) || ids.has(proposal.id)) throw new Error('Invalid or duplicate proposal ID.');
+        ids.add(proposal.id); validateThought(proposal.thought, ids);
+        if (proposal.thought.kind !== 'improvement') throw new Error('Improve proposal needs an improvement thought.');
+      }
+    }
+    return state;
+  }
+  function initialState() { return { framework: 'vpc', schema_version: '1.0', content: { framing: Object.fromEntries(framing.map(k => [k, ''])), ...Object.fromEntries(sections.map(k => [k, []])) } }; }
+  function collection(state, section) { if (!sections.includes(section)) throw new Error('Unknown VPC collection.'); return state.content[section]; }
+  function addItem(state, section) {
+    validate(state); const list = collection(state, section), used = validateContent(state.content);
+    for (const thought of state.thoughts || []) used.add(thought.id);
+    for (const proposal of state.proposals || []) {
+      used.add(proposal.id); used.add(proposal.thought.id);
+      for (const content of [proposal.base_content, proposal.content]) for (const id of validateContent(content)) used.add(id);
+    }
+    let id;
+    do { id = `item-${crypto.randomUUID()}`; } while (used.has(id));
+    list.push({ id, text: '' }); return id;
+  }
+  function editItem(state, section, id, text) {
+    validate(state); const item = collection(state, section).find(i => i.id === id);
+    if (!item) throw new Error('Unknown item.'); if (typeof text !== 'string') throw new Error('Item text must be text.'); item.text = text;
+  }
+  function deleteItem(state, section, id) {
+    validate(state); const list = collection(state, section), index = list.findIndex(i => i.id === id);
+    if (index < 0) throw new Error('Unknown item.'); list.splice(index, 1);
+  }
+  function validateRequest(request) {
+    keys(request, ['canvas', 'action'], 'Request'); validate(request.canvas);
+    if (request.canvas.proposals?.length) throw new Error('Resolve the pending proposal first.');
+    keys(request.action, ['id'], 'Action', ['comment', 'use_thoughts']);
+    const action = request.action;
+    if (!['evaluate', 'improve'].includes(action.id)) throw new Error('Unsupported VPC action.');
+    if (action.comment !== undefined && typeof action.comment !== 'string') throw new Error('Action comment must be text.');
+    if (action.use_thoughts !== undefined && typeof action.use_thoughts !== 'boolean') throw new Error('use_thoughts must be boolean.');
+    return request;
+  }
+  function buildRequest(state, action) {
+    const request = { canvas: structuredClone(state), action: { ...structuredClone(action), use_thoughts: action.use_thoughts ?? true } };
+    return validateRequest(request);
+  }
+  function composeResult(request, response) {
+    validateRequest(request);
+    keys(response, request.action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'Response');
+    if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('Response thought must be nonempty text.');
+    const result = structuredClone(request.canvas), ids = validateContent(result.content);
+    for (const thought of result.thoughts || []) ids.add(thought.id);
+    if (request.action.id === 'improve') {
+      for (const id of validateContent(response.content)) {
+        if ((result.thoughts || []).some(t => t.id === id)) throw new Error('Candidate item collides with an annotation ID.');
+        ids.add(id);
+      }
+      boundary(result.content, response.content);
+    }
+    function fresh(prefix) { let id; do { id = `${prefix}-${crypto.randomUUID()}`; } while (ids.has(id)); ids.add(id); return id; }
+    const thought = { id: fresh('thought'), kind: request.action.id === 'evaluate' ? 'evaluation' : 'improvement', text: response.thought };
+    if (request.action.id === 'evaluate') result.thoughts = [...(result.thoughts || []), thought];
+    else result.proposals = [{ id: fresh('proposal'), action: 'improve', base_content: structuredClone(result.content), content: structuredClone(response.content), thought }];
+    return validate(result);
+  }
+  function acceptProposal(state) {
+    validate(state); const proposal = state.proposals?.[0]; if (!proposal) throw new Error('No pending proposal.');
+    if (!same(state.content, proposal.base_content)) throw new Error('Canvas content or framing changed; reject and request a fresh proposal.');
+    const next = structuredClone(state); next.content = structuredClone(proposal.content);
+    next.thoughts = [...(next.thoughts || []), structuredClone(proposal.thought)]; next.proposals = [];
+    validate(next); Object.assign(state, next);
+  }
+  function rejectProposal(state) {
+    validate(state); if (!state.proposals?.length) throw new Error('No pending proposal.'); state.proposals = [];
+  }
+  function parseState(json) { return validate(JSON.parse(json)); }
+  function safeJson(state) { validate(state); return JSON.stringify(state, null, 2).replace(/[<>&\u2028\u2029]/g, c => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`); }
+  function packageHtml(html, state) {
+    const start = ['<!--', 'pensive-state-start', '-->'].join(''), end = ['<!--', 'pensive-state-end', '-->'].join('');
+    const first = html.indexOf(start), last = html.indexOf(end);
+    if (first < 0 || last < first || html.indexOf(start, first + start.length) !== -1 || html.indexOf(end, last + end.length) !== -1) throw new Error('Expected one complete state slot.');
+    return html.slice(0, first) + `${start}\n<script id="canvas-state" type="application/json">${safeJson(state)}<${'/script>'}\n${end}` + html.slice(last + end.length);
+  }
+  return Object.freeze({ sections, framing, initialState, validate, validateContent, collection, addItem, editItem, deleteItem, validateRequest, buildRequest, composeResult, acceptProposal, rejectProposal, parseState, safeJson, packageHtml });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = Vpc;
+</script>
+<script data-implementation>
+/* Local VPC editing. No network or persistence service. */
+(() => {
+  'use strict';
+  const labels = { jobs: ['Customer Jobs', 'J'], pains: ['Pains', 'P'], gains: ['Gains', 'G'], products_services: ['Products & Services', 'PS'], pain_relievers: ['Pain Relievers', 'PR'], gain_creators: ['Gain Creators', 'GC'] };
+  const $ = selector => document.querySelector(selector);
+  const source = '<!doctype html>\n' + document.documentElement.outerHTML;
+  let state, requestedAction;
+  function element(tag, className, text) { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; }
+  function status(message, error = false) { $('#status').textContent = message; $('#status').classList.toggle('error', error); }
+  function resize(input) { input.style.height = 'auto'; input.style.height = `${Math.max(input.scrollHeight + input.offsetHeight - input.clientHeight, 30)}px`; }
+  function edited() { $('#clipboard-fallback').hidden = true; status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.'); }
+  function renderSection(section) {
+    const container = $(`[data-section="${section}"]`), [label, symbol] = labels[section];
+    const heading = element('div', 'vpc-heading'); heading.append(element('span', 'cell-symbol', symbol), element('h3', '', label));
+    const list = element('ul', 'items');
+    Vpc.collection(state, section).forEach((item, index) => {
+      const row = element('li', 'item'), input = element('textarea'); input.rows = 1; input.value = item.text; input.dataset.id = item.id;
+      input.setAttribute('aria-label', `${label} ${index + 1}`); input.placeholder = 'Write one idea…';
+      input.addEventListener('input', () => { Vpc.editItem(state, section, item.id, input.value); resize(input); edited(); });
+      const remove = element('button', 'delete', '×'); remove.type = 'button'; remove.setAttribute('aria-label', `Delete ${label.toLowerCase()} ${index + 1}`);
+      remove.addEventListener('click', () => { Vpc.deleteItem(state, section, item.id); renderSection(section); container.querySelector('.add').focus(); edited(); });
+      row.append(input, remove); list.append(row);
+    });
+    const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
+    add.addEventListener('click', () => { const id = Vpc.addItem(state, section); renderSection(section); edited(); Array.from(container.querySelectorAll('textarea')).find(n => n.dataset.id === id).focus(); });
+    container.replaceChildren(heading, list, add); container.querySelectorAll('textarea').forEach(resize);
+  }
+  function renderThoughts() {
+    const container = $('#thoughts'); container.replaceChildren(); container.hidden = !state.thoughts?.length;
+    for (const thought of state.thoughts || []) { const card = element('article', 'thought'); card.append(element('h3', '', thought.kind === 'evaluation' ? 'Evaluation' : 'What improved and why'), element('p', '', thought.text)); container.append(card); }
+  }
+  function renderProposal() {
+    const panel = $('#proposal-panel'), proposal = state.proposals?.[0]; panel.replaceChildren(); panel.hidden = !proposal;
+    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
+    if (!proposal) return;
+    panel.append(element('h3', '', 'Proposed improvements'), element('p', '', proposal.thought.text));
+    const details = element('details'), summary = element('summary', '', 'Review proposed changes'); details.append(summary);
+    for (const section of Vpc.sections) {
+      if (JSON.stringify(proposal.base_content[section]) === JSON.stringify(proposal.content[section])) continue;
+      const diff = element('div', 'proposal-diff'); diff.append(element('h4', '', labels[section][0]));
+      for (const [heading, items] of [['Current', proposal.base_content[section]], ['Proposed', proposal.content[section]]]) {
+        const column = element('div'), list = element('ul'); column.append(element('strong', '', heading));
+        for (const item of items) list.append(element('li', '', item.text || '(Blank draft)'));
+        if (!items.length) list.append(element('li', '', '(Empty)')); column.append(list); diff.append(column);
+      }
+      details.append(diff);
+    }
+    const controls = element('div', 'proposal-actions');
+    for (const [label, action] of [['Accept transformation', Vpc.acceptProposal], ['Reject', Vpc.rejectProposal]]) {
+      const button = element('button', label === 'Accept transformation' ? 'primary' : '', label); button.type = 'button';
+      button.addEventListener('click', () => {
+        try { action(state); refresh(); edited(); status(label === 'Reject' ? 'Proposal rejected. Your current content is preserved.' : 'Transformation accepted. Save or export to keep it.'); }
+        catch (error) { status(error.message, true); }
+      }); controls.append(button);
+    }
+    panel.append(details, controls);
+  }
+  function refresh() { for (const field of Vpc.framing) { const input = $(`[data-framing="${field}"]`); input.value = state.content.framing[field]; resize(input); } Vpc.sections.forEach(renderSection); renderThoughts(); renderProposal(); }
+  async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
+    try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status(message); }
+    catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access blocked. Copy the selected JSON below.', true); }
+  }
+  function save() {
+    try { const url = URL.createObjectURL(new Blob([Vpc.packageHtml(source, state)], { type: 'text/html;charset=utf-8' })); const link = element('a'); link.href = url; link.download = 'pensive-vpc.html'; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); status('HTML download started. Keep the downloaded file to preserve your work.'); }
+    catch (e) { status(`Could not save: ${e.message}`, true); }
+  }
+  try {
+    state = Vpc.parseState($('#canvas-state').textContent); refresh();
+    for (const field of Vpc.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { state.content.framing[field] = e.target.value; resize(e.target); edited(); });
+    document.querySelectorAll('[data-ai]').forEach(button => button.addEventListener('click', () => {
+      try {
+        if (state.proposals?.length) throw new Error('Resolve the pending proposal first.');
+        requestedAction = button.dataset.ai; $('#ai-form').reset(); $('#ai-error').textContent = '';
+        $('#ai-title').textContent = requestedAction === 'evaluate' ? 'Evaluate VPC' : 'Improve VPC';
+        $('#ai-dialog').showModal(); $('#ai-guidance').focus();
+      } catch (error) { status(error.message, true); }
+    }));
+    $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());
+    $('#ai-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      try { const request = Vpc.buildRequest(state, { id: requestedAction, comment: $('#ai-guidance').value, use_thoughts: $('#use-thoughts').checked }); $('#ai-dialog').close(); await copyJson(JSON.stringify(request, null, 2), 'Copied AI request. Paste it into Codex or ChatGPT with the Pensive skill.'); }
+      catch (error) { $('#ai-error').textContent = error.message; }
+    });
+    $('#copy').addEventListener('click', () => copyJson(JSON.stringify(Vpc.validate(state), null, 2))); $('#save').addEventListener('click', save);
+    $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });
+    $('#import').addEventListener('click', () => { $('#import-form').reset(); $('#import-error').textContent = ''; $('#import-dialog').showModal(); $('#import-json').focus(); });
+    $('#cancel-import').addEventListener('click', () => $('#import-dialog').close());
+    $('#import-form').addEventListener('submit', e => { e.preventDefault(); try { const next = Vpc.parseState($('#import-json').value); if (!confirm('Replace the current canvas? Save or export first if you want to keep it.')) return; state = next; $('#import-dialog').close(); refresh(); edited(); status('VPC JSON imported. Save to keep this state.'); } catch (err) { $('#import-error').textContent = err.message; } });
+    window.addEventListener('resize', () => document.querySelectorAll('[data-framing], .vpc-cell textarea').forEach(resize));
+    $('details').addEventListener('toggle', () => { for (const input of document.querySelectorAll('details textarea')) resize(input); });
+  } catch (err) { document.querySelectorAll('button, textarea, input').forEach(n => { n.disabled = true; }); status(`Invalid canvas: ${err.message} Embedded state has not been changed.`, true); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+{
+  "audit_date": "2026-11-03",
+  "v1_revision": null,
+  "v2_head": "a75617205cf342ebe851379ab43db52e35a07a5e",
+  "note": "SHA-256 of selected source-inspected files; some shared files were inspected in relevant excerpts only. No legacy runtime verification.",
+  "sources": [
+    {
+      "version": "V1",
+      "path": "app/api/canvas_router.py",
+      "sha256": "f6b0fa07c93b6ad937f11914dea6d6c578556cfc625eb31d56934ae58aa4d095"
+    },
+    {
+      "version": "V1",
+      "path": "app/api/ripple_router.py",
+      "sha256": "ea20f1a5d7170db2b14eff07c88d5ffee9cdc6597155944a82d5f2da6e72ddec"
+    },
+    {
+      "version": "V1",
+      "path": "app/api/wizard_router.py",
+      "sha256": "4c4bd891ce332462ae83bfb51b64b95a438424bee28c11e6aa426c769b41550b"
+    },
+    {
+      "version": "V1",
+      "path": "app/service/prompt_builder.py",
+      "sha256": "b246e49575f8a1059245e8bb3716c888083b7e7551b929c8cc751f876db2e50e"
+    },
+    {
+      "version": "V1",
+      "path": "app/service/prompt_rules.yml",
+      "sha256": "d5cfdc567269d083dbd61251f84b6d1df6f90840113644be4906bbe0abd3544d"
+    },
+    {
+      "version": "V1",
+      "path": "app/service/wizard.py",
+      "sha256": "dc2139927e13a561ff6322aef704d075893aaeacdb4b5ebd94460f55818eae78"
+    },
+    {
+      "version": "V1",
+      "path": "prompts/generate/vpc_generate.j2",
+      "sha256": "4e69cdff8ea9979c8df36e984f4c5ac90288e52f578928a516489925f248abb3"
+    },
+    {
+      "version": "V1",
+      "path": "prompts/improve/vpc_improve.j2",
+      "sha256": "cf31a15d8736d0b88dd3f2deebdcee5d485a98acf4a6f1390fd702eabf3e204d"
+    },
+    {
+      "version": "V1",
+      "path": "prompts/reflect/vpc_reflect.j2",
+      "sha256": "fc7a3b7c5927b0c6feb6a85a84a35788025fb7119af14406a30bf7b668e7f349"
+    },
+    {
+      "version": "V1",
+      "path": "prompts/ripple/vpc_ripple.j2",
+      "sha256": "3fc71a56f7e91b955fdcc92069b3db1cf7e58c7a23bf43774132e10721da7b29"
+    },
+    {
+      "version": "V1",
+      "path": "prompts/ripple/vpc_ripple_pains.j2",
+      "sha256": "e6b5ebc35fb5620b50c706334bf95bbbc24f365f79d74ef5214a47c13fbfdd34"
+    },
+    {
+      "version": "V1",
+      "path": "prompts/tools/vpc_tool.j2",
+      "sha256": "46d8f58507babfc4f49bfd5d6738a0bae48262fa77a1f4b37f143360d57e9150"
+    },
+    {
+      "version": "V1",
+      "path": "schemas/vpc.yml",
+      "sha256": "f88ecb65f64d0e0053a89970ba14c5e35b92f28baf14c902230eccfaaa32e22b"
+    },
+    {
+      "version": "V1",
+      "path": "static/vpc/canvas.js",
+      "sha256": "48db4aec2f887f1cc2a075e633bb1c92618f1cd144e6eb3ecb66f93420ca980d"
+    },
+    {
+      "version": "V1",
+      "path": "static/vpc/vpc.css",
+      "sha256": "339b3129aa07b8a2c7f4cfa5e85af7edc4b58e55d11502d164ae29db8d8d935c"
+    },
+    {
+      "version": "V1",
+      "path": "static/vpc/vpc.js",
+      "sha256": "457f8b622fe815bfa398a5f00b118c7d96bae3d0a516e6060e724dc623e2af54"
+    },
+    {
+      "version": "V1",
+      "path": "templates/frameworks/vpc.html",
+      "sha256": "6dec3052980db0d8fcc1507a56da3bd198b6eb95ed22da2f44effbfbea6eae37"
+    },
+    {
+      "version": "V1",
+      "path": "tests/views/test_canvas_vpc.py",
+      "sha256": "d5e59e0faf2d74658cbe93a0fcd708512fcf6aa888e803638e41b8becc41463e"
+    },
+    {
+      "version": "V2",
+      "path": "app/frameworks/layouts/vpc.canvas.yml",
+      "sha256": "9d092731a4ca0d188373e539673dbc4cd9d5db4c35c0d941d2c123cb13d2fb8f"
+    },
+    {
+      "version": "V2",
+      "path": "app/frameworks/registry.py",
+      "sha256": "f6bfe38cc987fba62cee8e949a2fa44ef75fc94614141349985495cd4204910d"
+    },
+    {
+      "version": "V2",
+      "path": "app/routes/canvas_api.py",
+      "sha256": "df7524b3a458cb5ea3df47da91c2b4049d2476b7cc3949f59b7bd09959615ff1"
+    },
+    {
+      "version": "V2",
+      "path": "app/routes/canvas_pages.py",
+      "sha256": "d1988026ee0fb7f3ab47209574620ffe429b6be6744507068b628dcade3fb192"
+    },
+    {
+      "version": "V2",
+      "path": "app/services/canvas_ai_service.py",
+      "sha256": "3b5d2f72f0e8b8e91cd1fb68a1c220d2357a16c698f66691820841e858d3e728"
+    },
+    {
+      "version": "V2",
+      "path": "app/services/prompt_library_service.py",
+      "sha256": "6c1e723b67453ab4f5dbac26d59e5aee1100313153b844db583cf7d28ababba8"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/rules.json",
+      "sha256": "52cfa844d8aee65b0965696b5047e03b1e7e56a35634593d5c687d4207ae206f"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/system/generate_base.j2",
+      "sha256": "f14d31755fc2914d05e5ff144bf6aea7f1d7b1608033f6735bf24e2a11dcf096"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/system/guidance_base.j2",
+      "sha256": "f7cf47c66f9f29a2613eb6ac50aa4cc26a104c0f61f96f2b0f96ed976ade666b"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/system/improve_base.j2",
+      "sha256": "f324182620684c0fae5b5b5006328f63918edde4a6d96cd65dead592899fade5"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/system/reflect_base.j2",
+      "sha256": "c8a4ac51ade3dc5417181fbb800c4284da640ede89c55cd33f40f54ebedb9dd9"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/system/restate_problem_base.j2",
+      "sha256": "9cf3de255cacf029a328219892f862e384ca2b520e0d270f95bfc3451a581d3f"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/system/viewpoint_base.j2",
+      "sha256": "bc9fa5fa6bdf460714b0971ee569a7376751a061c50260679bdab37db299d06b"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_generate.j2",
+      "sha256": "0dca707de63e656555e641f201ac185a358895406099bd6afb7b0ed6f2b93802"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_guidance.j2",
+      "sha256": "fb501ad32bb77d9e9b858acd9daad1f2a8ac8f00414b9e585b2b0c64db498c5f"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_improve.j2",
+      "sha256": "dd4dbcdbc0c289c44ccfea76b648ae6ce198b8f27da37c94748f062dec438374"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_reflect.j2",
+      "sha256": "7d6940858e12eea4a4039f80fb125e32c00b3db396f0049efd900e5ca2046193"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_restate_problem.j2",
+      "sha256": "cb5c728fea38a864fce38d6711ad18acad1ebd5a65a42b8aaa5668ea09d91260"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_viewpoint_black.j2",
+      "sha256": "9fda3462441710f8c6363bcbb589e85e526db0fdbca9470d2d5ddcc1726cb061"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_viewpoint_blue.j2",
+      "sha256": "2fd68ed79b745fd8f22d435e859c408b9941fefa0cf7a577b6f92d73144af7db"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_viewpoint_green.j2",
+      "sha256": "8f773cfdb08a5a70ac8d3fab6b756d79984afd8383cfb981266f209e687e3065"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_viewpoint_red.j2",
+      "sha256": "ef13da79a416eb51e4666d57ea6166081691f72a833c002eab9c72dac6065c91"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_viewpoint_white.j2",
+      "sha256": "6253a9be3bfc471c1e38962c5ff8d1da04d6578a23c461684915f54020161047"
+    },
+    {
+      "version": "V2",
+      "path": "prompt_templates/user/vpc_viewpoint_yellow.j2",
+      "sha256": "8ef1c257a705c0a1b1d824fbdb3f7b1679ce2712c62f57be747dd630a38dc5be"
+    },
+    {
+      "version": "V2",
+      "path": "tests/unit/test_framework_layout_service.py",
+      "sha256": "049257e3e65dbbd092f4fddf629860b56d21d122fe758093a9094ceca4983b19"
+    }
+  ]
+}

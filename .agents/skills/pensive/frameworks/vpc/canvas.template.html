@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Pensive — Value Proposition Canvas</title>
+<!--pensive-style-->
+</head>
+<body>
+<div class="shell">
+  <header class="masthead"><div class="brand"><a class="wordmark" href="#main" aria-label="Pensive, skip to canvas">pensive<span aria-hidden="true">.</span></a><p class="eyebrow">VALUE PROPOSITION CANVAS: CUSTOMER &amp; OFFERING FIT</p></div></header>
+  <main id="main">
+    <section class="framing" aria-label="Analysis context">
+      <label for="product_offering">Product / Offering<textarea id="product_offering" data-framing="product_offering" rows="1" placeholder="Which offering are you considering?"></textarea></label>
+      <label for="customer_segment">Customer Segment<textarea id="customer_segment" data-framing="customer_segment" rows="1" placeholder="Which specific customer are you examining?"></textarea></label>
+      <label for="scenario_job_context">Scenario / Job Context<textarea id="scenario_job_context" data-framing="scenario_job_context" rows="1" placeholder="When and where does the customer need arise?"></textarea></label>
+      <details><summary>Alternative &amp; success criterion <span class="optional">/ optional</span></summary><label for="current_alternative">Current Alternative<textarea id="current_alternative" data-framing="current_alternative" rows="1" placeholder="What does the customer do instead?"></textarea></label><label for="success_metric">Success Metric<textarea id="success_metric" data-framing="success_metric" rows="1" placeholder="What would indicate progress? Leave unknown measures empty."></textarea></label></details>
+    </section>
+    <div class="toolbar"><div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button></div><div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div></div>
+    <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
+    <section id="vpc-view" aria-label="Value Proposition Canvas">
+      <div class="vpc-halves">
+        <section class="vpc-half value-map" aria-labelledby="value-map-title"><h2 class="half-title" id="value-map-title">Value Map</h2><div class="half-grid"><section class="vpc-cell products" data-section="products_services" aria-label="Products &amp; Services"></section><section class="vpc-cell creators" data-section="gain_creators" aria-label="Gain Creators"></section><section class="vpc-cell relievers" data-section="pain_relievers" aria-label="Pain Relievers"></section></div></section>
+        <section class="vpc-half customer-profile" aria-labelledby="customer-profile-title"><h2 class="half-title" id="customer-profile-title">Customer Profile</h2><div class="half-grid"><section class="vpc-cell jobs" data-section="jobs" aria-label="Customer Jobs"></section><section class="vpc-cell gains" data-section="gains" aria-label="Gains"></section><section class="vpc-cell pains" data-section="pains" aria-label="Pains"></section></div></section>
+      </div>
+      <p class="vpc-guide">Describe customer needs separately from the offering. A proposed match is a hypothesis until supported by evidence.</p>
+    </section>
+    <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden><label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p><textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button></section>
+    <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
+  </main>
+  <footer><span>Less conversation. More thinking.</span><span>VPC <span aria-hidden="true">·</span> Pensive</span></footer>
+</div>
+<dialog id="ai-dialog" aria-labelledby="ai-title"><form id="ai-form"><h2 id="ai-title">Evaluate VPC</h2><p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill.</p><label for="ai-guidance">Steering guidance</label><textarea id="ai-guidance" rows="3" placeholder="Focus, constraints, evidence to consider…"></textarea><label class="checkbox-label"><input id="use-thoughts" type="checkbox" checked> Use existing thoughts as guidance</label><p id="ai-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-ai" type="button">Cancel</button><button type="submit" class="primary">Copy AI request</button></div></form></dialog>
+<dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><h2 id="import-title">Import VPC JSON</h2><p class="dialog-note">Paste complete exported VPC state. Validation happens before replacement.</p><label for="import-json">Import canvas JSON</label><textarea id="import-json" rows="10" spellcheck="false"></textarea><p id="import-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-import" type="button">Cancel import</button><button type="submit" class="primary">Replace canvas</button></div></form></dialog>
+<noscript>This canvas requires JavaScript for local editing and export. No server is needed.</noscript>
+<!--pensive-state-start-->
+<script id="canvas-state" type="application/json">{}</script>
+<!--pensive-state-end-->
+<!--pensive-core-->
+<!--pensive-runtime-->
+</body>
+</html>

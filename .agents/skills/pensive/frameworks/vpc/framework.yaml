@@ -1,0 +1,42 @@
+id: vpc
+name: Value Proposition Canvas
+package_version: 0.1.0
+schema_version: '1.0'
+state_schema: canvas.schema.json
+canvas: canvas.html
+semantics:
+  framing: [product_offering, customer_segment, scenario_job_context, current_alternative, success_metric]
+  customer_profile:
+    jobs: What the customer seeks to accomplish in context.
+    pains: Obstacles, risks and undesired outcomes experienced around those jobs.
+    gains: Desired benefits and outcomes.
+  value_map:
+    products_services: Actual or explicitly proposed offering components.
+    pain_relievers: How the offering addresses a specific customer pain.
+    gain_creators: How the offering supports a specific desired gain.
+  fit: A plausible mapping is a hypothesis, not evidence of customer demand or product-market fit.
+manual_capabilities: [edit_framing, add_edit_delete_items, import_validated_json, export_complete_json, save_standalone_html]
+ai_actions:
+  create:
+    method: prompts/create.md
+    effect: Establish framing before creating supported customer-profile and value-map content.
+    required_context: Identifiable offering and segment, or explicit agreement to a sparse draft.
+  evaluate:
+    method: prompts/evaluate.md
+    effect: Add a grounded assessment of fit, evidence and framing-content coherence without changing content.
+  improve:
+    method: prompts/improve.md
+    effect: Propose content improvements while preserving framing and evidence boundaries.
+target_types: [canvas]
+action_compatibility:
+  create: new_canvas
+  evaluate: complete_canvas
+  improve: complete_canvas
+quality_criteria:
+  - One identifiable customer segment and offering, with sufficient scenario context.
+  - Customer reports and observations remain distinct from provider hypotheses.
+  - Framing-content mismatches are analytical signals, not automatic validation failures.
+  - Empty collections are valid when evidence does not support a claim.
+acceptance:
+  granularity: whole_canvas_only
+  proposal_actions: [improve]

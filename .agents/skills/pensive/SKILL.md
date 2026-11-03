@@ -1,20 +1,33 @@
 ---
 name: pensive
-description: Use for Pensive canvas requests, SWOT/TOWS or PAGES analysis, framework selection, analytical actions on supplied canvas JSON, or exploring the assumptions and structure of a limiting perspective.
+description: Use for Pensive canvas requests, SWOT/TOWS, PAGES or Value Proposition Canvas (VPC) analysis, framework selection, analytical actions on supplied canvas JSON, or exploring the assumptions and structure of a limiting perspective.
 ---
 
 # Pensive
 
 ## Availability
 
-SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve requests, and manual SWOT/TOWS editing. PAGES supports creation, Evaluate/Improve/Ripple, five editable dimensions, JSON import/export and artifact-persisted Ripple baselines. Transformations use the full submitted state and return new standalone HTML; pages do not call AI. Both frameworks support node-level and bulk acceptance/rejection; read [proposal review](references/proposal-review.md) when coordinating review. Bullet-level acceptance, Six Hats, research, revision history and other frameworks are unavailable. SWOT has no import UI; PAGES imports pasted complete JSON.
+SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve requests, and manual SWOT/TOWS editing. PAGES supports creation, Evaluate/Improve/Ripple, five editable dimensions, JSON import/export and artifact-persisted Ripple baselines. VPC supports blank/context-based creation, Evaluate/Improve, six editable content collections and JSON import/export. Transformations use the full submitted state and return new standalone HTML; pages do not call AI. SWOT and PAGES support node-level and bulk acceptance/rejection; read [proposal review](references/proposal-review.md) when coordinating review. VPC uses whole-canvas acceptance/rejection only. Bullet-level acceptance, Six Hats, research, revision history and other frameworks are unavailable. SWOT has no import UI; PAGES and VPC import pasted complete JSON.
 
 ## Select a framework without imposing one
 
-- Honor explicit framework choice. An explicit PAGES request needs no recommendation or permission step; distinguish blank, context-driven creation and actions on existing state.
+- Honor explicit framework choice. An explicit PAGES or VPC request needs no recommendation or permission step; distinguish blank, context-driven creation and actions on existing state.
 - PAGES can help discover how a current perspective is composed, or shift a limiting lens: assumptions, interpretations, repeated conclusions, an impasse or an established viewpoint the user wants to question. Read its [semantics](frameworks/pages/framework.yaml). These are contextual opportunities, not automatic triggers.
 - When only implicitly relevant, normally offer it once as an option with a brief concrete reason: “We could map the parts, actions, goals, events and self-concepts behind this view, then test what changes when one premise shifts.” Wait for the user's choice before creating a canvas. Respect a decline; do not suggest it again unless the user reopens it or the situation materially changes.
-- Ordinary uncertainty, disagreement or a simple factual/logistical question usually needs ordinary conversation. Do not turn every difficulty into PAGES. SWOT/TOWS fits strategic internal/external assessment and options; PAGES fits the structure of a perspective. Ask a brief purpose question only if the choice materially affects usefulness.
+- VPC examines one customer segment’s jobs, pains and gains against an offering’s products/services, pain relievers and gain creators. Use it for customer needs, offering design or uncertain customer–offering fit; read its [semantics](frameworks/vpc/framework.yaml). When only implicitly useful, offer it selectively with a concrete reason and wait for the user’s choice. Respect a decline; ordinary product questions do not automatically require a canvas.
+- Ordinary uncertainty, disagreement or a simple factual/logistical question usually needs ordinary conversation. Do not turn every difficulty into PAGES. SWOT/TOWS fits strategic internal/external assessment and options; PAGES fits the structure of a perspective; VPC fits the relationship between customer needs and an offering. Ask a brief purpose question only if the choice materially affects usefulness.
+
+## Create, package or transform VPC
+
+Read [VPC framework](frameworks/vpc/framework.yaml) and [VPC handoff](references/vpc-workflow.md). Preserve the established [canvas](frameworks/vpc/canvas.html).
+
+- Blank: copy the established empty canvas exclusively to a new output path.
+- New draft: follow [Create](frameworks/vpc/prompts/create.md) and the [framing–content contract](references/framing-content.md). Extract framing first, clarify essential gaps adaptively, generate supported content, then check coherence. Unknown optional fields and weak fit are valid; do not fabricate customer evidence or offering capabilities.
+- Complete JSON: `node scripts/package-vpc.mjs state.json new-output.html` from the skill directory.
+- Existing state: validate the full `{canvas,action}` and load only [Evaluate](frameworks/vpc/prompts/evaluate.md) or [Improve](frameworks/vpc/prompts/improve.md). Evaluate adds a thought; Improve proposes core changes while preserving framing. Use `--result` as specified in the handoff. Resolve pending proposals before another action.
+- VPC supports whole-canvas Accept/Reject only. Ripple, Restate framing and thinking tools are deferred; no baseline or partial-resolution metadata is supported.
+
+Return a new standalone HTML link. Import JSON confirms validated replacement; Export to clipboard copies complete state; Save to File preserves editable HTML, thoughts and proposals. Changes stay in the tab until exported.
 
 ## Create, package or transform PAGES
 

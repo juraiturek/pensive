@@ -157,3 +157,12 @@ Origin: V1 `prompts/generate/pages_generate.j2` explicitly attributes its PAGES 
 | V2 | `prompt_templates/user/pages_viewpoint_blue.j2` | `fe1bdcc207288e3187daf2e3bc8d8f25eecf62450015219f1473457671db3f1f` |
 
 Verification and methodological limits are recorded in [testing.md](testing.md). Legacy application/server tests are not migrated or run.
+
+
+## VPC — 2026-11-03
+
+Read-only source audit and adopt/adapt/reject decisions: [approved Phase A review](plans/2026-11-03-vpc-phase-a-review.md). Exact selected file fingerprints: [source manifest](plans/2026-11-03-vpc-phase-a-sources.json). V2 HEAD was `a75617205cf342ebe851379ab43db52e35a07a5e`; V1 had no resolvable Git repository at the inspected roots. Fingerprints record actual bytes without assuming clean legacy state.
+
+V1's `schemas/vpc.yml` and V2's `app/frameworks/registry.py` agree on six methodological collections. V2's five-field framing and guidance criteria are adapted into `frameworks/vpc/` Markdown methods. V1/V2's outer jobs/products and paired pains/relievers, gains/creators geometry informs new destination CSS; no legacy canvas runtime was copied. Destination editor/export/import/state packaging patterns supply local behavior. Legacy quotas, text caps/deduplication, storage/server/Jinja/API infrastructure and automatic mutations are rejected. VPC has no partial review or source baseline.
+
+The shared framing–content instruction and guarded fit assessment are destination methodological adaptations. Evidence labels and readable mappings retain the current `{id,text}` contract; no relationship graph or inferred quantitative score. Official Strategyzer methodology references are documented in the audit. Future thinking tools are not VPC-specific; the user requested their attribution be investigated as Cronin/Loewenstein methodology before implementation.

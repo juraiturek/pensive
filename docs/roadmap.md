@@ -32,3 +32,19 @@ Subsequent ordering:
 3. Implement Six Thinking Hats across supported canvases, producing both reflections and suggested changes. Require explicit framework compatibility and partial acceptance; do not limit Six Hats to PAGES or thought-only output.
 
 Other deferred tools and frameworks remain separately scoped. README remains unchanged.
+
+
+## Approved VPC slice — 2026-11-03
+
+Implement the five-field V2-derived framing model and six standard VPC collections, then Evaluate and Improve, in that order. See [approved audit/design](plans/2026-11-03-vpc-phase-a-review.md). Evaluate includes fit, evidence and framing–content coherence; Improve preserves framing. VPC uses whole-canvas proposal review only; its partial acceptance is not authorized. Existing SWOT/PAGES behavior remains unchanged.
+
+## Cross-framework thinking-tool backlog
+
+- **Analogy, Combination, Re-Categorization and Association:** future thinking tools relevant to most or all canvases, not VPC-specific features. User attributes their methodological basis to Jeffrey Loewenstein and his coauthor; the legacy PAGES prompt names Matthew Cronin and Jeffrey Loewenstein and *The Craft of Creativity*. Verify exact source terminology and principles before implementation rather than claiming that all four legacy labels are authenticated book categories. Design full-canvas/framing-aware inputs, explicit framework compatibility, stable identities and reviewed suggestions; do not port isolated node rewrites blindly.
+- **Six Thinking Hats:** already present in the 2026-11-02 ordering above; retained as a generic cross-framework thinking tool, not a VPC feature. Future scope includes reflections and suggested changes, with explicit compatibility and separately approved acceptance behavior. Current VPC approval does not authorize it.
+
+## VPC-specific backlog
+
+- **Ripple for VPC:** adapt the general implications tool to explicit changes in customer profile/value map, including pains → relievers/offering. Requires an artifact-persisted comparison baseline, selected-source preservation, deletion/reorder handling and review. Never invent customer evidence or product capabilities to repair fit. No automatic cascade or implementation in the current slice.
+- **Restate framing:** a separate reviewed framing-only proposal informed by core evidence; do not silently infer a new customer, alternative or success metric. Requires explicit framing-change permissions and stale-state guards; user chooses whether the insight warrants reframing or content revision. Deferred from the approved initial actions.
+- **Structured fit links:** revisit only if readable mappings prove inadequate; no relationship graph or automatic fit score in the current slice.

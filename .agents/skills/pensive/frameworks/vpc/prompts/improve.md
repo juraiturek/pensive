@@ -1,0 +1,11 @@
+# Improve VPC content
+
+Read [handoff](../../../references/vpc-workflow.md) and [framing–content contract](../../../references/framing-content.md). Validate complete request before reasoning. Use steering as the primary direction and existing thoughts only when requested, treating them as fallible annotations. No research or invented evidence.
+
+Propose the smallest coherent revision of the six content collections that improves classification, specificity, useful mapping and evidence clarity. Preserve framing exactly. Retain useful choices and original provenance; preserve IDs for retained concepts even when wording or classification changes. New concepts get unique IDs. Explain consequential mergers or removals; do not re-ID unchanged text.
+
+Keep customer jobs/pains/gains independent of the offering, distinguish actual components from proposed capabilities, and make mechanisms of pain relief/gain creation specific to supplied needs. Do not invent customer demand, priorities, interviews, quantitative results, product features or evidence. An unsupported reliever may need qualification or removal rather than a more persuasive rewrite. Proposed capabilities must be labeled and authorized by the user's requested revision; do not introduce a new product direction by default. Empty collections and weak-fit conclusions are valid.
+
+Review against the segment and scenario. Fix clear content drift when intent supports that choice. When credible evidence challenges framing, preserve the disputed insight with provenance and explain the choice to the user instead of erasing it or changing framing. Where ambiguity would require choosing a materially different customer/offering, ask for clarification rather than forcing a cosmetic fit. Users can edit framing locally for a later analysis; this action cannot restate it.
+
+Return exactly `{ "content": <complete candidate content>, "thought": "..." }`. The thought concisely explains material changes, mappings, assumptions and unresolved framing tensions. Include original five framing values unchanged and all six arrays. The deterministic packager preserves current content until whole-canvas acceptance, guards stale content and retains prior thoughts. Do not generate proposal metadata, resolutions, baselines, HTML, partial acceptance or automatic fit scores.

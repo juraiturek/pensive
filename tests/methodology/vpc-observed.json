@@ -1,0 +1,394 @@
+{
+  "kind": "synthetic_methodology_forward_test",
+  "baseline": {
+    "procedure": "Read-only inspection of pre-VPC SKILL.md before new VPC methods existed; not a sampled live-user experiment.",
+    "observation": "The skill supported only SWOT/TOWS and PAGES and explicitly marked other frameworks unavailable. All three explicit VPC scenarios had no supported route."
+  },
+  "creation_cases": [
+    {
+      "id": "rich-scheduling",
+      "input": "Create a VPC for a scheduling tool for independent physiotherapists doing weekly appointment planning. We interviewed two users: both report spending Friday reconciling paper diaries and message requests. Tool currently imports a CSV but has no automatic booking.",
+      "question_turns": 0,
+      "state": {
+        "framework": "vpc",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "product_offering": "Scheduling tool; current supplied capability: imports a CSV. No automatic booking.",
+            "customer_segment": "Independent physiotherapists.",
+            "scenario_job_context": "Weekly appointment planning; supplied interview reports describe Friday reconciliation of paper diaries and message requests.",
+            "current_alternative": "Paper diaries and message requests, as described in the two supplied interviews.",
+            "success_metric": ""
+          },
+          "jobs": [
+            {
+              "id": "rich-job-1",
+              "text": "Customer report: reconcile appointment records from paper diaries and message requests during weekly planning."
+            }
+          ],
+          "pains": [
+            {
+              "id": "rich-pain-1",
+              "text": "Provider hypothesis: Friday reconciliation may be an unwanted burden; the two supplied interviews establish the activity, not its severity or undesirability."
+            }
+          ],
+          "gains": [],
+          "products_services": [
+            {
+              "id": "rich-product-1",
+              "text": "Existing capability: import a CSV into the scheduling tool; no automatic booking."
+            }
+          ],
+          "pain_relievers": [],
+          "gain_creators": []
+        }
+      },
+      "observation": "Extracted offering/segment/scenario before content. Alternative is grounded in supplied reports; metric remains empty. Interviews establish reconciliation activity, not that it is painful: the possible burden is explicitly a provider hypothesis. No desired gains or CSV-to-reconciliation mechanism was supplied, so gains, pain relievers and gain creators remain empty."
+    },
+    {
+      "id": "partial-app",
+      "input": "Create a VPC for my app.",
+      "first_question": "What does the app offer, and who is it for?",
+      "state": null,
+      "observation": "One focused question addresses the linked essential offering/segment gap. No answer, product, segment or content was fabricated."
+    },
+    {
+      "id": "partial-elicited-sparse",
+      "synthetic": true,
+      "input": "Create a VPC for my app.",
+      "question_turns": 2,
+      "turns": [
+        {
+          "speaker": "assistant",
+          "text": "What does the app offer, and who is it for?"
+        },
+        {
+          "speaker": "simulated_user",
+          "text": "It is a CSV scheduling importer for solo physiotherapists planning weekly appointments. I have no customer interviews yet."
+        },
+        {
+          "speaker": "assistant",
+          "text": "I can create a sparse draft with that framing and supplied offering, labeling the appointment-planning job as a provider hypothesis and leaving unsupported needs and benefits empty. Shall I proceed?"
+        },
+        {
+          "speaker": "simulated_user",
+          "text": "Yes, create that sparse draft."
+        }
+      ],
+      "state": {
+        "framework": "vpc",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "product_offering": "CSV scheduling importer; supplied description, not independently verified.",
+            "customer_segment": "Solo physiotherapists.",
+            "scenario_job_context": "Planning weekly appointments; no customer interviews supplied.",
+            "current_alternative": "",
+            "success_metric": ""
+          },
+          "jobs": [
+            {
+              "id": "elicited-job-1",
+              "text": "Provider hypothesis: plan weekly appointments as a solo physiotherapist."
+            }
+          ],
+          "pains": [],
+          "gains": [],
+          "products_services": [
+            {
+              "id": "elicited-product-1",
+              "text": "Supplied offering: import scheduling data from a CSV."
+            }
+          ],
+          "pain_relievers": [],
+          "gain_creators": []
+        }
+      },
+      "observation": "The first focused question established offering, segment and scenario. The second question obtained explicit sparse-draft agreement. The generated state preserves unknown alternative and metric, labels the inferred customer job, and supplies no pains, gains, relievers or creators without evidence."
+    }
+  ],
+  "action_cases": [
+    {
+      "id": "weak-message-fit",
+      "request": {
+        "canvas": {
+          "framework": "vpc",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "product_offering": "Scheduling tool that imports a CSV; no automatic booking or message integration.",
+              "customer_segment": "Solo physiotherapists.",
+              "scenario_job_context": "Weekly appointment planning; provider is exploring whether the tool can address unresponded patient messages.",
+              "current_alternative": "",
+              "success_metric": ""
+            },
+            "jobs": [
+              {
+                "id": "weak-job-1",
+                "text": "Provider hypothesis: respond to patient appointment requests before planning the week."
+              }
+            ],
+            "pains": [
+              {
+                "id": "weak-pain-1",
+                "text": "Provider hypothesis: unresponded patient messages may leave appointment requests unresolved."
+              }
+            ],
+            "gains": [],
+            "products_services": [
+              {
+                "id": "weak-product-1",
+                "text": "Existing capability: CSV import only; no message integration or automatic booking."
+              }
+            ],
+            "pain_relievers": [],
+            "gain_creators": []
+          }
+        },
+        "action": {
+          "id": "evaluate",
+          "comment": "Assess the proposed link without inventing features or customer evidence.",
+          "use_thoughts": false
+        }
+      },
+      "response": {
+        "thought": "The proposed pain is unresponded patient messages, but the only supplied capability is CSV import with no message integration or automatic booking. Importing records does not establish a mechanism for finding or responding to those messages, and the need itself is labeled as a provider hypothesis. Leave relievers and creators empty for this claim; clarify what message-handling work the customer actually needs and whether any supplied workflow connects that work to CSV import before claiming fit."
+      }
+    },
+    {
+      "id": "mixed-segment-evaluate",
+      "request": {
+        "canvas": {
+          "framework": "vpc",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "product_offering": "Scheduling tool that imports a CSV; automatic booking is not available.",
+              "customer_segment": "Solo physiotherapists.",
+              "scenario_job_context": "Planning the physiotherapist\u2019s own weekly appointments.",
+              "current_alternative": "Paper diary plus message requests.",
+              "success_metric": ""
+            },
+            "jobs": [
+              {
+                "id": "mixed-job-1",
+                "text": "Plan my own weekly appointments."
+              },
+              {
+                "id": "mixed-job-2",
+                "text": "Coordinate nationwide hospital staffing."
+              }
+            ],
+            "pains": [
+              {
+                "id": "mixed-pain-1",
+                "text": "Provider hypothesis: manually reconciling appointment sources creates avoidable work."
+              }
+            ],
+            "gains": [],
+            "products_services": [
+              {
+                "id": "mixed-product-1",
+                "text": "Existing capability: CSV import; no automatic booking."
+              }
+            ],
+            "pain_relievers": [
+              {
+                "id": "mixed-reliever-1",
+                "text": "Automatically book appointments to eliminate manual reconciliation."
+              }
+            ],
+            "gain_creators": []
+          }
+        },
+        "action": {
+          "id": "evaluate",
+          "comment": "Check fit and framing-content coherence. There is no customer evidence for the hospital staffing entry.",
+          "use_thoughts": false
+        }
+      },
+      "response": {
+        "thought": "\u201cCoordinate nationwide hospital staffing\u201d does not match the solo-therapist segment and own-appointment scenario, while no customer evidence explains that scope expansion. \u201cAutomatically book appointments\u201d also contradicts the stated CSV-only capability, so its claimed relief is unsupported. Treat the staffing entry as possible scope drift unless clarification establishes a different target, and remove or qualify the unsupported reliever rather than interpreting the tidy layout as fit; the provider-hypothesized reconciliation pain still needs customer evidence."
+      }
+    },
+    {
+      "id": "credible-discovery-improve",
+      "request": {
+        "canvas": {
+          "framework": "vpc",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "product_offering": "Scheduling tool that imports a CSV; automatic booking is not available.",
+              "customer_segment": "Solo physiotherapists.",
+              "scenario_job_context": "Planning the physiotherapist\u2019s own weekly appointments.",
+              "current_alternative": "Paper diary plus message requests.",
+              "success_metric": ""
+            },
+            "jobs": [
+              {
+                "id": "mixed-job-1",
+                "text": "Plan my own weekly appointments."
+              },
+              {
+                "id": "mixed-job-2",
+                "text": "Supplied interview note: a hospital staffing lead asked about coordinating nationwide hospital staffing; relevance to the solo-therapist offering is unresolved."
+              }
+            ],
+            "pains": [
+              {
+                "id": "mixed-pain-1",
+                "text": "Provider hypothesis: manually reconciling appointment sources creates avoidable work."
+              }
+            ],
+            "gains": [],
+            "products_services": [
+              {
+                "id": "mixed-product-1",
+                "text": "Existing capability: CSV import; no automatic booking."
+              }
+            ],
+            "pain_relievers": [
+              {
+                "id": "mixed-reliever-1",
+                "text": "Automatically book appointments to eliminate manual reconciliation."
+              }
+            ],
+            "gain_creators": []
+          }
+        },
+        "action": {
+          "id": "improve",
+          "comment": "Improve clarity without inventing capabilities. Preserve the hospital interview insight as a possible discovery; do not choose a new target segment for me.",
+          "use_thoughts": false
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "product_offering": "Scheduling tool that imports a CSV; automatic booking is not available.",
+            "customer_segment": "Solo physiotherapists.",
+            "scenario_job_context": "Planning the physiotherapist\u2019s own weekly appointments.",
+            "current_alternative": "Paper diary plus message requests.",
+            "success_metric": ""
+          },
+          "jobs": [
+            {
+              "id": "mixed-job-1",
+              "text": "Provider hypothesis: plan my own weekly appointments as a solo physiotherapist."
+            },
+            {
+              "id": "mixed-job-2",
+              "text": "Out-of-frame discovery, relevance unresolved: supplied interview note says a hospital staffing lead asked about nationwide staffing coordination. This may indicate another segment; it is not evidence of a solo therapist job."
+            }
+          ],
+          "pains": [
+            {
+              "id": "mixed-pain-1",
+              "text": "Provider hypothesis: manually reconciling appointment sources creates avoidable work."
+            }
+          ],
+          "gains": [],
+          "products_services": [
+            {
+              "id": "mixed-product-1",
+              "text": "Existing capability: CSV import; no automatic booking."
+            }
+          ],
+          "pain_relievers": [],
+          "gain_creators": []
+        },
+        "thought": "Qualified the own-appointment job as a provider hypothesis because no solo-therapist interview evidence was supplied for this canvas. Retained the hospital staffing insight and its ID with its interview provenance, explicitly separated from the selected segment rather than deleting a potentially legitimate discovery or changing framing. Removed the automatic-booking reliever because that capability is explicitly unavailable; CSV import alone does not justify a replacement mechanism. Other items, identities and all five framing values are preserved. You still need to decide whether to investigate a separate hospital segment or keep this analysis focused on solo therapists."
+      }
+    }
+  ],
+  "unsupported_fit_observation": "The rich case supplies evidence of reconciliation activity, but not its undesirability or severity; the possible pain remains a provider hypothesis. It also supplies no evidence that CSV import relieves that potential pain. The weak-message case supplies only a provider-hypothesized pain and no message-handling capability. Neither supports a strong value proposition or product-market-fit claim.",
+  "rubric_assessment": [
+    {
+      "criterion": "Framing before content; adaptive elicitation",
+      "result": "Met in this synthetic run: rich case uses zero questions; initial partial case stops at one essential question; separately labeled simulated multi-turn case establishes framing and obtains sparse-draft agreement within two question turns."
+    },
+    {
+      "criterion": "Six-category classification and evidence separation",
+      "result": "Met with sparse data: reported reconciliation activity is a job, possible burden is explicitly a provider hypothesis rather than reported pain, CSV import is the supplied offering, and no benefits or relief mechanisms are invented."
+    },
+    {
+      "criterion": "Framing-content mismatch",
+      "result": "Clear unsupported staffing drift is diagnosed; credible supplied hospital interview insight is preserved as unresolved possible segment discovery."
+    },
+    {
+      "criterion": "Action boundary and identity preservation",
+      "result": "Evaluate returns thought only. Improve preserves five framing values and retained IDs; removes unsupported automatic-booking reliever. Deterministic composer verification remains root responsibility."
+    },
+    {
+      "criterion": "No forced fit",
+      "result": "Met: weak value claims remain weak, and empty reliever/creator lists are treated as valid."
+    }
+  ],
+  "limitations": [
+    "Synthetic cases and model-authored responses, not live customers or a statistical quality evaluation.",
+    "No external research, live API independence claim, interviews or product measurements were performed.",
+    "Schema/composer packaging and browser behavior are separate deterministic checks not performed by this methodological pass.",
+    "Scenario evidence is supplied inside synthetic inputs and does not describe real interviews.",
+    "The initial partial-context case records only a first question. A separate multi-turn scenario uses explicitly simulated user replies and sparse-draft agreement; this is not a live conversation.",
+    "Routing observations are synthetic instruction-following responses from the updated SKILL.md, not independent live-user conversations. Blank-copy and action execution are verified separately."
+  ],
+  "routing_cases": [
+    {
+      "id": "explicit-empty-vpc",
+      "synthetic": true,
+      "input": "New empty VPC.",
+      "observed_response": "I will create a new empty VPC canvas.",
+      "route": "Read VPC manifest/handoff; copy the established blank VPC exclusively to a new output path. No recommendation, permission or framing elicitation is needed.",
+      "result": "Supported explicit choice; no content invented. Artifact execution is checked separately."
+    },
+    {
+      "id": "implicit-fit-question",
+      "synthetic": true,
+      "input": "I can\u2019t tell if my offer solves what customers care about.",
+      "observed_response": "We could use a Value Proposition Canvas to compare one customer segment\u2019s jobs, pains and gains with what your offer actually addresses. Would you like to do that?",
+      "route": "One selective VPC suggestion with a concrete fit reason; wait for choice. Do not open a canvas automatically.",
+      "result": "Respects implicit relevance and user choice."
+    },
+    {
+      "id": "declined-vpc",
+      "synthetic": true,
+      "input": "No, I do not want a VPC. Let\u2019s just discuss it.",
+      "observed_response": "We can discuss it directly. Which customer need do you think your offer addresses most clearly?",
+      "route": "Respect the decline and continue ordinary conversation. Do not create or re-offer VPC in the unchanged situation.",
+      "result": "No forced framework or repeated suggestion."
+    },
+    {
+      "id": "ordinary-error-question",
+      "synthetic": true,
+      "input": "What does this error message mean?",
+      "observed_response": "Please paste the error message and what you were doing when it appeared.",
+      "route": "Ordinary technical clarification; no framework recommendation or canvas.",
+      "result": "No irrelevant VPC/PAGES activation."
+    },
+    {
+      "id": "explicit-pages-perspective",
+      "synthetic": true,
+      "input": "Use PAGES to explore a shift in how I see my responsibility for this project.",
+      "observed_response": "I will use PAGES to explore that perspective.",
+      "route": "Read PAGES semantics and handoff; for new analysis follow PAGES Create using available context and adaptive elicitation. If this concerns existing edited state, request complete export rather than reconstructing it.",
+      "result": "Explicit PAGES remains PAGES; no VPC substitution."
+    },
+    {
+      "id": "explicit-swot-strategize",
+      "synthetic": true,
+      "input": "Use my existing SWOT to strategize.",
+      "observed_response": "Please supply the complete current SWOT export so I can derive strategies from your latest factors.",
+      "route": "SWOT Strategize method and SWOT AI handoff. Missing complete current state requires export; do not rebuild from conversation.",
+      "result": "Existing SWOT route preserved; no VPC substitution or invented state."
+    },
+    {
+      "id": "unsupported-vpc-ripple",
+      "synthetic": true,
+      "input": "Run Ripple on my VPC.",
+      "observed_response": "Ripple is deferred for VPC. VPC currently supports Evaluate and Improve; neither uses a Ripple baseline or propagates source changes.",
+      "route": "Explain unsupported VPC action without mutation or fabricated baseline. Do not apply PAGES Ripple merely because the action name matches. Offer an available action only if the user chooses it.",
+      "result": "Deferred boundary preserved; no silent action substitution."
+    }
+  ]
+}

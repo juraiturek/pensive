@@ -1,0 +1,191 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pensive VPC state 1.0",
+  "$comment": "Runtime additionally enforces globally unique item IDs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "framework",
+    "schema_version",
+    "content"
+  ],
+  "properties": {
+    "framework": {
+      "const": "vpc"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "content": {
+      "$ref": "#/$defs/content"
+    },
+    "thoughts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/thought"
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "$ref": "#/$defs/proposal"
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "thought": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "kind": {
+          "enum": [
+            "evaluation",
+            "improvement"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "framing",
+        "jobs",
+        "pains",
+        "gains",
+        "products_services",
+        "pain_relievers",
+        "gain_creators"
+      ],
+      "properties": {
+        "framing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "product_offering",
+            "customer_segment",
+            "scenario_job_context",
+            "current_alternative",
+            "success_metric"
+          ],
+          "properties": {
+            "product_offering": {
+              "type": "string"
+            },
+            "customer_segment": {
+              "type": "string"
+            },
+            "scenario_job_context": {
+              "type": "string"
+            },
+            "current_alternative": {
+              "type": "string"
+            },
+            "success_metric": {
+              "type": "string"
+            }
+          }
+        },
+        "jobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "pains": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "gains": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "products_services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "pain_relievers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "gain_creators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        }
+      }
+    },
+    "proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "action",
+        "base_content",
+        "content",
+        "thought"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "action": {
+          "const": "improve"
+        },
+        "base_content": {
+          "$ref": "#/$defs/content"
+        },
+        "content": {
+          "$ref": "#/$defs/content"
+        },
+        "thought": {
+          "$ref": "#/$defs/thought"
+        }
+      }
+    }
+  }
+}
