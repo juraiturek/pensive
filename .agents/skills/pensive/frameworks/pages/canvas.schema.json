@@ -1,0 +1,290 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pensive PAGES state 1.0",
+  "$comment": "Runtime additionally checks identity uniqueness, action boundaries, changed Ripple sources and stale content/baseline acceptance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "framework",
+    "schema_version",
+    "content"
+  ],
+  "properties": {
+    "framework": {
+      "const": "pages"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "content": {
+      "$ref": "#/$defs/content"
+    },
+    "ripple_baseline": {
+      "$ref": "#/$defs/collections"
+    },
+    "thoughts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/thought"
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "action",
+          "sources",
+          "base_content",
+          "base_baseline",
+          "content",
+          "thought"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+          },
+          "action": {
+            "enum": [
+              "improve",
+              "ripple"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 4,
+            "items": {
+              "enum": [
+                "parts",
+                "actions",
+                "goals",
+                "events",
+                "self_concepts"
+              ]
+            }
+          },
+          "base_content": {
+            "$ref": "#/$defs/content"
+          },
+          "base_baseline": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/collections"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "content": {
+            "$ref": "#/$defs/content"
+          },
+          "thought": {
+            "$ref": "#/$defs/thought"
+          },
+          "resolutions": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "parts": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "actions": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "goals": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "events": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "self_concepts": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "collections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parts",
+        "actions",
+        "goals",
+        "events",
+        "self_concepts"
+      ],
+      "properties": {
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "self_concepts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "framing",
+        "parts",
+        "actions",
+        "goals",
+        "events",
+        "self_concepts"
+      ],
+      "properties": {
+        "framing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "what",
+            "why",
+            "intuition"
+          ],
+          "properties": {
+            "what": {
+              "type": "string"
+            },
+            "why": {
+              "type": "string"
+            },
+            "intuition": {
+              "type": "string"
+            }
+          }
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "self_concepts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        }
+      }
+    },
+    "thought": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "kind": {
+          "enum": [
+            "evaluation",
+            "improvement",
+            "ripple"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    }
+  }
+}

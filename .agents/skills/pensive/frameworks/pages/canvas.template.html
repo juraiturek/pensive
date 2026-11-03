@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Pensive — PAGES</title>
+<!--pensive-style-->
+</head>
+<body>
+<div class="shell">
+  <header class="masthead"><div class="brand"><a class="wordmark" href="#main" aria-label="Pensive, skip to canvas">pensive<span aria-hidden="true">.</span></a><p class="eyebrow">PAGES: UNDERSTAND &amp; SHIFT YOUR PERSPECTIVE</p></div></header>
+  <main id="main">
+    <section class="framing" aria-label="Analysis context">
+      <label for="what">Situation / problem<textarea id="what" data-framing="what" rows="1" placeholder="What situation are you looking at?"></textarea></label>
+      <label for="why">Motivation<textarea id="why" data-framing="why" rows="1" placeholder="Why does this matter to you?"></textarea></label>
+      <details><summary>Inkling <span class="optional">/ optional</span></summary><label for="intuition">Initial intuition<textarea id="intuition" data-framing="intuition" rows="2" placeholder="How do you currently see it?"></textarea></label></details>
+    </section>
+    <div class="toolbar">
+      <div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button><button type="button" data-ai="ripple" title="Explore implications of changed dimensions">Ripple</button></div>
+      <div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
+    </div>
+    <div class="baseline-bar"><p id="baseline-status">Changes are marked against the initial canvas.</p><button type="button" id="reset-baseline">Set current state as Ripple baseline</button></div>
+    <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
+    <section id="pages-view" aria-label="PAGES perspective">
+      <p class="pages-guide">A perspective through five elements: Parts, Actions, Goals, Events, Self-concepts. Explore their connections; the bands are not a causal hierarchy.</p>
+      <section class="pages-band" data-section="self_concepts" aria-label="Self-concepts"></section>
+      <section class="pages-band" data-section="events" aria-label="Events"></section>
+      <section class="pages-band" data-section="goals" aria-label="Goals"></section>
+      <section class="pages-band" data-section="actions" aria-label="Actions"></section>
+      <section class="pages-band" data-section="parts" aria-label="Parts"></section>
+    </section>
+    <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden><label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p><textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button></section>
+    <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
+  </main>
+  <footer><span>Less conversation. More thinking.</span><span>PAGES <span aria-hidden="true">·</span> Pensive</span></footer>
+</div>
+<dialog id="ai-dialog" aria-labelledby="ai-title">
+  <form id="ai-form"><h2 id="ai-title">Request AI action</h2><p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill.</p>
+    <fieldset id="ripple-options" hidden><legend>Changed source dimensions</legend><div id="ripple-sources"></div><div id="ripple-preview" aria-live="polite"></div></fieldset>
+    <label for="ai-guidance">Steering guidance</label><textarea id="ai-guidance" rows="3" placeholder="Focus, constraints, evidence to consider…"></textarea>
+    <label class="checkbox-label"><input id="use-thoughts" type="checkbox" checked> Use existing thoughts as guidance</label>
+    <p id="ai-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel-ai">Cancel</button><button type="submit" class="primary">Copy AI request</button></div>
+  </form>
+</dialog>
+<dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><h2 id="import-title">Import PAGES JSON</h2><p class="dialog-note">Paste complete exported PAGES state. Validation happens before replacement.</p><label for="import-json">Import canvas JSON</label><textarea id="import-json" rows="10" spellcheck="false"></textarea><p id="import-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-import" type="button">Cancel import</button><button type="submit" class="primary">Replace canvas</button></div></form></dialog>
+<noscript>This canvas requires JavaScript for local editing and export. No server is needed.</noscript>
+<!--pensive-state-start-->
+<script id="canvas-state" type="application/json">{}</script>
+<!--pensive-state-end-->
+<!--pensive-review-->
+<!--pensive-review-ui-->
+<!--pensive-core-->
+<!--pensive-runtime-->
+</body>
+</html>

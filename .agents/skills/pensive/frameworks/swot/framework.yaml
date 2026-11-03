@@ -51,4 +51,4 @@ quality_criteria:
   - Relate factors to the stated entity and objective.
   - Use the named factor categories for each strategy pairing.
   - Prefer concrete factors and actionable strategies over vague claims.
-acceptance: Creation and evaluation require no content acceptance. Strategize and Improve require atomic whole-canvas acceptance or rejection; stale proposals cannot be accepted. Manual edits remain direct user operations.
+acceptance: Creation and evaluation require no content acceptance. Strategize and Improve support explicit collection-level and bulk acceptance/rejection, with atomic resulting-state validation. Earlier acceptances remain applied while other collections are pending; unrelated edits make further acceptance stale. Bullet-level review is deferred. Manual edits remain direct user operations.

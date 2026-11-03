@@ -1,0 +1,38 @@
+/* PAGES layout over the established Pensive canvas styles, included at build time. */
+.pages-guide { font-size: .78rem; color: var(--muted); margin: .3rem 0 1rem; max-width: 68rem; }
+.pages-band { --category: var(--accent); display: grid; grid-template-columns: 12rem minmax(0, 1fr); border: 1px solid var(--line); background: var(--surface); border-radius: 5px; margin-bottom: .85rem; overflow: hidden; }
+.band-heading { padding: 1.2rem; background: #eee9d7; border-right: 1px solid var(--line); }
+.band-heading .cell-symbol { display: block; font-size: .65rem; letter-spacing: .12em; margin-bottom: .4rem; }
+.band-heading h2 { font-size: 1.4rem; }
+.band-description { font-size: .72rem; color: var(--muted); margin-top: .6rem; }
+[data-section="self_concepts"] .band-heading { background: var(--green); }
+[data-section="events"] .band-heading { background: var(--blue); }
+[data-section="goals"] .band-heading { background: var(--orange); }
+[data-section="actions"] .band-heading { background: #eae6ef; }
+.band-content { min-width: 0; padding: .8rem 1.2rem; min-height: 8rem; display: flex; flex-direction: column; }
+.pages-band .items { margin-bottom: .5rem; }
+.pages-band .item:first-child { border-top: 0; }
+.change-mark { flex: 0 0 auto; font-size: .62rem; padding: .25rem .4rem; margin-top: .1rem; background: #e7edde; border-radius: 3px; color: #34553c; }
+.removed-items { font-size: .75rem; color: #804539; white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: .5rem; }
+.removed-items p { margin-bottom: .3rem; }
+.baseline-bar { display: flex; justify-content: space-between; align-items: center; gap: .8rem; margin-bottom: 1rem; font-size: .72rem; color: var(--muted); }
+.baseline-bar button { font-size: .7rem; }
+fieldset { border: 1px solid var(--line); min-width: 0; margin: 1rem 0; padding: .6rem .8rem; }
+legend { font-size: .8rem; }
+#ripple-sources { display: flex; flex-wrap: wrap; gap: .4rem 1rem; }
+#ripple-sources label { margin: .3rem 0; }
+#ripple-preview { font-size: .75rem; margin-top: .6rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+#ripple-preview p + p { margin-top: .6rem; }
+.error { color: var(--danger); font-size: .8rem; overflow-wrap: anywhere; }
+.export-actions { flex-wrap: wrap; }
+@media (max-width: 560px) {
+  .brand { flex-wrap: wrap; gap: .25rem 1rem; }
+  .pages-band { grid-template-columns: minmax(0, 1fr); }
+  .band-heading { padding: .8rem 1rem; border-right: 0; border-bottom: 1px solid var(--line); }
+  .band-heading .cell-symbol { display: inline; margin-right: .6rem; }
+  .band-heading h2 { display: inline; font-size: 1.25rem; }
+  .band-description { margin-top: .3rem; }
+  .baseline-bar { align-items: flex-start; flex-direction: column; }
+  .change-mark { font-size: .58rem; }
+  .band-content { padding: .65rem 1rem; }
+}

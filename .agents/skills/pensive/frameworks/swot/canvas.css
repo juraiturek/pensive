@@ -117,6 +117,19 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem
 .proposal-diff h4 { grid-column: 1 / -1; margin: 0; font-size: .85rem; }
 .proposal-diff ul { padding-left: 1.2rem; font-size: .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
 .proposal-diff strong { font-size: .75rem; }
+.review-node-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; }
+.review-node-heading h4 { margin: 0; }
+.review-node-controls { display: flex; align-items: center; gap: .45rem; font-size: .75rem; flex-wrap: wrap; }
+.review-node-controls button { padding: .3rem .65rem; }
+.review-select { display: inline-flex; align-items: center; gap: .3rem; margin-right: .3rem; cursor: pointer; }
+.review-select input { accent-color: var(--accent); }
+.review-select input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.node-status { font-size: .7rem; border-radius: 3px; padding: .2rem .5rem; }
+.node-status.accepted { color: #34553c; background: var(--green); }
+.node-status.rejected { color: #804539; background: var(--rose); }
+.proposal-panel .review-hint { color: var(--muted); font-size: .75rem; margin-top: .6rem; }
+.proposal-panel .review-error { color: var(--danger); font-size: .8rem; }
+.proposal-tag { display: inline-block; margin-left: .5rem; padding: .1rem .4rem; border-radius: 3px; background: var(--green); color: #34553c; font-size: .65rem; font-weight: 600; line-height: 1.5; vertical-align: baseline; white-space: nowrap; }
 dialog { width: min(540px, calc(100% - 2rem)); max-height: calc(100% - 2rem); overflow: auto; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1.5rem; }
 dialog::backdrop { background: #26332866; }
 dialog h2 { margin-bottom: .7rem; }

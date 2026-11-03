@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Pensive — PAGES</title>
+<style>
+:root {
+  --paper: #f6f1e8; --surface: #fffdf8; --ink: #2d3029; --muted: #66685f;
+  --line: #d9d7cc; --accent: #345c49; --danger: #a2392e;
+  --green: #e7edde; --orange: #f3e6d6; --blue: #e4eced; --rose: #f2e1dc;
+  font-family: "Avenir Next", "Segoe UI", sans-serif; color: var(--ink);
+  background: var(--paper); font-size: 15px; line-height: 1.5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(ellipse at 10% 0%, #fffdf7 0, transparent 55%); }
+[hidden] { display: none !important; }
+button, textarea { font: inherit; }
+button, summary { cursor: pointer; }
+button { color: var(--ink); border: 1px solid var(--line); background: var(--surface); border-radius: 5px; padding: .55rem .9rem; transition: background .15s; }
+button:hover { background: #eeeee5; }
+button:focus-visible, textarea:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button:disabled { opacity: .5; cursor: default; }
+textarea { width: 100%; min-width: 0; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: .5rem 0; resize: vertical; border-radius: 0; }
+textarea::placeholder { color: #777a70; }
+p { margin: 0; }
+.shell { width: min(1320px, calc(100% - 5rem)); margin: 0 auto; }
+.masthead { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1.5rem 0; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: baseline; gap: 1.5rem; min-width: 0; }
+.wordmark { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 2rem; letter-spacing: -.07em; color: var(--ink); text-decoration: none; }
+.wordmark span { color: var(--accent); }
+.eyebrow { text-transform: uppercase; font-size: .67rem; letter-spacing: .14em; font-weight: 600; color: var(--muted); }
+.framing { display: grid; grid-template-columns: 1fr 1.4fr; gap: .9rem 2rem; padding: 1.3rem 0; }
+.framing label { display: block; font-size: .75rem; font-weight: 600; }
+.framing textarea { display: block; font-size: .95rem; font-weight: 400; min-height: 2.25rem; }
+.framing details { grid-column: 1 / -1; font-size: .75rem; color: var(--muted); }
+.framing details[open] summary { margin-bottom: .8rem; }
+.optional { font-weight: 400; font-size: .7rem; margin-left: .3rem; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+.view-tabs { display: flex; gap: .2rem; padding: .2rem; border: 1px solid var(--line); border-radius: 6px; }
+.view-tabs button { border: 0; background: transparent; font-size: .78rem; font-weight: 600; min-width: 5.5rem; }
+.view-tabs button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.count { display: inline-flex; align-items: center; justify-content: center; min-width: 1.25rem; height: 1.25rem; padding: 0 .25rem; margin-left: .35rem; font-size: .65rem; border: 1px solid currentColor; border-radius: 1rem; opacity: .55; }
+.count.has-content { opacity: 1; background: #d7e5ce; color: #274c35; border-color: #a9bd9c; }
+.export-actions { display: flex; gap: .55rem; font-size: .76rem; }
+.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.primary:hover { background: #284a3a; }
+.primary span { margin-left: 1rem; }
+.swot-grid { display: grid; grid-template-columns: 5rem minmax(0, 1fr) minmax(0, 1fr); gap: .75rem; }
+.axis { font-size: .8rem; font-weight: 600; display: flex; flex-direction: column; justify-content: center; }
+.axis span { font-size: .65rem; font-weight: 400; color: var(--muted); }
+.axis.helpful, .axis.harmful { padding: 0 1.3rem .15rem; }
+.axis.internal, .axis.external { writing-mode: vertical-rl; transform: rotate(180deg); align-items: center; gap: .4rem; }
+.cell { min-width: 0; padding: 1.25rem 1.3rem 1rem; border: 1px solid #0000000d; border-radius: 5px; min-height: 230px; display: flex; flex-direction: column; }
+.strengths, .so { background: var(--green); --category: #4c6a43; }
+.weaknesses, .wo { background: var(--orange); --category: #8a6034; }
+.opportunities, .st { background: var(--blue); --category: #486c73; }
+.threats, .wt { background: var(--rose); --category: #905344; }
+.empty-factor { cursor: text; }
+.cell-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+h2 { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 1.55rem; line-height: 1.2; font-weight: 400; margin: 0; }
+.cell-symbol { color: var(--category); font-size: .75rem; font-weight: 600; }
+.cell-description { font-size: .7rem; color: #575d52; margin: .35rem 0 1rem; }
+.items { padding: 0; margin: 0 0 1rem; list-style: none; }
+.item { display: flex; align-items: start; gap: .6rem; border-top: 1px solid #00000014; padding: .55rem 0; }
+.item::before { content: "·"; color: var(--category); padding-top: .15rem; }
+.item textarea { border: none; min-height: 2rem; padding: .15rem 0; font-size: .9rem; line-height: 1.6; resize: vertical; overflow: hidden; }
+.delete { padding: .1rem .35rem; font-size: 1rem; background: transparent; border: 0; color: #6c6d63; }
+.delete:hover { color: var(--danger); background: #ffffff66; }
+.add { margin-top: auto; align-self: start; padding: .25rem 0; font-size: .75rem; border: 0; background: transparent; color: var(--category); font-weight: 600; }
+.add::before { content: "+"; margin-right: .4rem; font-size: 1rem; }
+.add:hover { background: transparent; text-decoration: underline; }
+.empty { font-size: .8rem; color: #707367; margin: .6rem 0 1rem; font-style: italic; }
+.tows-grid { display: grid; grid-template-columns: minmax(0, .8fr) repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.tows-guide { padding: 1rem .5rem; align-self: center; }
+.tows-guide > p { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 1.25rem; line-height: 1.35; margin: .5rem 0 .75rem; }
+.tows-guide small { font-size: .68rem; color: var(--muted); }
+.context { padding: 1rem 1.2rem; min-width: 0; border-radius: 5px; border: 1px solid #0000000d; }
+.context h2 { font-size: 1.2rem; }
+.context ul { padding-left: 1rem; margin: .7rem 0 0; font-size: .8rem; }
+.context li { margin: .3rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.context .readonly-label { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: .25rem; }
+.status { font-size: .75rem; color: var(--muted); padding: 1rem 0; min-height: 3rem; }
+.status.error { color: var(--danger); }
+.clipboard-fallback { background: var(--surface); border: 1px solid var(--line); padding: 1.25rem; margin-top: 1rem; border-radius: 5px; }
+.clipboard-fallback label { font-weight: 600; }
+.clipboard-fallback p { font-size: .8rem; margin-top: .4rem; }
+.clipboard-fallback textarea { display: block; font-family: monospace; font-size: .8rem; margin: 1rem 0; }
+footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 0 1.6rem; border-top: 1px solid var(--line); font-size: .65rem; color: var(--muted); }
+@media (max-width: 850px) {
+  .shell { width: calc(100% - 2rem); }
+  .swot-grid { grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1fr); }
+  .cell { padding: 1rem; }
+  .tows-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tows-guide { grid-column: 1 / -1; }
+  .context { min-height: 120px; }
+  .context.opportunities, .context.threats { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .framing { grid-template-columns: 1fr; gap: .85rem; }
+  .toolbar { flex-wrap: wrap; }
+  .export-actions { width: 100%; }
+  .export-actions button { flex: 1; padding-inline: .55rem; }
+  .swot-grid, .tows-grid { grid-template-columns: minmax(0, 1fr); }
+  .axis { display: none; }
+  .cell { min-height: 210px; }
+  .cell-description { margin-bottom: .75rem; }
+  .tows-guide { padding: .5rem 0; }
+  footer { flex-direction: column; gap: .2rem; }
+}
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
+
+/* Local AI request preparation and whole-canvas review, not an API client. */
+.toolbar { flex-wrap: wrap; }
+.ai-actions { display: flex; flex-wrap: wrap; gap: .35rem; font-size: .76rem; }
+.thoughts, .proposal-panel { margin: .5rem 0 1.25rem; }
+.thought, .proposal-panel { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 5px; padding: 1rem 1.2rem; }
+.thought + .thought { margin-top: .5rem; }
+.thought h3, .proposal-panel h3 { font-size: .8rem; margin: 0 0 .4rem; color: var(--accent); }
+.thought p, .proposal-panel p { font-size: .85rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.proposal-panel summary { font-size: .8rem; padding: .8rem 0; }
+.proposal-actions { display: flex; flex-wrap: wrap; gap: .5rem; font-size: .8rem; margin-top: .6rem; }
+.proposal-diff { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; border-top: 1px solid var(--line); padding: .8rem 0; }
+.proposal-diff h4 { grid-column: 1 / -1; margin: 0; font-size: .85rem; }
+.proposal-diff ul { padding-left: 1.2rem; font-size: .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.proposal-diff strong { font-size: .75rem; }
+.review-node-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; }
+.review-node-heading h4 { margin: 0; }
+.review-node-controls { display: flex; align-items: center; gap: .45rem; font-size: .75rem; flex-wrap: wrap; }
+.review-node-controls button { padding: .3rem .65rem; }
+.review-select { display: inline-flex; align-items: center; gap: .3rem; margin-right: .3rem; cursor: pointer; }
+.review-select input { accent-color: var(--accent); }
+.review-select input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.node-status { font-size: .7rem; border-radius: 3px; padding: .2rem .5rem; }
+.node-status.accepted { color: #34553c; background: var(--green); }
+.node-status.rejected { color: #804539; background: var(--rose); }
+.proposal-panel .review-hint { color: var(--muted); font-size: .75rem; margin-top: .6rem; }
+.proposal-panel .review-error { color: var(--danger); font-size: .8rem; }
+.proposal-tag { display: inline-block; margin-left: .5rem; padding: .1rem .4rem; border-radius: 3px; background: var(--green); color: #34553c; font-size: .65rem; font-weight: 600; line-height: 1.5; vertical-align: baseline; white-space: nowrap; }
+dialog { width: min(540px, calc(100% - 2rem)); max-height: calc(100% - 2rem); overflow: auto; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1.5rem; }
+dialog::backdrop { background: #26332866; }
+dialog h2 { margin-bottom: .7rem; }
+dialog label { display: block; font-size: .8rem; font-weight: 600; margin: 1rem 0 .4rem; }
+dialog .dialog-note { font-size: .8rem; color: var(--muted); }
+dialog select { width: 100%; padding: .55rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: .85rem; }
+dialog select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+dialog textarea { display: block; font-size: .9rem; }
+.checkbox-label { display: flex; align-items: center; gap: .5rem; font-weight: 400; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1.2rem; font-size: .8rem; }
+@media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
+
+/* PAGES layout over the established Pensive canvas styles, included at build time. */
+.pages-guide { font-size: .78rem; color: var(--muted); margin: .3rem 0 1rem; max-width: 68rem; }
+.pages-band { --category: var(--accent); display: grid; grid-template-columns: 12rem minmax(0, 1fr); border: 1px solid var(--line); background: var(--surface); border-radius: 5px; margin-bottom: .85rem; overflow: hidden; }
+.band-heading { padding: 1.2rem; background: #eee9d7; border-right: 1px solid var(--line); }
+.band-heading .cell-symbol { display: block; font-size: .65rem; letter-spacing: .12em; margin-bottom: .4rem; }
+.band-heading h2 { font-size: 1.4rem; }
+.band-description { font-size: .72rem; color: var(--muted); margin-top: .6rem; }
+[data-section="self_concepts"] .band-heading { background: var(--green); }
+[data-section="events"] .band-heading { background: var(--blue); }
+[data-section="goals"] .band-heading { background: var(--orange); }
+[data-section="actions"] .band-heading { background: #eae6ef; }
+.band-content { min-width: 0; padding: .8rem 1.2rem; min-height: 8rem; display: flex; flex-direction: column; }
+.pages-band .items { margin-bottom: .5rem; }
+.pages-band .item:first-child { border-top: 0; }
+.change-mark { flex: 0 0 auto; font-size: .62rem; padding: .25rem .4rem; margin-top: .1rem; background: #e7edde; border-radius: 3px; color: #34553c; }
+.removed-items { font-size: .75rem; color: #804539; white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: .5rem; }
+.removed-items p { margin-bottom: .3rem; }
+.baseline-bar { display: flex; justify-content: space-between; align-items: center; gap: .8rem; margin-bottom: 1rem; font-size: .72rem; color: var(--muted); }
+.baseline-bar button { font-size: .7rem; }
+fieldset { border: 1px solid var(--line); min-width: 0; margin: 1rem 0; padding: .6rem .8rem; }
+legend { font-size: .8rem; }
+#ripple-sources { display: flex; flex-wrap: wrap; gap: .4rem 1rem; }
+#ripple-sources label { margin: .3rem 0; }
+#ripple-preview { font-size: .75rem; margin-top: .6rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+#ripple-preview p + p { margin-top: .6rem; }
+.error { color: var(--danger); font-size: .8rem; overflow-wrap: anywhere; }
+.export-actions { flex-wrap: wrap; }
+@media (max-width: 560px) {
+  .brand { flex-wrap: wrap; gap: .25rem 1rem; }
+  .pages-band { grid-template-columns: minmax(0, 1fr); }
+  .band-heading { padding: .8rem 1rem; border-right: 0; border-bottom: 1px solid var(--line); }
+  .band-heading .cell-symbol { display: inline; margin-right: .6rem; }
+  .band-heading h2 { display: inline; font-size: 1.25rem; }
+  .band-description { margin-top: .3rem; }
+  .baseline-bar { align-items: flex-start; flex-direction: column; }
+  .change-mark { font-size: .58rem; }
+  .band-content { padding: .65rem 1rem; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="masthead"><div class="brand"><a class="wordmark" href="#main" aria-label="Pensive, skip to canvas">pensive<span aria-hidden="true">.</span></a><p class="eyebrow">PAGES: UNDERSTAND &amp; SHIFT YOUR PERSPECTIVE</p></div></header>
+  <main id="main">
+    <section class="framing" aria-label="Analysis context">
+      <label for="what">Situation / problem<textarea id="what" data-framing="what" rows="1" placeholder="What situation are you looking at?"></textarea></label>
+      <label for="why">Motivation<textarea id="why" data-framing="why" rows="1" placeholder="Why does this matter to you?"></textarea></label>
+      <details><summary>Inkling <span class="optional">/ optional</span></summary><label for="intuition">Initial intuition<textarea id="intuition" data-framing="intuition" rows="2" placeholder="How do you currently see it?"></textarea></label></details>
+    </section>
+    <div class="toolbar">
+      <div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button><button type="button" data-ai="ripple" title="Explore implications of changed dimensions">Ripple</button></div>
+      <div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
+    </div>
+    <div class="baseline-bar"><p id="baseline-status">Changes are marked against the initial canvas.</p><button type="button" id="reset-baseline">Set current state as Ripple baseline</button></div>
+    <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
+    <section id="pages-view" aria-label="PAGES perspective">
+      <p class="pages-guide">A perspective through five elements: Parts, Actions, Goals, Events, Self-concepts. Explore their connections; the bands are not a causal hierarchy.</p>
+      <section class="pages-band" data-section="self_concepts" aria-label="Self-concepts"></section>
+      <section class="pages-band" data-section="events" aria-label="Events"></section>
+      <section class="pages-band" data-section="goals" aria-label="Goals"></section>
+      <section class="pages-band" data-section="actions" aria-label="Actions"></section>
+      <section class="pages-band" data-section="parts" aria-label="Parts"></section>
+    </section>
+    <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden><label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p><textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button></section>
+    <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
+  </main>
+  <footer><span>Less conversation. More thinking.</span><span>PAGES <span aria-hidden="true">·</span> Pensive</span></footer>
+</div>
+<dialog id="ai-dialog" aria-labelledby="ai-title">
+  <form id="ai-form"><h2 id="ai-title">Request AI action</h2><p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill.</p>
+    <fieldset id="ripple-options" hidden><legend>Changed source dimensions</legend><div id="ripple-sources"></div><div id="ripple-preview" aria-live="polite"></div></fieldset>
+    <label for="ai-guidance">Steering guidance</label><textarea id="ai-guidance" rows="3" placeholder="Focus, constraints, evidence to consider…"></textarea>
+    <label class="checkbox-label"><input id="use-thoughts" type="checkbox" checked> Use existing thoughts as guidance</label>
+    <p id="ai-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel-ai">Cancel</button><button type="submit" class="primary">Copy AI request</button></div>
+  </form>
+</dialog>
+<dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><h2 id="import-title">Import PAGES JSON</h2><p class="dialog-note">Paste complete exported PAGES state. Validation happens before replacement.</p><label for="import-json">Import canvas JSON</label><textarea id="import-json" rows="10" spellcheck="false"></textarea><p id="import-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-import" type="button">Cancel import</button><button type="submit" class="primary">Replace canvas</button></div></form></dialog>
+<noscript>This canvas requires JavaScript for local editing and export. No server is needed.</noscript>
+<!--pensive-state-start-->
+<script id="canvas-state" type="application/json">{
+  "framework": "pages",
+  "schema_version": "1.0",
+  "content": {
+    "framing": {
+      "what": "",
+      "why": "",
+      "intuition": ""
+    },
+    "parts": [],
+    "actions": [],
+    "goals": [],
+    "events": [],
+    "self_concepts": []
+  },
+  "ripple_baseline": {
+    "parts": [],
+    "actions": [],
+    "goals": [],
+    "events": [],
+    "self_concepts": []
+  }
+}</script>
+<!--pensive-state-end-->
+<script data-implementation>
+/* Collection-level proposal decisions, shared by Node and standalone canvases. */
+const ProposalReview = (() => {
+  'use strict';
+  function same(a, b) {
+    if (a === b) return true;
+    if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
+    const keys = Object.keys(a);
+    return keys.length === Object.keys(b).length && keys.every(k => Object.hasOwn(b, k) && same(a[k], b[k]));
+  }
+  function create({ sections, collection, validateContent }) {
+    function entries(proposal) {
+      return sections.filter(s => !same(collection(proposal.base_content, s), collection(proposal.content, s)))
+        .map(section => ({ section, status: proposal.resolutions?.[section] || 'pending' }));
+    }
+    function replace(content, proposal, section) {
+      const destination = collection(content, section);
+      destination.splice(0, destination.length, ...structuredClone(collection(proposal.content, section)));
+    }
+    function expected(proposal) {
+      const content = structuredClone(proposal.base_content);
+      for (const entry of entries(proposal)) if (entry.status === 'accepted') replace(content, proposal, entry.section);
+      return content;
+    }
+    function validate(proposal) {
+      if (proposal.resolutions !== undefined) {
+        const value = proposal.resolutions, changed = entries(proposal).map(e => e.section);
+        if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(s => !changed.includes(s) || !['pending', 'accepted', 'rejected'].includes(value[s]))) throw new Error('Invalid proposal resolutions; only changed nodes can be resolved.');
+        if (changed.length && entries(proposal).every(e => e.status !== 'pending')) throw new Error('Completed proposal must be cleared.');
+        validateContent(expected(proposal));
+      }
+    }
+    function apply(state, selected, decision) {
+      const original = state.proposals?.[0];
+      if (!original) throw new Error('No pending proposal.');
+      if (!['accept', 'reject'].includes(decision)) throw new Error('Unsupported review decision.');
+      const pending = entries(original).filter(e => e.status === 'pending').map(e => e.section);
+      const targets = selected === undefined ? pending : selected;
+      if (!Array.isArray(targets) || (selected !== undefined && !targets.length) || new Set(targets).size !== targets.length || targets.some(s => !pending.includes(s))) throw new Error('Select distinct pending changed nodes.');
+      const next = structuredClone(state), proposal = next.proposals[0];
+      proposal.resolutions = { ...(proposal.resolutions || {}) };
+      for (const section of targets) {
+        proposal.resolutions[section] = decision === 'accept' ? 'accepted' : 'rejected';
+        if (decision === 'accept') replace(next.content, proposal, section);
+      }
+      try { validateContent(next.content); }
+      catch (error) { throw new Error(`These node changes cannot be accepted independently. Select related nodes together. ${error.message}`); }
+      if (entries(proposal).every(e => e.status !== 'pending')) {
+        const accepted = entries(proposal).filter(e => e.status === 'accepted').map(e => e.section);
+        const rejected = entries(proposal).filter(e => e.status === 'rejected').map(e => e.section);
+        if (accepted.length) {
+          const label = section => section.replaceAll('_', ' ');
+          const text = `Accepted nodes: ${accepted.map(label).join(', ')}. Rejected nodes: ${rejected.length ? rejected.map(label).join(', ') : 'none'}.\nOriginal proposal rationale (not a reassessment of the mixed canvas):\n${proposal.thought.text}`;
+          next.thoughts = [...(next.thoughts || []), { ...proposal.thought, text }];
+        }
+        next.proposals = [];
+      }
+      return next;
+    }
+    return Object.freeze({ entries, expected, validate, apply });
+  }
+  return Object.freeze({ create, same });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = ProposalReview;
+</script>
+<script data-implementation>
+/* Shared collection review controls. Frameworks own state and action validation. */
+const ProposalReviewUI = (() => {
+  'use strict';
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function render({ state, core, panel, labels, title, onDecision }) {
+    const expanded = !!panel.querySelector('details')?.open;
+    const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
+    panel.replaceChildren();
+    const proposal = state.proposals?.[0]; panel.hidden = !proposal;
+    if (!proposal) return;
+    const entries = core.proposalSections(state);
+    const hasDecisions = entries.some(e => e.status !== 'pending');
+    panel.append(element('h3', '', title), element('p', '', proposal.thought.text), element('p', 'review-hint', 'Accept or reject each node, or select nodes to accept together. Unchecked nodes remain pending.'));
+    const review = element('details'); review.open = expanded;
+    review.append(element('summary', '', 'Review proposed changes'));
+    const error = element('p', 'review-error'); error.setAttribute('role', 'alert');
+    function decide(targets, decision) {
+      try {
+        onDecision(targets, decision);
+        panel.querySelector('input:not(:disabled), button:not(:disabled)')?.focus();
+      } catch (e) { error.textContent = e.message; }
+    }
+    function button(label, run, primary = false) {
+      const node = element('button', primary ? 'primary' : '', label); node.type = 'button'; node.addEventListener('click', run); return node;
+    }
+    const acceptSelected = button('Accept Selected', () => decide(Array.from(review.querySelectorAll('input:checked')).map(n => n.value), 'accept'));
+    const updateSelection = () => { acceptSelected.disabled = !review.querySelector('input:checked'); };
+    for (const { section, status } of entries) {
+      const label = labels[section][0], diff = element('div', 'proposal-diff'); diff.dataset.reviewSection = section;
+      const header = element('div', 'review-node-heading'); header.append(element('h4', '', label));
+      if (status === 'pending') {
+        const controls = element('div', 'review-node-controls'), select = element('label', 'review-select');
+        const input = element('input'); input.type = 'checkbox'; input.value = section; input.checked = selected.has(section);
+        input.setAttribute('aria-label', `Select ${label}`); input.addEventListener('change', updateSelection);
+        select.append(input, document.createTextNode('Select'));
+        const accept = button('Accept', () => decide([section], 'accept')); accept.setAttribute('aria-label', `Accept ${label}`);
+        const reject = button('Reject', () => decide([section], 'reject')); reject.setAttribute('aria-label', `Reject ${label}`);
+        controls.append(select, accept, reject); header.append(controls);
+      } else header.append(element('span', `node-status ${status}`, status === 'accepted' ? 'Accepted' : 'Rejected'));
+      diff.append(header);
+      const original = core.collection({ content: proposal.base_content }, section);
+      const before = status === 'accepted' ? original : core.collection(state, section);
+      const after = core.collection({ content: proposal.content }, section);
+      for (const [columnLabel, items] of [[status === 'accepted' ? 'Original' : 'Current', before], ['Proposed', after]]) {
+        const column = element('div'), list = element('ul'); column.append(element('strong', '', columnLabel));
+        for (const item of items) {
+          const bullet = element('li', '', item.text || '(Blank draft)');
+          if (columnLabel === 'Proposed') {
+            const previous = original.find(old => old.id === item.id);
+            if (!previous || previous.text !== item.text) bullet.append(element('span', 'proposal-tag', previous ? 'Updated' : 'New'));
+          }
+          list.append(bullet);
+        }
+        if (!items.length) list.append(element('li', '', '(Empty)'));
+        column.append(list); diff.append(column);
+      }
+      review.append(diff);
+    }
+    if (!entries.length) review.append(element('p', 'review-hint', 'No node content changes were proposed. Accept All or Reject All closes this review.'));
+    const actions = element('div', 'proposal-actions');
+    actions.append(button(hasDecisions ? 'Accept All Remaining' : 'Accept All', () => decide(undefined, 'accept'), true), acceptSelected,
+      button(hasDecisions ? 'Reject All Remaining' : 'Reject All', () => decide(undefined, 'reject')));
+    updateSelection(); panel.append(review, error, actions);
+  }
+  return Object.freeze({ render });
+})();
+</script>
+<script data-implementation>
+/* PAGES state and action boundaries. Used by the standalone page and Node. */
+const Pages = (() => {
+  'use strict';
+  const sections = Object.freeze(['parts', 'actions', 'goals', 'events', 'self_concepts']);
+  const framing = Object.freeze(['what', 'why', 'intuition']);
+  const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
+  const review = Review.create({ sections, collection: (content, section) => collection({ content }, section), validateContent });
+  const clone = value => structuredClone(value);
+  const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
+  function keys(value, required, path, optional = []) {
+    if (!value || typeof value !== 'object' || Array.isArray(value) ||
+        Object.keys(value).some(k => !required.includes(k) && !optional.includes(k)) ||
+        required.some(k => !Object.hasOwn(value, k))) throw new Error(`${path}: expected ${required.join(', ')}.`);
+  }
+  function same(a, b) {
+    if (a === b) return true;
+    if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
+    return Object.keys(a).length === Object.keys(b).length && Object.keys(a).every(k => Object.hasOwn(b, k) && same(a[k], b[k]));
+  }
+  function validateCollections(value) {
+    keys(value, sections, 'PAGES collections');
+    const ids = new Set();
+    for (const section of sections) {
+      if (!Array.isArray(value[section])) throw new Error(`${section}: expected array.`);
+      for (const item of value[section]) {
+        keys(item, ['id', 'text'], section);
+        if (typeof item.id !== 'string' || !idPattern.test(item.id) || typeof item.text !== 'string') throw new Error(`${section}: invalid item ID or text.`);
+        if (ids.has(item.id)) throw new Error(`Duplicate item ID: ${item.id}.`);
+        ids.add(item.id);
+      }
+    }
+    return ids;
+  }
+  function coreContent(content) { return Object.fromEntries(sections.map(s => [s, content[s]])); }
+  function validateContent(content) {
+    keys(content, ['framing', ...sections], 'Content');
+    keys(content.framing, framing, 'Framing');
+    if (framing.some(k => typeof content.framing[k] !== 'string')) throw new Error('Framing must be text.');
+    return validateCollections(coreContent(content));
+  }
+  function thought(th, ids) {
+    keys(th, ['id', 'kind', 'text'], 'Thought');
+    if (typeof th.id !== 'string' || !idPattern.test(th.id) || ids.has(th.id)) throw new Error('Invalid or duplicate thought ID.');
+    if (!['evaluation', 'improvement', 'ripple'].includes(th.kind) || typeof th.text !== 'string' || !th.text.trim()) throw new Error('Invalid thought kind or text.');
+    ids.add(th.id);
+  }
+  function boundary(before, after, action, sources = []) {
+    if (!same(before.framing, after.framing)) throw new Error('AI actions must preserve framing.');
+    const previous = sections.flatMap(s => before[s]);
+    for (const item of sections.flatMap(s => after[s])) {
+      const matches = previous.filter(old => old.text === item.text);
+      if (matches.length && !matches.some(old => old.id === item.id)) throw new Error('Retained text must preserve an existing matching ID.');
+    }
+    if (action === 'ripple' && sources.some(s => !same(before[s], after[s]))) throw new Error('Ripple must preserve selected source collections.');
+  }
+  function validateSources(sources) {
+    if (!Array.isArray(sources) || !sources.length || sources.length >= sections.length || new Set(sources).size !== sources.length || sources.some(s => !sections.includes(s))) throw new Error('Select distinct source dimensions, leaving another dimension for implications.');
+  }
+  function collectionChanged(before, after) {
+    return before.length !== after.length || before.some(old => !after.some(item => item.id === old.id && item.text === old.text));
+  }
+  function validate(state) {
+    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['ripple_baseline', 'thoughts', 'proposals']);
+    if (state.framework !== 'pages' || state.schema_version !== '1.0') throw new Error('Unsupported framework/version; expected pages / 1.0.');
+    const ids = validateContent(state.content);
+    if (state.ripple_baseline !== undefined) validateCollections(state.ripple_baseline);
+    if (state.thoughts !== undefined) {
+      if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
+      state.thoughts.forEach(t => thought(t, ids));
+    }
+    if (state.proposals !== undefined) {
+      if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one pending proposal is supported.');
+      for (const p of state.proposals) {
+        keys(p, ['id', 'action', 'sources', 'base_content', 'base_baseline', 'content', 'thought'], 'Proposal', ['resolutions']);
+        if (typeof p.id !== 'string' || !idPattern.test(p.id) || ids.has(p.id)) throw new Error('Invalid or duplicate proposal ID.');
+        ids.add(p.id);
+        if (!['improve', 'ripple'].includes(p.action)) throw new Error('Unsupported proposal action.');
+        validateContent(p.base_content);
+        if (p.base_baseline !== null) validateCollections(p.base_baseline);
+        if (p.action === 'ripple') {
+          validateSources(p.sources);
+          if (!p.base_baseline) throw new Error('Ripple proposal needs its baseline.');
+          if (p.sources.some(s => !collectionChanged(p.base_baseline[s], p.base_content[s]))) throw new Error('Ripple sources must have changed.');
+        } else if (!Array.isArray(p.sources) || p.sources.length) throw new Error('Improve has no Ripple sources.');
+        const nextIds = validateContent(p.content);
+        thought(p.thought, ids);
+        if (p.thought.kind !== (p.action === 'improve' ? 'improvement' : 'ripple')) throw new Error('Thought must match action.');
+        const annotations = [...(state.thoughts || []).map(t => t.id), p.id, p.thought.id];
+        if (annotations.some(id => nextIds.has(id))) throw new Error('Proposed item collides with annotation ID.');
+        boundary(p.base_content, p.content, p.action, p.sources);
+        review.validate(p);
+      }
+    }
+    return state;
+  }
+  function initialState() {
+    const content = { framing: { what: '', why: '', intuition: '' }, ...Object.fromEntries(sections.map(s => [s, []])) };
+    return { framework: 'pages', schema_version: '1.0', content, ripple_baseline: clone(coreContent(content)) };
+  }
+  function collection(state, section) {
+    if (!sections.includes(section)) throw new Error(`Unknown PAGES section: ${section}.`);
+    return state.content[section];
+  }
+  function locate(state, section, id) {
+    validate(state); const items = collection(state, section); const index = items.findIndex(i => i.id === id);
+    if (index < 0) throw new Error(`Missing item: ${id}.`);
+    return { items, index };
+  }
+  function addItem(state, section) {
+    validate(state); const items = collection(state, section);
+    const used = new Set([...sections.flatMap(s => state.content[s]), ...sections.flatMap(s => state.ripple_baseline?.[s] || []), ...(state.thoughts || [])].map(i => i.id));
+    let id; do { id = `item-${globalThis.crypto.randomUUID()}`; } while (used.has(id));
+    items.push({ id, text: '' }); return id;
+  }
+  function editItem(state, section, id, text) {
+    if (typeof text !== 'string') throw new Error('Item text must be text.');
+    const { items, index } = locate(state, section, id); items[index].text = text;
+  }
+  function deleteItem(state, section, id) { const { items, index } = locate(state, section, id); items.splice(index, 1); }
+  function resetBaseline(state) {
+    validate(state);
+    if (state.proposals?.length) throw new Error('Resolve the pending proposal before resetting the baseline.');
+    state.ripple_baseline = clone(coreContent(state.content));
+  }
+  function changes(state) {
+    validate(state);
+    if (!state.ripple_baseline) return [];
+    const result = [];
+    for (const section of sections) {
+      const before = state.ripple_baseline[section], after = state.content[section];
+      for (const old of before) {
+        const next = after.find(i => i.id === old.id);
+        if (!next) result.push({ section, kind: 'removed', before: clone(old), after: null });
+        else if (old.text !== next.text) result.push({ section, kind: 'edited', before: clone(old), after: clone(next) });
+      }
+      for (const next of after) if (!before.some(i => i.id === next.id)) result.push({ section, kind: 'added', before: null, after: clone(next) });
+    }
+    return result;
+  }
+  function buildRequest(state, action) {
+    validate(state);
+    if (state.proposals?.length) throw new Error('Resolve the pending proposal first.');
+    const id = action?.id;
+    if (!['evaluate', 'improve', 'ripple'].includes(id)) throw new Error('Unsupported PAGES action.');
+    keys(action, ['id'], 'Action', ['comment', 'use_thoughts', ...(id === 'ripple' ? ['sources'] : [])]);
+    const normalized = { id, comment: action.comment === undefined ? '' : action.comment, use_thoughts: action.use_thoughts === undefined ? true : action.use_thoughts };
+    if (typeof normalized.comment !== 'string' || typeof normalized.use_thoughts !== 'boolean') throw new Error('Invalid action guidance.');
+    if (id === 'ripple') {
+      if (!state.ripple_baseline) throw new Error('Establish a Ripple baseline explicitly first; prior changes cannot be recovered.');
+      validateSources(action.sources);
+      const changed = changes(state);
+      if (action.sources.some(s => !changed.some(c => c.section === s))) throw new Error('Every selected Ripple source must have changed since baseline.');
+      normalized.sources = clone(action.sources);
+    }
+    return { canvas: clone(state), action: normalized };
+  }
+  function validateRequest(request) { keys(request, ['canvas', 'action'], 'Request'); return buildRequest(request.canvas, request.action); }
+  function composeResult(input, response) {
+    const { canvas, action } = validateRequest(input);
+    keys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'Response');
+    if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('A nonempty explanatory thought is required.');
+    const th = { id: `thought-${globalThis.crypto.randomUUID()}`, kind: action.id === 'evaluate' ? 'evaluation' : action.id === 'improve' ? 'improvement' : 'ripple', text: response.thought };
+    if (action.id === 'evaluate') canvas.thoughts = [...(canvas.thoughts || []), th];
+    else {
+      validateContent(response.content); boundary(canvas.content, response.content, action.id, action.sources);
+      canvas.proposals = [{ id: `proposal-${globalThis.crypto.randomUUID()}`, action: action.id, sources: action.sources || [], base_content: clone(canvas.content), base_baseline: canvas.ripple_baseline ? clone(canvas.ripple_baseline) : null, content: clone(response.content), thought: th }];
+    }
+    return validate(canvas);
+  }
+  function proposalSections(state) { validate(state); return state.proposals?.length ? review.entries(state.proposals[0]) : []; }
+  function resolveProposal(state, selected, decision) {
+    validate(state); const p = state.proposals?.[0]; if (!p) throw new Error('No pending proposal.');
+    if (decision === 'accept') {
+      if (!same(state.ripple_baseline ?? null, p.base_baseline)) throw new Error('Ripple baseline changed; reject and request again.');
+      if (!same(state.content, review.expected(p))) throw new Error('Canvas content changed; reject remaining changes and request again.');
+    }
+    const next = review.apply(state, selected, decision);
+    validate(next); Object.assign(state, next);
+  }
+  function acceptProposal(state) { resolveProposal(state, undefined, 'accept'); }
+  function rejectProposal(state) { resolveProposal(state, undefined, 'reject'); }
+  function parseState(json) { return validate(JSON.parse(json)); }
+  function safeJson(state) { validate(state); return JSON.stringify(state, null, 2).replace(/[<>&\u2028\u2029]/g, c => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`); }
+  function packageHtml(html, state) {
+    const start = ['<!--', 'pensive-state-start', '-->'].join(''), end = ['<!--', 'pensive-state-end', '-->'].join('');
+    const first = html.indexOf(start), last = html.indexOf(end);
+    if (first < 0 || last < first || html.indexOf(start, first + start.length) !== -1 || html.indexOf(end, last + end.length) !== -1) throw new Error('Expected one complete state slot.');
+    return html.slice(0, first) + `${start}\n<script id="canvas-state" type="application/json">${safeJson(state)}<${'/script>'}\n${end}` + html.slice(last + end.length);
+  }
+  return Object.freeze({ sections, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, resetBaseline, changes, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = Pages;
+</script>
+<script data-implementation>
+/* Local PAGES editing and explicit AI handoff. No network or storage service. */
+(() => {
+  'use strict';
+  const labels = {
+    parts: ['Parts', 'P', 'People, objects, systems and other elements you notice.'],
+    actions: ['Actions', 'A', 'What is being done, by whom, and how.'],
+    goals: ['Goals', 'G', 'Outcomes and intentions shaping this perspective.'],
+    events: ['Events', 'E', 'What happened, what triggers it, and what follows.'],
+    self_concepts: ['Self-concepts', 'S', 'Identity, roles and beliefs about who you are here.']
+  };
+  const $ = selector => document.querySelector(selector);
+  const source = '<!doctype html>\n' + document.documentElement.outerHTML;
+  let state, requestedAction;
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function status(message, error = false) { $('#status').textContent = message; $('#status').classList.toggle('error', error); }
+  function resize(input) { input.style.height = 'auto'; input.style.height = `${Math.max(input.scrollHeight, 30)}px`; }
+  function edited() {
+    $('#clipboard-fallback').hidden = true;
+    status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
+    renderChanges();
+  }
+  function renderChanges() {
+    const changes = Pages.changes(state);
+    $('#baseline-status').textContent = state.ripple_baseline
+      ? `${changes.length} ${changes.length === 1 ? 'change' : 'changes'} from the Ripple baseline. New canvases start with their initialized state as baseline.`
+      : 'No Ripple baseline. Prior changes cannot be recovered; establish the current state explicitly to start tracking.';
+    for (const section of Pages.sections) {
+      const container = $(`[data-section="${section}"]`);
+      for (const row of container.querySelectorAll('.item')) {
+        row.querySelector('.change-mark')?.remove();
+        const change = changes.find(c => c.section === section && c.after?.id === row.querySelector('textarea').dataset.id);
+        if (change) {
+          const mark = element('span', 'change-mark', change.kind === 'added' ? 'Added' : 'Edited');
+          mark.title = change.before ? `Previously: ${change.before.text}` : 'Added since baseline';
+          row.insertBefore(mark, row.querySelector('.delete'));
+        }
+      }
+      const removed = container.querySelector('.removed-items');
+      removed.replaceChildren();
+      for (const c of changes.filter(c => c.section === section && c.kind === 'removed')) removed.append(element('p', '', `Removed: ${c.before.text || '(Blank draft)'}`));
+      removed.hidden = !removed.childNodes.length;
+    }
+  }
+  function renderSection(section) {
+    const container = $(`[data-section="${section}"]`), [label, symbol, description] = labels[section];
+    const heading = element('div', 'band-heading');
+    heading.append(element('span', 'cell-symbol', symbol), element('h2', '', label), element('p', 'band-description', description));
+    const content = element('div', 'band-content'), list = element('ul', 'items');
+    Pages.collection(state, section).forEach((item, index) => {
+      const row = element('li', 'item'), input = element('textarea');
+      input.rows = 1; input.value = item.text; input.dataset.id = item.id;
+      input.setAttribute('aria-label', `${label} ${index + 1}`); input.placeholder = 'Write one idea…';
+      input.addEventListener('input', () => { Pages.editItem(state, section, item.id, input.value); resize(input); edited(); });
+      const remove = element('button', 'delete', '×'); remove.type = 'button'; remove.setAttribute('aria-label', `Delete ${label.toLowerCase()} ${index + 1}`);
+      remove.addEventListener('click', () => { Pages.deleteItem(state, section, item.id); renderSection(section); container.querySelector('.add').focus(); edited(); });
+      row.append(input, remove); list.append(row);
+    });
+    const removed = element('div', 'removed-items'); removed.hidden = true;
+    const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
+    add.addEventListener('click', () => {
+      const id = Pages.addItem(state, section); renderSection(section); edited();
+      Array.from(container.querySelectorAll('textarea')).find(n => n.dataset.id === id).focus();
+    });
+    content.append(list, removed, add); container.replaceChildren(heading, content); container.querySelectorAll('textarea').forEach(resize);
+  }
+  function renderAI() {
+    const thoughts = $('#thoughts'); thoughts.replaceChildren(); thoughts.hidden = !state.thoughts?.length;
+    for (const th of state.thoughts || []) {
+      const card = element('article', 'thought');
+      card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', ripple: 'Ripple implications' }[th.kind]), element('p', '', th.text)); thoughts.append(card);
+    }
+    const proposal = state.proposals?.[0];
+    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
+    $('#reset-baseline').disabled = !!proposal;
+    ProposalReviewUI.render({ state, core: Pages, panel: $('#proposal-panel'), labels,
+      title: proposal?.action === 'ripple' ? 'Proposed Ripple implications' : 'Proposed improvements',
+      onDecision: (selected, decision) => {
+        Pages.resolveProposal(state, selected, decision); refresh(); edited();
+        status('Review decision saved in this tab. Export or save to keep it.');
+      }
+    });
+  }
+  function refresh() {
+    for (const field of Pages.framing) { const input = $(`[data-framing="${field}"]`); input.value = state.content.framing[field]; resize(input); }
+    Pages.sections.forEach(renderSection); renderChanges(); renderAI();
+  }
+  async function copyJson(json, message) {
+    try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status(message); }
+    catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access blocked. Copy the selected JSON below.', true); }
+  }
+  function ripplePreview() {
+    const selected = Array.from(document.querySelectorAll('#ripple-sources input:checked')).map(n => n.value);
+    const preview = $('#ripple-preview'); preview.replaceChildren();
+    for (const c of Pages.changes(state).filter(c => selected.includes(c.section))) {
+      preview.append(element('p', '', `${labels[c.section][0]} — ${c.kind === 'removed' ? 'Removed' : c.kind === 'added' ? 'Added' : 'Edited'}\nBefore: ${c.before?.text ?? '(Absent)'}\nAfter: ${c.after?.text ?? '(Absent)'}`));
+    }
+  }
+  function openAction(id) {
+    try {
+      if (state.proposals?.length) throw new Error('Resolve the pending proposal first.');
+      if (id === 'ripple') {
+        if (!state.ripple_baseline) throw new Error('Establish a Ripple baseline explicitly first; prior changes cannot be recovered.');
+        if (!Pages.changes(state).length) throw new Error('No dimensions have changed since the Ripple baseline. Edit a premise first.');
+      }
+      requestedAction = id; $('#ai-form').reset(); $('#ai-error').textContent = '';
+      $('#ai-title').textContent = { evaluate: 'Evaluate PAGES', improve: 'Improve PAGES', ripple: 'Ripple changes' }[id];
+      $('#ripple-options').hidden = id !== 'ripple'; $('#ripple-sources').replaceChildren(); $('#ripple-preview').replaceChildren();
+      if (id === 'ripple') for (const section of Pages.sections) {
+        if (!Pages.changes(state).some(c => c.section === section)) continue;
+        const label = element('label', 'checkbox-label'), input = element('input'); input.type = 'checkbox'; input.value = section;
+        input.addEventListener('change', ripplePreview); label.append(input, document.createTextNode(labels[section][0])); $('#ripple-sources').append(label);
+      }
+      $('#ai-dialog').showModal(); $('#ai-guidance').focus();
+    } catch (e) { status(e.message, true); }
+  }
+  function save() {
+    try {
+      const url = URL.createObjectURL(new Blob([Pages.packageHtml(source, state)], { type: 'text/html;charset=utf-8' }));
+      const link = element('a'); link.href = url; link.download = 'pensive-pages.html'; document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000); status('HTML download started. Keep the downloaded file to preserve your work.');
+    } catch (e) { status(`Could not save: ${e.message}`, true); }
+  }
+  try {
+    state = Pages.parseState($('#canvas-state').textContent); refresh();
+    for (const field of Pages.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { state.content.framing[field] = e.target.value; resize(e.target); edited(); });
+    document.querySelectorAll('[data-ai]').forEach(b => b.addEventListener('click', () => openAction(b.dataset.ai)));
+    $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());
+    $('#ai-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      try {
+        const action = { id: requestedAction, comment: $('#ai-guidance').value, use_thoughts: $('#use-thoughts').checked };
+        if (requestedAction === 'ripple') action.sources = Array.from(document.querySelectorAll('#ripple-sources input:checked')).map(n => n.value);
+        const request = Pages.buildRequest(state, action); $('#ai-dialog').close();
+        await copyJson(JSON.stringify(request, null, 2), 'Copied AI request. Paste it into Codex or ChatGPT with the Pensive skill.');
+      } catch (err) { $('#ai-error').textContent = err.message; }
+    });
+    $('#copy').addEventListener('click', () => copyJson(JSON.stringify(Pages.validate(state), null, 2), 'Copied complete canvas JSON to clipboard.'));
+    $('#save').addEventListener('click', save);
+    $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });
+    $('#reset-baseline').addEventListener('click', () => {
+      if (confirm('Set the current core content as the Ripple baseline? This clears change markers. Previous changes will no longer be available to Ripple.')) {
+        try { Pages.resetBaseline(state); edited(); status('Ripple baseline set to current content. Save or export to keep it.'); } catch (e) { status(e.message, true); }
+      }
+    });
+    $('#import').addEventListener('click', () => { $('#import-form').reset(); $('#import-error').textContent = ''; $('#import-dialog').showModal(); $('#import-json').focus(); });
+    $('#cancel-import').addEventListener('click', () => $('#import-dialog').close());
+    $('#import-form').addEventListener('submit', e => {
+      e.preventDefault();
+      try {
+        const next = Pages.parseState($('#import-json').value);
+        if (!confirm('Replace the current canvas, including edits, thoughts, baseline and pending proposal? Save or export first if you want to keep it.')) return;
+        state = next; $('#import-dialog').close(); refresh(); edited(); status(next.ripple_baseline ? 'PAGES JSON imported. Save to keep this state.' : 'PAGES JSON imported without a baseline. Prior changes cannot be recovered; establish the current state explicitly.');
+      } catch (err) { $('#import-error').textContent = err.message; }
+    });
+    $('details').addEventListener('toggle', () => resize($('#intuition')));
+  } catch (err) { document.querySelectorAll('button, textarea, input').forEach(n => { n.disabled = true; }); status(`Invalid canvas: ${err.message} Embedded state has not been changed.`, true); }
+})();
+</script>
+</body>
+</html>

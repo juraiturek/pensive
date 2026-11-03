@@ -106,3 +106,54 @@ New destination decisions: `{canvas, action}` protocol, current thoughts, tempor
 | V2 `docs/decisions/ADR-0002-guidance-method-vs-content.md` | `197c793824a092ea326241ff64d4cfb33cf4bd605f84af3400f3d73b4300667c` |
 
 Verification: full destination tests, observed methodology sample, skill validation, and reference/integrity checks are recorded in [testing.md](testing.md). Legacy server suites were not run; destination regressions exercise the adapted behavior without obsolete infrastructure.
+
+## PAGES: RrEAC extraction and adaptation
+
+Research/review used the same V1 snapshot and V2 revision `a75617205cf342ebe851379ab43db52e35a07a5e`, read-only. Findings and rejected alternatives are in the [approved design](plans/2026-11-02-pages-design.md). Destination paths below are relative to `.agents/skills/pensive/`.
+
+| Source | Relative value / extraction decision | Destination adaptation |
+| --- | --- | --- |
+| V1 schema and five-band template/CSS | Consistent five dimensions; stronger distinctive representation than V2 linear fallback. | `frameworks/pages/` manifest, schema and responsive S/E/G/A/P bands using Pensive typography and controls. No Tagify or application CSS copied. |
+| V1 Ripple prompts and selected-node dialog | Change in one dimension implies possible changes elsewhere; self-concepts can affect goals. Current values alone do not record the change. | `prompts/ripple.md`, guided multi-source selection and before/after preview. Persist one initialization baseline, a new destination design explicitly requested by the user. |
+| V1 Reflect and Improve | Grounded gaps/connections and explanatory revisions; broad prompts and direct server mutation. | Evaluate formulation, coverage, verbosity, gaps and content inconsistencies; Improve best-practice core changes. Whole-canvas review replaces direct mutation. |
+| V2 registry and generate | Canonical Parts/Actions/Goals/Events/Self-concepts, what/why/intuition and perspective activation. | Context-aware create method, optional recommendation, bounded adaptive elicitation; no item quotas, list caps or invented self-beliefs. |
+| V2 guidance and improve | Specific methodology checks and framing-preserving core revision. | Evaluate/Improve Markdown; balanced coverage is contextual, not equal item counts. “I am” is useful elicitation, not a mandatory format. |
+| V2 framing restatement | Distinct framing-only action with evidence rationale. | Inspected but deferred at user request; no action shipped. |
+| V1/V2 Six Hats and V1 generic tools | Supplementary tools, not equivalent to the PAGES model. Legacy V2 Six Hats outputs are thought-only. | Deferred. User's future contract spans canvases and includes reflections plus suggested changes, after stabilization and partial acceptance. |
+| V2 dashboard design draft | Conflicting Players/Aspirations/Goals/Enablers/Scope expansion. | Rejected because implemented registry and both schemas/prompts consistently use the canonical five dimensions. |
+
+Adjust/compile: original static state/schema, safe packager, persisted baseline diff, atomic import, proposal guards and browser controls. Shared Pensive CSS is included from the existing SWOT stylesheet at build time with PAGES-specific overrides, avoiding duplication of source visual infrastructure or SWOT runtime changes. Reasoning remains readable Markdown. No backend, dependency migration, API client, generic engine or legacy source directory copying.
+
+Origin: V1 `prompts/generate/pages_generate.j2` explicitly attributes its PAGES principles to *The Craft of Creativity* by Matthew Cronin and Jeffrey Loewenstein. This recovers the legacy attribution; the book’s exact formulation was not independently inspected. The attribution to Edward de Bono in Six Hats prompts applies to Six Hats only. No missing methodology or historical attribution was invented.
+
+### Exact source identities inspected for PAGES
+
+| Version | Path | SHA-256 |
+| --- | --- | --- |
+| V1 | `schemas/pages.yml` | `008091444a113c2a21e5e5a0d296c94628e622f519e8cd4f195375ae7df7f404` |
+| V1 | `templates/frameworks/pages.html` | `0627d97c78121db53470b538a37fd94ecc1098642d0d9b268364264ceea94a73` |
+| V1 | `static/pages/pages.css` | `6ee3965a7801385ac73b6da9d0403226d636a6e4d9a2672de4f22274d02d4692` |
+| V1 | `static/pages/pages.js` | `8263bd3e2dcb1ffe34b924937d1059d7771e19021f467f3de7e697b1cfa469dd` |
+| V1 | `prompts/generate/pages_generate.j2` | `45d6e40556bf780998b6e4930b4ce0ad353a7c6b52f0fd1b5cc09dbe9c7a50d9` |
+| V1 | `prompts/reflect/pages_reflect.j2` | `15cf1aa22557c61378a3665bd2b6b96caf1fbffcf1480ee050ea126568369451` |
+| V1 | `prompts/improve/pages_improve.j2` | `307caa6306192c29d6deeeec8e0163fa8ea7277f0d248d394d82d785ab2efe66` |
+| V1 | `prompts/ripple/pages_ripple.j2` | `6715ec36de7680a53458e527d8819320f76a085d817b3841f591490800dacb8e` |
+| V1 | `prompts/ripple/pages_ripple_selfconcept.j2` | `e1f124f56dfdd3c9dbbbdcfd9fe6e8513367cea19b75a4f2580654b6d79bb35c` |
+| V1 | `prompts/tools/pages_tool.j2` | `46d8f58507babfc4f49bfd5d6738a0bae48262fa77a1f4b37f143360d57e9150` |
+| V1 | `prompts/viewpoints/pages_viewpoint_default.j2` | `50f07e45eeacbd296e144976d577b2da7af8dfd56d67647eb50132fa2ad15739` |
+| V1 | `prompts/viewpoints/pages_viewpoint_white.j2` | `b82bf02cc34dd357a94525dfbf366714caa09e102a47f7deb990306841d7303f` |
+| V2 | `app/frameworks/registry.py` | `f6bfe38cc987fba62cee8e949a2fa44ef75fc94614141349985495cd4204910d` |
+| V2 | `prompt_templates/user/pages_generate.j2` | `1603d23d5e4183611a1ce7b5ca6c41e912a92fd2f00bbe55b1c97b2d337e3316` |
+| V2 | `prompt_templates/user/pages_guidance.j2` | `aa78a3edaa58ac82e54ef7d0b86350ce26fc9fd469d00c493cc9a9642a87799b` |
+| V2 | `prompt_templates/user/pages_improve.j2` | `3f7b2e753ad285e4b4658fdf2228f74a34a4638e5917585dbd20714939abec3b` |
+| V2 | `prompt_templates/user/pages_reflect.j2` | `2bd4f3ac4602642d95f2c92e680beeb72aa9f45655542ad12ab58e61e803d2cc` |
+| V2 | `prompt_templates/user/pages_restate_problem.j2` | `fa2d584aeeebabda198d40a3a5bbbc0dc55c0da78fcf5b6a46cb56fc6035b7d9` |
+| V2 | `docs/plans/2026-03-03-dashboard-canvas-management-design.md` | `4d043e791abf1059f60051a10a46f2b0b4a3d8ba6a0a6a8dd0d1ab5f9bb7c911` |
+| V2 | `prompt_templates/user/pages_viewpoint_white.j2` | `e6cac86f66ac08d70ee2c203baf14030e54f84f48369b25ee2474461b386a3b8` |
+| V2 | `prompt_templates/user/pages_viewpoint_red.j2` | `a90ed7808baff27a96afcbf76c019e8345ebe8086908b6e45f5460c165a938f5` |
+| V2 | `prompt_templates/user/pages_viewpoint_black.j2` | `6e32a8f8f51460376e38a61cbc35d1093fe83cd87559a4e7f4a543a00e2b070d` |
+| V2 | `prompt_templates/user/pages_viewpoint_yellow.j2` | `708d00e0e3e191b0fdb3d60c03a18afbdbdabf080ac7cb9a520f5840b202a7cf` |
+| V2 | `prompt_templates/user/pages_viewpoint_green.j2` | `ea0350d539126473f8bd9c141c76dcf7a61ac6e3d190cd6110bddf7d0ddecd34` |
+| V2 | `prompt_templates/user/pages_viewpoint_blue.j2` | `fe1bdcc207288e3187daf2e3bc8d8f25eecf62450015219f1473457671db3f1f` |
+
+Verification and methodological limits are recorded in [testing.md](testing.md). Legacy application/server tests are not migrated or run.

@@ -16,4 +16,4 @@ Retain IDs for retained items, including wording changes or reclassification. Ne
 
 Return exactly `{ "content": { ...complete candidate content... }, "thought": "..." }`. The plain-text thought accompanies the proposed iteration above the matrix. Identify the material improvements with concrete before/after references, why they improve methodological or strategic usefulness, and remaining assumptions/limitations. If no useful change is warranted, say so; do not manufacture improvements to justify the action.
 
-The candidate is packaged as a pending whole-canvas transformation, preserving current content until explicit local acceptance. Existing thoughts remain intact. No item/section acceptance or history is introduced.
+The candidate is packaged as a pending whole-canvas transformation, preserving current content until explicit local acceptance. Existing thoughts remain intact. Local collection-level and bulk acceptance/rejection are supported; see [proposal review](../../../references/proposal-review.md). Individual-item acceptance and history remain deferred.

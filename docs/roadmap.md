@@ -20,3 +20,15 @@ For each vertical slice, inspect relevant read-only references, integrate minima
 Slice 1 includes manual SO/ST/WO/WT strategies and read-only factor context in TOWS. Slice 2B adds the separately authorized AI actions and whole-canvas proposal acceptance; Slice 1 did not include them.
 
 Future user story: recognize when external research would improve SWOT creation and execute appropriate web searches. Slice 2A uses available conversation and supplied materials only.
+
+## PAGES priority and cross-framework tools — user review, 2026-11-02
+
+The current authorized work brings PAGES creation, canvas and methodology forward from the original slice 6/7 sequence. See [PAGES design](plans/2026-11-02-pages-design.md). Initial actions are Evaluate, Improve and Ripple; Restate framing is deferred. Ripple is a generic tool implemented first with PAGES-specific interpretation, using a persistent comparison baseline to identify source changes. This does not authorize a generic action engine or revision history.
+
+Subsequent ordering:
+
+1. Stabilize at least two frameworks (initially SWOT and PAGES), including their creation, editing, action handoff and import/export behavior.
+2. Implement partial accept/reject for suggested changes as a separately scoped slice. It is not a prerequisite for delivering PAGES.
+3. Implement Six Thinking Hats across supported canvases, producing both reflections and suggested changes. Require explicit framework compatibility and partial acceptance; do not limit Six Hats to PAGES or thought-only output.
+
+Other deferred tools and frameworks remain separately scoped. README remains unchanged.

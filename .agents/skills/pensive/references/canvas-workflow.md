@@ -1,6 +1,6 @@
 # Canvas workflow
 
-SWOT initialization, guided action export, thought display, and whole-canvas transformation review are available. Read [AI handoff](ai-workflow.md) for the implemented action protocol.
+SWOT initialization, guided action export, thought display, and collection-level/bulk transformation review are available. Read [AI handoff](ai-workflow.md) for the implemented action protocol.
 
 ## Initialize
 
@@ -18,7 +18,7 @@ Validate the resulting state and package it deterministically into the establish
 
 ## Transformation review and acceptance
 
-Users accept or reject proposals locally without AI. Acceptance validates current references, framework rules, and complete resulting state before applying changes atomically. Invalid or stale acceptance leaves state unchanged and reports the issue. Generating or opening an artifact never implies acceptance.
+Users accept or reject proposals locally without AI. Acceptance validates current references, framework rules, and complete resulting state before applying changes atomically. Invalid or stale acceptance leaves state unchanged and reports the issue. Generating or opening an artifact never implies acceptance. See [proposal review](proposal-review.md) for individual collection controls, batch decisions and persisted partial review.
 
 ## Failure boundaries
 

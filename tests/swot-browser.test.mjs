@@ -300,16 +300,16 @@ test('whole-canvas proposals can be reviewed, accepted or rejected and remain sa
   await page.screenshot({ path: 'test-results/ai-proposal-mobile.png', fullPage: true, animations: 'disabled' });
   await page.setViewportSize({ width: 1440, height: 1000 });
   const saved = await save(page, 'proposal.html');
-  await page.getByRole('button', { name: 'Accept transformation', exact: true }).click();
+  await page.getByRole('button', { name: 'Accept All', exact: true }).click();
   assert.equal(await page.locator('[data-section="strengths"] textarea').inputValue(), 'Improved');
   assert.ok((await page.locator('#thoughts').textContent()).includes('Improved specificity'));
   assert.equal((await copiedState(page)).content.strengths[0].id, 's1');
   await page.goto(pathToFileURL(saved).href);
   await page.locator('[data-section="strengths"] textarea').fill('Later user edit');
-  await page.getByRole('button', { name: 'Accept transformation', exact: true }).click();
-  assert.ok((await page.locator('#status').textContent()).includes('changed'));
+  await page.getByRole('button', { name: 'Accept All', exact: true }).click();
+  assert.ok((await page.locator('#proposal-panel [role="alert"]').textContent()).includes('changed'));
   assert.equal(await page.locator('[data-section="strengths"] textarea').inputValue(), 'Later user edit');
-  await page.getByRole('button', { name: 'Reject transformation', exact: true }).click();
+  await page.getByRole('button', { name: 'Reject All', exact: true }).click();
   assert.equal(await page.locator('#proposal-panel').isVisible(), false);
   assert.equal(await page.locator('[data-section="strengths"] textarea').inputValue(), 'Later user edit');
   assert.equal((await copiedState(page)).thoughts?.length || 0, 0);
@@ -336,4 +336,20 @@ test('AI dialog cancellation and denied clipboard leave canvas unchanged and exp
   assert.deepEqual(request.canvas, before);
   assert.equal(request.action.comment, 'Preserve our constraints');
   assert.equal(request.action.mode, 'extend');
+});
+
+test('proposal review distinguishes new and updated SWOT bullets without tagging unchanged/current bullets',async t=>{
+  const p=require(fileURLToPath(new URL('state.js',root))),s=p.initialState();
+  s.content.strengths=[{id:'s1',text:'Keep this strength'},{id:'s2',text:'General expertise'}];
+  const content=structuredClone(s.content);content.strengths[1].text='Expertise in accessible product design';
+  content.strengths.push({id:'s3',text:'An additional capability'});
+  const proposed=p.composeResult(p.buildRequest(s,{id:'improve'}),{content,thought:'Specified expertise and added a capability.'});
+  const page=await openCanvas(t,proposed);await page.getByText('Review proposed changes',{exact:true}).click();
+  const diff=page.locator('.proposal-diff');assert.equal(await diff.locator('.proposal-tag').count(),2);
+  assert.equal(await diff.locator('li').filter({hasText:'Keep this strength'}).locator('.proposal-tag').count(),0);
+  assert.equal(await diff.locator('li').filter({hasText:'Expertise in accessible'}).locator('.proposal-tag').textContent(),'Updated');
+  assert.equal(await diff.locator('li').filter({hasText:'An additional capability'}).locator('.proposal-tag').textContent(),'New');
+  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.screenshot({path:'test-results/swot-proposal-tags-mobile.png',fullPage:true});
+  await page.getByRole('button',{name:'Reject All',exact:true}).click();assert.deepEqual((await copiedState(page)).content,s.content);
 });

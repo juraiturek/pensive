@@ -170,45 +170,14 @@
     }
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
-    const panel = $('#proposal-panel');
-    panel.replaceChildren();
-    panel.hidden = !proposal;
-    if (!proposal) return;
-    panel.append(element('h3', '', proposal.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements'), element('p', '', proposal.thought.text));
-    const review = element('details');
-    review.append(element('summary', '', 'Review proposed changes'));
-    for (const section of [...Swot.factors, ...Swot.strategies]) {
-      const before = Swot.collection(state, section);
-      const after = Swot.collection({ content: proposal.content }, section);
-      if (JSON.stringify(before) === JSON.stringify(after)) continue;
-      const diff = element('div', 'proposal-diff');
-      diff.append(element('h4', '', labels[section][0]));
-      for (const [label, items] of [['Current', before], ['Proposed', after]]) {
-        const column = element('div');
-        column.append(element('strong', '', label));
-        const list = element('ul');
-        for (const item of items) list.append(element('li', '', item.text || '(Blank draft)'));
-        if (!items.length) list.append(element('li', '', '(Empty)'));
-        column.append(list); diff.append(column);
+    ProposalReviewUI.render({ state, core: Swot, panel: $('#proposal-panel'), labels,
+      title: proposal?.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements',
+      onDecision: (selected, decision) => {
+        Swot.resolveProposal(state, selected, decision); refreshCanvas();
+        $('#clipboard-fallback').hidden = true;
+        status('Review decision saved in this tab. Export or save to keep it.');
       }
-      review.append(diff);
-    }
-    panel.append(review);
-    const actions = element('div', 'proposal-actions');
-    for (const [label, apply] of [['Accept transformation', Swot.acceptProposal], ['Reject transformation', Swot.rejectProposal]]) {
-      const button = element('button', label.startsWith('Accept') ? 'primary' : '', label);
-      button.type = 'button';
-      button.addEventListener('click', () => {
-        try {
-          apply(state);
-          refreshCanvas();
-          $('#clipboard-fallback').hidden = true;
-          status(label.startsWith('Accept') ? 'Transformation accepted. Export or save to keep this state.' : 'Transformation rejected. Your current content is unchanged.');
-        } catch (error) { status(error.message, true); }
-      });
-      actions.append(button);
-    }
-    panel.append(actions);
+    });
   }
   function saveFile() {
     try {

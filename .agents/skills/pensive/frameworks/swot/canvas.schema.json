@@ -58,6 +58,68 @@
           },
           "thought": {
             "$ref": "#/$defs/thought"
+          },
+          "resolutions": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "strengths": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "weaknesses": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "opportunities": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "threats": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "so": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "st": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "wo": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              },
+              "wt": {
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "rejected"
+                ]
+              }
+            }
           }
         }
       }

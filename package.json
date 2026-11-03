@@ -2,10 +2,11 @@
   "name": "pensive",
   "private": true,
   "scripts": {
-    "build": "node .agents/skills/pensive/scripts/package-swot.mjs",
+    "build": "node .agents/skills/pensive/scripts/package-swot.mjs && node .agents/skills/pensive/scripts/package-pages.mjs",
+    "build:pages": "node .agents/skills/pensive/scripts/package-pages.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:state": "node --test tests/swot-state.test.mjs",
-    "test:browser": "node --test tests/swot-browser.test.mjs"
+    "test:state": "node --test tests/*-state.test.mjs",
+    "test:browser": "node --test tests/*-browser.test.mjs"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

@@ -4,6 +4,8 @@ const Swot = (() => {
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
   const framing = Object.freeze(['focal_entity', 'objective', 'environment']);
+  const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
+  const review = Review.create({ sections: [...factors, ...strategies], collection: (content, section) => collection({ content }, section), validateContent });
   const start = ['<!--', 'pensive-state-start', '-->'].join('');
   const end = ['<!--', 'pensive-state-end', '-->'].join('');
 
@@ -64,7 +66,7 @@ const Swot = (() => {
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one whole-canvas proposal is supported.');
       for (const proposal of state.proposals) {
-        objectWithKeys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal');
+        objectWithKeys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal', ['resolutions']);
         if (typeof proposal.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(proposal.id) || ids.has(proposal.id)) throw new Error('Invalid or duplicate proposal ID.');
         ids.add(proposal.id);
         if (!['strategize', 'improve'].includes(proposal.action)) throw new Error('Unsupported proposal action.');
@@ -76,6 +78,7 @@ const Swot = (() => {
         if (nextIds.has(proposal.thought.id)) throw new Error('Proposed item collides with proposal thought ID.');
         if (proposal.thought.kind !== (proposal.action === 'improve' ? 'improvement' : 'strategize')) throw new Error('Proposal thought kind must match its action.');
         checkBoundary(proposal.base_content, proposal.content, proposal.action);
+        review.validate(proposal);
       }
     }
     return state;
@@ -172,23 +175,21 @@ const Swot = (() => {
     }
     return validate(canvas);
   }
-  function acceptProposal(state) {
+  function proposalSections(state) {
+    validate(state);
+    return state.proposals?.length ? review.entries(state.proposals[0]) : [];
+  }
+  function resolveProposal(state, selected, decision) {
     validate(state);
     const proposal = state.proposals?.[0];
     if (!proposal) throw new Error('No pending proposal.');
-    if (!same(state.content, proposal.base_content)) throw new Error('Canvas content changed after this proposal; reject it and request a fresh transformation.');
-    const next = structuredClone(state);
-    next.content = structuredClone(proposal.content);
-    next.thoughts = [...(next.thoughts || []), structuredClone(proposal.thought)];
-    next.proposals = [];
+    if (decision === 'accept' && !same(state.content, review.expected(proposal))) throw new Error('Canvas content changed after this proposal; reject remaining changes and request a fresh transformation.');
+    const next = review.apply(state, selected, decision);
     validate(next);
     Object.assign(state, next);
   }
-  function rejectProposal(state) {
-    validate(state);
-    if (!state.proposals?.length) throw new Error('No pending proposal.');
-    state.proposals = [];
-  }
+  function acceptProposal(state) { resolveProposal(state, undefined, 'accept'); }
+  function rejectProposal(state) { resolveProposal(state, undefined, 'reject'); }
   function safeJson(state) {
     validate(state);
     return JSON.stringify(state, null, 2).replace(/[<>&\u2028\u2029]/g,
@@ -205,6 +206,6 @@ const Swot = (() => {
     const slot = `${start}\n<script id="canvas-state" type="application/json">${json}<${'/script>'}\n${end}`;
     return html.slice(0, first) + slot + html.slice(last + end.length);
   }
-  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, buildRequest, validateRequest, composeResult, acceptProposal, rejectProposal, safeJson, packageHtml });
+  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Swot;

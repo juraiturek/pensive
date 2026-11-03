@@ -1,0 +1,66 @@
+id: pages
+name: PAGES
+package_version: 1.0.0
+schema_version: '1.0'
+state_schema: canvas.schema.json
+canvas: canvas.html
+semantics:
+  purpose: Make a perspective explicit, then explore implications of deliberately changing its elements.
+  dimensions:
+    parts: People, objects, systems, roles and other elements included in the current view; not only actors.
+    actions: Behaviors and activities, with actor and context when known; separate observations from inferred intentions.
+    goals: Desired outcomes, purposes and criteria; distinguish stated goals from inferred ones.
+    events: Occurrences, triggers, sequences, timing and consequences as perceived in the focal situation.
+    self_concepts: Identity, role and self-beliefs shaping the perspective; user-owned interpretations, not diagnoses.
+  framing:
+    what: Focal situation or problem and relevant scope.
+    why: Why this situation matters to the user.
+    intuition: Optional initial interpretation or inkling.
+  relationships: Explore connections across dimensions in readable text; do not assume the display order is causal.
+  discovery: Surface the composition of the current perspective without presenting it as objective truth.
+  shifting: Deliberately vary an explicit premise and examine implications across other dimensions, preserving facts and labeling hypotheses.
+  provenance: V1's generation prompt attributes its PAGES principles to The Craft of Creativity by Matthew Cronin and Jeffrey Loewenstein. Both legacy schemas agree on Parts, Actions, Goals, Events, Self-concepts. The book was not independently inspected; Six Hats attribution does not establish PAGES origin.
+manual_capabilities:
+  - edit_framing
+  - add_edit_delete_items
+  - import_validated_json
+  - export_complete_json
+  - save_standalone_html
+  - display_baseline_changes_including_removals
+  - explicit_ripple_baseline_reset
+ai_actions:
+  create:
+    method: prompts/create.md
+    effect: Initialize a grounded draft and matching baseline.
+  evaluate:
+    method: prompts/evaluate.md
+    effect: Add methodological assessment without content changes.
+  improve:
+    method: prompts/improve.md
+    effect: Propose best-practice core-content improvements while preserving framing.
+  ripple:
+    method: prompts/ripple.md
+    effect: Propose implications in other dimensions of explicit selected source changes.
+target_types:
+  - canvas
+  - dimension
+action_compatibility:
+  create: new_canvas
+  evaluate: complete_canvas
+  improve: complete_canvas
+  ripple: complete_canvas_with_baseline_and_one_to_four_changed_source_dimensions
+quality_criteria:
+  - One coherent focal situation and perspective owner; scope is explicit when material.
+  - Concrete, atomic, concise entries without forced list counts or equal dimensions.
+  - Distinguish observation, reported experience, interpretation, assumption and hypothetical implication where material.
+  - Meaningful coverage and connections; missing evidence is not automatically a defect.
+  - Goals and actions are distinguished; events have useful temporal context.
+  - Self-concepts are grounded in user statements or explicitly marked for confirmation.
+  - Alternative perspectives are exploratory, never imposed identities or fabricated facts.
+acceptance:
+  granularity: collection_and_bulk
+  proposal_actions: [improve, ripple]
+  preserve_framing: true
+  ripple_sources: Current selected source collections must remain identical.
+  concurrency: Compare against original base plus previously accepted collections; reject acceptance after unrelated edits or baseline changes.
+  baseline: Never advance automatically on acceptance; retain one snapshot inside the artifact.

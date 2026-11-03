@@ -11,6 +11,8 @@ export async function buildCanvas(state = Swot.initialState()) {
   let html = await readFile(new URL('canvas.template.html', framework), 'utf8');
   const resources = [
     ['<!--pensive-style-->', 'canvas.css', 'style'],
+    ['<!--pensive-review-->', '../../shared/proposal-review.js', 'script'],
+    ['<!--pensive-review-ui-->', '../../shared/proposal-review-ui.js', 'script'],
     ['<!--pensive-core-->', 'state.js', 'script'],
     ['<!--pensive-runtime-->', 'canvas.js', 'script']
   ];

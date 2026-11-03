@@ -125,6 +125,19 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem
 .proposal-diff h4 { grid-column: 1 / -1; margin: 0; font-size: .85rem; }
 .proposal-diff ul { padding-left: 1.2rem; font-size: .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
 .proposal-diff strong { font-size: .75rem; }
+.review-node-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; }
+.review-node-heading h4 { margin: 0; }
+.review-node-controls { display: flex; align-items: center; gap: .45rem; font-size: .75rem; flex-wrap: wrap; }
+.review-node-controls button { padding: .3rem .65rem; }
+.review-select { display: inline-flex; align-items: center; gap: .3rem; margin-right: .3rem; cursor: pointer; }
+.review-select input { accent-color: var(--accent); }
+.review-select input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.node-status { font-size: .7rem; border-radius: 3px; padding: .2rem .5rem; }
+.node-status.accepted { color: #34553c; background: var(--green); }
+.node-status.rejected { color: #804539; background: var(--rose); }
+.proposal-panel .review-hint { color: var(--muted); font-size: .75rem; margin-top: .6rem; }
+.proposal-panel .review-error { color: var(--danger); font-size: .8rem; }
+.proposal-tag { display: inline-block; margin-left: .5rem; padding: .1rem .4rem; border-radius: 3px; background: var(--green); color: #34553c; font-size: .65rem; font-weight: 600; line-height: 1.5; vertical-align: baseline; white-space: nowrap; }
 dialog { width: min(540px, calc(100% - 2rem)); max-height: calc(100% - 2rem); overflow: auto; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1.5rem; }
 dialog::backdrop { background: #26332866; }
 dialog h2 { margin-bottom: .7rem; }
@@ -233,12 +246,152 @@ dialog textarea { display: block; font-size: .9rem; }
 }</script>
 <!--pensive-state-end-->
 <script data-implementation>
+/* Collection-level proposal decisions, shared by Node and standalone canvases. */
+const ProposalReview = (() => {
+  'use strict';
+  function same(a, b) {
+    if (a === b) return true;
+    if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
+    const keys = Object.keys(a);
+    return keys.length === Object.keys(b).length && keys.every(k => Object.hasOwn(b, k) && same(a[k], b[k]));
+  }
+  function create({ sections, collection, validateContent }) {
+    function entries(proposal) {
+      return sections.filter(s => !same(collection(proposal.base_content, s), collection(proposal.content, s)))
+        .map(section => ({ section, status: proposal.resolutions?.[section] || 'pending' }));
+    }
+    function replace(content, proposal, section) {
+      const destination = collection(content, section);
+      destination.splice(0, destination.length, ...structuredClone(collection(proposal.content, section)));
+    }
+    function expected(proposal) {
+      const content = structuredClone(proposal.base_content);
+      for (const entry of entries(proposal)) if (entry.status === 'accepted') replace(content, proposal, entry.section);
+      return content;
+    }
+    function validate(proposal) {
+      if (proposal.resolutions !== undefined) {
+        const value = proposal.resolutions, changed = entries(proposal).map(e => e.section);
+        if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(s => !changed.includes(s) || !['pending', 'accepted', 'rejected'].includes(value[s]))) throw new Error('Invalid proposal resolutions; only changed nodes can be resolved.');
+        if (changed.length && entries(proposal).every(e => e.status !== 'pending')) throw new Error('Completed proposal must be cleared.');
+        validateContent(expected(proposal));
+      }
+    }
+    function apply(state, selected, decision) {
+      const original = state.proposals?.[0];
+      if (!original) throw new Error('No pending proposal.');
+      if (!['accept', 'reject'].includes(decision)) throw new Error('Unsupported review decision.');
+      const pending = entries(original).filter(e => e.status === 'pending').map(e => e.section);
+      const targets = selected === undefined ? pending : selected;
+      if (!Array.isArray(targets) || (selected !== undefined && !targets.length) || new Set(targets).size !== targets.length || targets.some(s => !pending.includes(s))) throw new Error('Select distinct pending changed nodes.');
+      const next = structuredClone(state), proposal = next.proposals[0];
+      proposal.resolutions = { ...(proposal.resolutions || {}) };
+      for (const section of targets) {
+        proposal.resolutions[section] = decision === 'accept' ? 'accepted' : 'rejected';
+        if (decision === 'accept') replace(next.content, proposal, section);
+      }
+      try { validateContent(next.content); }
+      catch (error) { throw new Error(`These node changes cannot be accepted independently. Select related nodes together. ${error.message}`); }
+      if (entries(proposal).every(e => e.status !== 'pending')) {
+        const accepted = entries(proposal).filter(e => e.status === 'accepted').map(e => e.section);
+        const rejected = entries(proposal).filter(e => e.status === 'rejected').map(e => e.section);
+        if (accepted.length) {
+          const label = section => section.replaceAll('_', ' ');
+          const text = `Accepted nodes: ${accepted.map(label).join(', ')}. Rejected nodes: ${rejected.length ? rejected.map(label).join(', ') : 'none'}.\nOriginal proposal rationale (not a reassessment of the mixed canvas):\n${proposal.thought.text}`;
+          next.thoughts = [...(next.thoughts || []), { ...proposal.thought, text }];
+        }
+        next.proposals = [];
+      }
+      return next;
+    }
+    return Object.freeze({ entries, expected, validate, apply });
+  }
+  return Object.freeze({ create, same });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = ProposalReview;
+</script>
+<script data-implementation>
+/* Shared collection review controls. Frameworks own state and action validation. */
+const ProposalReviewUI = (() => {
+  'use strict';
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function render({ state, core, panel, labels, title, onDecision }) {
+    const expanded = !!panel.querySelector('details')?.open;
+    const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
+    panel.replaceChildren();
+    const proposal = state.proposals?.[0]; panel.hidden = !proposal;
+    if (!proposal) return;
+    const entries = core.proposalSections(state);
+    const hasDecisions = entries.some(e => e.status !== 'pending');
+    panel.append(element('h3', '', title), element('p', '', proposal.thought.text), element('p', 'review-hint', 'Accept or reject each node, or select nodes to accept together. Unchecked nodes remain pending.'));
+    const review = element('details'); review.open = expanded;
+    review.append(element('summary', '', 'Review proposed changes'));
+    const error = element('p', 'review-error'); error.setAttribute('role', 'alert');
+    function decide(targets, decision) {
+      try {
+        onDecision(targets, decision);
+        panel.querySelector('input:not(:disabled), button:not(:disabled)')?.focus();
+      } catch (e) { error.textContent = e.message; }
+    }
+    function button(label, run, primary = false) {
+      const node = element('button', primary ? 'primary' : '', label); node.type = 'button'; node.addEventListener('click', run); return node;
+    }
+    const acceptSelected = button('Accept Selected', () => decide(Array.from(review.querySelectorAll('input:checked')).map(n => n.value), 'accept'));
+    const updateSelection = () => { acceptSelected.disabled = !review.querySelector('input:checked'); };
+    for (const { section, status } of entries) {
+      const label = labels[section][0], diff = element('div', 'proposal-diff'); diff.dataset.reviewSection = section;
+      const header = element('div', 'review-node-heading'); header.append(element('h4', '', label));
+      if (status === 'pending') {
+        const controls = element('div', 'review-node-controls'), select = element('label', 'review-select');
+        const input = element('input'); input.type = 'checkbox'; input.value = section; input.checked = selected.has(section);
+        input.setAttribute('aria-label', `Select ${label}`); input.addEventListener('change', updateSelection);
+        select.append(input, document.createTextNode('Select'));
+        const accept = button('Accept', () => decide([section], 'accept')); accept.setAttribute('aria-label', `Accept ${label}`);
+        const reject = button('Reject', () => decide([section], 'reject')); reject.setAttribute('aria-label', `Reject ${label}`);
+        controls.append(select, accept, reject); header.append(controls);
+      } else header.append(element('span', `node-status ${status}`, status === 'accepted' ? 'Accepted' : 'Rejected'));
+      diff.append(header);
+      const original = core.collection({ content: proposal.base_content }, section);
+      const before = status === 'accepted' ? original : core.collection(state, section);
+      const after = core.collection({ content: proposal.content }, section);
+      for (const [columnLabel, items] of [[status === 'accepted' ? 'Original' : 'Current', before], ['Proposed', after]]) {
+        const column = element('div'), list = element('ul'); column.append(element('strong', '', columnLabel));
+        for (const item of items) {
+          const bullet = element('li', '', item.text || '(Blank draft)');
+          if (columnLabel === 'Proposed') {
+            const previous = original.find(old => old.id === item.id);
+            if (!previous || previous.text !== item.text) bullet.append(element('span', 'proposal-tag', previous ? 'Updated' : 'New'));
+          }
+          list.append(bullet);
+        }
+        if (!items.length) list.append(element('li', '', '(Empty)'));
+        column.append(list); diff.append(column);
+      }
+      review.append(diff);
+    }
+    if (!entries.length) review.append(element('p', 'review-hint', 'No node content changes were proposed. Accept All or Reject All closes this review.'));
+    const actions = element('div', 'proposal-actions');
+    actions.append(button(hasDecisions ? 'Accept All Remaining' : 'Accept All', () => decide(undefined, 'accept'), true), acceptSelected,
+      button(hasDecisions ? 'Reject All Remaining' : 'Reject All', () => decide(undefined, 'reject')));
+    updateSelection(); panel.append(review, error, actions);
+  }
+  return Object.freeze({ render });
+})();
+</script>
+<script data-implementation>
 /* SWOT-specific state operations, shared by the local page and Node packager. */
 const Swot = (() => {
   'use strict';
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
   const framing = Object.freeze(['focal_entity', 'objective', 'environment']);
+  const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
+  const review = Review.create({ sections: [...factors, ...strategies], collection: (content, section) => collection({ content }, section), validateContent });
   const start = ['<!--', 'pensive-state-start', '-->'].join('');
   const end = ['<!--', 'pensive-state-end', '-->'].join('');
 
@@ -299,7 +452,7 @@ const Swot = (() => {
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one whole-canvas proposal is supported.');
       for (const proposal of state.proposals) {
-        objectWithKeys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal');
+        objectWithKeys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal', ['resolutions']);
         if (typeof proposal.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(proposal.id) || ids.has(proposal.id)) throw new Error('Invalid or duplicate proposal ID.');
         ids.add(proposal.id);
         if (!['strategize', 'improve'].includes(proposal.action)) throw new Error('Unsupported proposal action.');
@@ -311,6 +464,7 @@ const Swot = (() => {
         if (nextIds.has(proposal.thought.id)) throw new Error('Proposed item collides with proposal thought ID.');
         if (proposal.thought.kind !== (proposal.action === 'improve' ? 'improvement' : 'strategize')) throw new Error('Proposal thought kind must match its action.');
         checkBoundary(proposal.base_content, proposal.content, proposal.action);
+        review.validate(proposal);
       }
     }
     return state;
@@ -407,23 +561,21 @@ const Swot = (() => {
     }
     return validate(canvas);
   }
-  function acceptProposal(state) {
+  function proposalSections(state) {
+    validate(state);
+    return state.proposals?.length ? review.entries(state.proposals[0]) : [];
+  }
+  function resolveProposal(state, selected, decision) {
     validate(state);
     const proposal = state.proposals?.[0];
     if (!proposal) throw new Error('No pending proposal.');
-    if (!same(state.content, proposal.base_content)) throw new Error('Canvas content changed after this proposal; reject it and request a fresh transformation.');
-    const next = structuredClone(state);
-    next.content = structuredClone(proposal.content);
-    next.thoughts = [...(next.thoughts || []), structuredClone(proposal.thought)];
-    next.proposals = [];
+    if (decision === 'accept' && !same(state.content, review.expected(proposal))) throw new Error('Canvas content changed after this proposal; reject remaining changes and request a fresh transformation.');
+    const next = review.apply(state, selected, decision);
     validate(next);
     Object.assign(state, next);
   }
-  function rejectProposal(state) {
-    validate(state);
-    if (!state.proposals?.length) throw new Error('No pending proposal.');
-    state.proposals = [];
-  }
+  function acceptProposal(state) { resolveProposal(state, undefined, 'accept'); }
+  function rejectProposal(state) { resolveProposal(state, undefined, 'reject'); }
   function safeJson(state) {
     validate(state);
     return JSON.stringify(state, null, 2).replace(/[<>&\u2028\u2029]/g,
@@ -440,7 +592,7 @@ const Swot = (() => {
     const slot = `${start}\n<script id="canvas-state" type="application/json">${json}<${'/script>'}\n${end}`;
     return html.slice(0, first) + slot + html.slice(last + end.length);
   }
-  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, buildRequest, validateRequest, composeResult, acceptProposal, rejectProposal, safeJson, packageHtml });
+  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
 </script>
@@ -617,45 +769,14 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     }
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
-    const panel = $('#proposal-panel');
-    panel.replaceChildren();
-    panel.hidden = !proposal;
-    if (!proposal) return;
-    panel.append(element('h3', '', proposal.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements'), element('p', '', proposal.thought.text));
-    const review = element('details');
-    review.append(element('summary', '', 'Review proposed changes'));
-    for (const section of [...Swot.factors, ...Swot.strategies]) {
-      const before = Swot.collection(state, section);
-      const after = Swot.collection({ content: proposal.content }, section);
-      if (JSON.stringify(before) === JSON.stringify(after)) continue;
-      const diff = element('div', 'proposal-diff');
-      diff.append(element('h4', '', labels[section][0]));
-      for (const [label, items] of [['Current', before], ['Proposed', after]]) {
-        const column = element('div');
-        column.append(element('strong', '', label));
-        const list = element('ul');
-        for (const item of items) list.append(element('li', '', item.text || '(Blank draft)'));
-        if (!items.length) list.append(element('li', '', '(Empty)'));
-        column.append(list); diff.append(column);
+    ProposalReviewUI.render({ state, core: Swot, panel: $('#proposal-panel'), labels,
+      title: proposal?.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements',
+      onDecision: (selected, decision) => {
+        Swot.resolveProposal(state, selected, decision); refreshCanvas();
+        $('#clipboard-fallback').hidden = true;
+        status('Review decision saved in this tab. Export or save to keep it.');
       }
-      review.append(diff);
-    }
-    panel.append(review);
-    const actions = element('div', 'proposal-actions');
-    for (const [label, apply] of [['Accept transformation', Swot.acceptProposal], ['Reject transformation', Swot.rejectProposal]]) {
-      const button = element('button', label.startsWith('Accept') ? 'primary' : '', label);
-      button.type = 'button';
-      button.addEventListener('click', () => {
-        try {
-          apply(state);
-          refreshCanvas();
-          $('#clipboard-fallback').hidden = true;
-          status(label.startsWith('Accept') ? 'Transformation accepted. Export or save to keep this state.' : 'Transformation rejected. Your current content is unchanged.');
-        } catch (error) { status(error.message, true); }
-      });
-      actions.append(button);
-    }
-    panel.append(actions);
+    });
   }
   function saveFile() {
     try {

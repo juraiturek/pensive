@@ -1,0 +1,9 @@
+# Improve PAGES
+
+Follow the [PAGES handoff](../../../references/pages-workflow.md). Validate the complete request; action must be `improve`. Honor steering and the `use_thoughts` choice. Current submitted content, not remembered conversation, is authoritative.
+
+Apply PAGES best practices to core content: concise atomic entries, distinct dimensions, meaningful coverage, explicit goals, useful event sequences, grounded self-concepts and coherent cross-dimension connections. Remove duplication without erasing meaningful distinctions. Preserve the user's perspective and evidence boundaries; “improve” does not authorize imposing a different identity or treating speculative interpretations as facts. If steering explicitly asks for an alternative premise, label it as exploratory and explain the consequential change. Framing still remains identical.
+
+Keep useful entries and their identities. Rewriting the same concept retains its ID; new concepts get new IDs. Avoid gratuitous churn. Do not fill every dimension or expand to a quota. Missing facts should remain missing, or be named as questions in the explanatory thought. Uncertain inferred content must be labeled in its text. Do not manufacture stakeholder motives or external events to make the story coherent.
+
+Return complete candidate `content` plus a concise `thought` explaining substantive improvements, their rationale and any unresolved gap. Preserve framing exactly and consider both existing strengths and deficiencies; if no supported change improves the canvas, return unchanged content with an honest explanation. Do not output baseline or proposal metadata. Use `--result` so the user reviews and accepts/rejects changed dimensions locally, individually or in bulk; see [proposal review](../../../references/proposal-review.md). Unselected dimensions stay pending. Baseline stays intact through every decision; no model-generated resolutions metadata is allowed.
