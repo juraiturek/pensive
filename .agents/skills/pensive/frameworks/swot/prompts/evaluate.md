@@ -18,6 +18,10 @@ For each requested strategy area assess the actual pairing: SO uses S/O, ST S/T,
 
 For `tows` scope, factors remain the evidence needed to assess strategy fit; evaluate strategies rather than conducting an unrelated SWOT rewrite. For `swot`, do not expand into a strategy audit. For `both`, connect defects in factors to their consequences for strategy quality.
 
+## Framing–content fit
+
+Within the requested scope, assess factors or strategies against `focal_entity`, `objective` and relevant `environment`. Distinguish misplaced content from credible evidence that the objective/scope deserves reconsideration, and from ambiguous framing or insufficient evidence. Recommend content adjustment, explicit framing reconsideration or focused investigation accordingly. Do not automatically reject a useful out-of-frame discovery. SWOT internal/external factor categories are not the two fit types; retain the framework-specific TOWS relationship criteria above.
+
 ## Thought output
 
 Return exactly `{ "thought": "..." }`. Default to one compact paragraph of roughly three to five sentences, prioritizing the most consequential observations rather than reciting the full checklist. Use a readable diagnosis with concrete observations, why they matter, and how to proceed. Expand only when the user asks for detail. Cite at least two specific observations when the canvas supports them, not imaginary evidence when sparse. A useful structure is “What I see … Why it matters … Next …”, but headings and fixed lengths are not mandatory. Recognize what is sound as well as weaknesses. Be clear about uncertainty and facts that would need checking.

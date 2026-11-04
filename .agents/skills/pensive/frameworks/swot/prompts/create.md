@@ -40,6 +40,8 @@ If the first answer is still thin, reserve the second question turn for this cho
 - Distinguish current facts from plausible developments. Put material uncertainty in factor text (“Assumption:”, “Potential … if …”) so it survives export. Retain useful supplied evidence attribution without inventing citations, statistics, or facts.
 - Disclose the general lens, material scope assumptions, and sparse-draft limitation in framing where relevant. Mention consequential limitations briefly in the delivery response. Do not add confidence/evidence fields.
 
+Review external fit explicitly: do factors concern this `focal_entity`, `objective` and `environment`, rather than another entity or goal? This is distinct from internal/external factor classification. Correct generated drift; if supplied evidence credibly challenges the objective or boundary, disclose that tension or a reframing question rather than silently broadening framing or discarding evidence. Respect the existing elicitation budget.
+
 Before packaging, check factual support, coherent framing, internal/external placement, duplication, uncertainty, and absence of strategies. Correct generated mistakes without another elicitation round.
 
 ## State and artifact handoff

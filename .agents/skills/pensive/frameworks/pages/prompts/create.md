@@ -18,6 +18,8 @@ Use at most two question turns, including agreement to a sparse draft. If little
 
 ## Generate and check
 
+Extract `what`, `why` and optional `intuition` before drafting the five dimensions. Keep the perspective owner explicit in existing framing text when material; no extra field is needed. Review content against that situation, purpose and perspective, separately from cross-dimension relationships. Correct unintended drift without suppressing useful discoveries or user-requested alternative lenses. If evidence questions the initial framing, explain the uncertainty/reframing need within the existing elicitation budget.
+
 - Write concrete, concise, atomic entries, keeping enough context to retain meaning. No quotas, equal list lengths or arbitrary character caps.
 - Put material uncertainty in readable text so it survives export: “Interpretation: …”, “Assumption to check: …”, “Hypothetical: …”. Do not add unsupported schema fields. Prefer leaving a dimension empty to inventing content; no “Unknown” placeholder items.
 - Keep goals distinct from actions and events distinct from broad context labels. Include sequences/timing only when known or explicitly tentative.

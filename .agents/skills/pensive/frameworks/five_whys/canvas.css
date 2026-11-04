@@ -1,0 +1,577 @@
+/* Focused V2 tree styles; geometry retained. Destination token aliases below. */
+.canvas-tree-strand {
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+}
+
+.canvas-tree-board {
+  min-width: 860px;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.canvas-tree-level-row {
+  display: grid;
+  grid-template-columns: minmax(360px, 52%) minmax(240px, 1fr);
+  align-items: start;
+  gap: 0.85rem;
+}
+
+.canvas-tree-spine-cell {
+  position: relative;
+}
+
+.canvas-tree-spine-cell.has-connector-down::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 0.85rem;
+  background: color-mix(in oklab, var(--border) 80%, var(--text-muted) 20%);
+}
+
+.canvas-tree-side-door-lane {
+  position: relative;
+  min-height: 100%;
+}
+
+.canvas-tree-side-door-lane.has-door-connector::before {
+  content: "";
+  position: absolute;
+  left: -0.85rem;
+  top: 1.15rem;
+  width: 0.85rem;
+  height: 1px;
+  background: color-mix(in oklab, var(--border) 78%, var(--text-muted) 22%);
+}
+
+.canvas-tree-stratum {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-3);
+}
+
+.canvas-tree-stratum.is-cursor-tip {
+  border-color: color-mix(in oklab, var(--accent-strong) 38%, var(--border) 62%);
+}
+
+.canvas-tree-stratum.is-terminal {
+  background: color-mix(in oklab, var(--surface) 88%, var(--surface-muted) 12%);
+}
+
+.canvas-tree-stratum-header {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin-bottom: 0.35rem;
+}
+
+.canvas-tree-depth-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.45rem;
+  height: 1.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.canvas-tree-role-label {
+  margin: 0 0 0.2rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.canvas-tree-stratum-title-group h3 {
+  margin: 0;
+}
+
+.canvas-tree-node-text-editor {
+  display: flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.canvas-tree-node-text-editor h3.is-clickable {
+  cursor: text;
+}
+
+.canvas-tree-node-edit-trigger {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.canvas-tree-node-text-editor.is-editable:hover .canvas-tree-node-edit-trigger,
+.canvas-tree-node-text-editor.is-editable:focus-within .canvas-tree-node-edit-trigger {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.canvas-tree-inline-text-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: min(760px, 100%);
+}
+
+.canvas-tree-inline-text-form input[type="text"] {
+  min-width: 16rem;
+}
+
+.canvas-tree-inline-text-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.canvas-tree-output {
+  margin-top: 0.58rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface-muted) 72%, var(--surface) 28%);
+}
+
+.canvas-tree-output h4 {
+  margin: 0 0 0.2rem;
+  font-size: 0.9rem;
+}
+
+.canvas-tree-output p {
+  margin: 0;
+}
+
+.canvas-tree-side-doors {
+  margin-bottom: var(--space-2);
+}
+
+.canvas-tree-side-doors-label {
+  margin: 0 0 0.32rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.canvas-tree-side-doors-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.canvas-tree-side-doors-list form {
+  margin: 0;
+}
+
+.canvas-tree-side-door-node {
+  border: 1px solid color-mix(in oklab, var(--border) 84%, var(--text-muted) 16%);
+  background: color-mix(in oklab, var(--surface) 82%, var(--surface-muted) 18%);
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 0.42rem 0.58rem;
+  min-height: 2.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 520;
+  line-height: 1.2;
+  max-width: 260px;
+  text-align: left;
+}
+
+.canvas-tree-side-door-node .lucide {
+  width: 0.85rem;
+  height: 0.85rem;
+  opacity: 0.82;
+}
+
+.canvas-tree-side-door-node span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.canvas-tree-side-door-node:hover {
+  background: color-mix(in oklab, var(--surface-muted) 82%, var(--surface) 18%);
+  border-color: color-mix(in oklab, var(--border) 62%, var(--text-muted) 38%);
+  color: var(--text);
+}
+
+.canvas-tree-tip-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.canvas-tree-connector-zone {
+  position: relative;
+  margin-left: 0;
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  padding: 0.08rem 0 0.18rem;
+}
+
+.canvas-tree-connector-half {
+  width: 1px;
+  height: 0.5rem;
+  background: color-mix(in oklab, var(--border) 80%, var(--text-muted) 20%);
+}
+
+.canvas-tree-connector-half.is-terminal-link {
+  height: 0.8rem;
+}
+
+.canvas-tree-connector-gap {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.canvas-tree-connector-add {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--border) 76%, var(--text-muted) 24%);
+  background: color-mix(in oklab, var(--surface) 93%, white 7%);
+  color: color-mix(in oklab, var(--text-muted) 82%, var(--text) 18%);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.canvas-tree-connector-add .lucide {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.canvas-tree-connector-add:hover {
+  border-color: color-mix(in oklab, var(--border) 52%, var(--text) 48%);
+  color: var(--text);
+  background: color-mix(in oklab, var(--surface) 88%, var(--surface-muted) 12%);
+}
+
+.canvas-tree-inline-form-connector {
+  margin-top: 0.28rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--surface) 90%, var(--surface-muted) 10%);
+  padding: 0.5rem;
+  width: min(540px, 100%);
+}
+
+.canvas-tree-terminal-action-link {
+  margin-top: 0.15rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  width: min(540px, 100%);
+}
+
+.canvas-tree-inline-form-terminal {
+  width: min(540px, 100%);
+}
+
+.canvas-tree-inline-form {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 0.45rem;
+}
+
+.canvas-tree-inline-form input[type="text"],
+.canvas-tree-inline-form textarea {
+  width: 100%;
+}
+
+.canvas-tree-inline-form-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.canvas-tree-trifurcation-hint {
+  margin: 0.1rem 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  max-width: 560px;
+  text-align: center;
+}
+
+.canvas-problem-inline-warning {
+  border: 1px solid color-mix(in oklab, var(--border) 70%, #d18f51 30%);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface-muted) 76%, #f8e3ce 24%);
+  color: color-mix(in oklab, var(--text) 78%, #8d5f2f 22%);
+  padding: 0.45rem 0.65rem;
+  font-size: 0.9rem;
+}
+
+.canvas-problem-inline-confirm {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface) 90%, var(--surface-muted) 10%);
+  padding: 0.52rem 0.68rem;
+}
+
+.canvas-problem-inline-confirm p {
+  margin: 0 0 0.35rem;
+}
+
+.canvas-problem-inline-confirm-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.canvas-tree-overview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: grid;
+  place-items: center;
+}
+
+.canvas-tree-overview-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(245, 242, 235, 0.92);
+  backdrop-filter: blur(1.5px);
+}
+
+.canvas-tree-overview-panel {
+  position: relative;
+  width: min(96vw, 1680px);
+  height: min(92vh, 980px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--surface) 93%, var(--surface-muted) 7%);
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.canvas-tree-overview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.canvas-tree-overview-header h3 {
+  margin: 0;
+}
+
+.canvas-tree-overview-close {
+  color: var(--text-muted);
+}
+
+.canvas-tree-overview-scroll {
+  overflow: auto;
+  padding: var(--space-4);
+}
+
+.canvas-tree-overview-board {
+  position: relative;
+  margin: 0 auto;
+}
+
+.canvas-tree-overview-edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.canvas-tree-overview-edges path {
+  fill: none;
+  stroke: color-mix(in oklab, var(--border) 72%, var(--text-muted) 28%);
+  stroke-width: 1.2;
+}
+
+.canvas-tree-overview-level-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border-top: 1px dashed color-mix(in oklab, var(--border) 60%, transparent 40%);
+  z-index: 0;
+}
+
+.canvas-tree-overview-node-form {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  z-index: 2;
+}
+
+.canvas-tree-overview-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 196px;
+  min-height: 86px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  z-index: 2;
+}
+
+button.canvas-tree-overview-node {
+  position: static;
+  transform: none;
+  width: 196px;
+  min-height: 86px;
+}
+
+.canvas-tree-overview-node:hover {
+  border-color: color-mix(in oklab, var(--border) 58%, var(--accent-strong) 42%);
+  background: color-mix(in oklab, var(--surface) 95%, var(--surface-muted) 5%);
+}
+
+.canvas-tree-overview-node.is-active {
+  border-color: color-mix(in oklab, var(--accent-strong) 44%, var(--border) 56%);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent-strong) 16%, transparent 84%),
+    var(--shadow-soft);
+}
+
+.canvas-tree-overview-node.is-tip {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent-strong) 22%, transparent 78%),
+    var(--shadow-soft);
+}
+
+.canvas-tree-overview-node.is-terminal {
+  background: color-mix(in oklab, var(--surface) 87%, var(--surface-muted) 13%);
+}
+
+.canvas-tree-overview-node.is-unresolved-leaf {
+  border-style: dashed;
+}
+
+.canvas-tree-overview-node-role {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.canvas-tree-overview-node-text {
+  margin: 0.25rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.canvas-tree-overview-terminal-flag {
+  position: absolute;
+  right: 0.45rem;
+  top: 0.45rem;
+  color: color-mix(in oklab, var(--accent-strong) 45%, var(--text-muted) 55%);
+  display: inline-flex;
+  align-items: center;
+}
+
+.canvas-tree-overview-terminal-flag .lucide {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.canvas-tree-overview-output-group {
+  position: absolute;
+  transform: translateX(-50%);
+  width: 188px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.canvas-tree-overview-output-connector {
+  display: block;
+  width: 1px;
+  height: 0.62rem;
+  margin: 0 auto;
+  background: color-mix(in oklab, var(--border) 62%, var(--text-muted) 38%);
+  opacity: 0.58;
+}
+
+.canvas-tree-overview-output-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface-muted) 72%, var(--surface) 28%);
+  padding: 0.42rem 0.58rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.canvas-tree-overview-output-card h4 {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.canvas-tree-overview-output-card p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.28;
+  color: var(--text);
+}
+
+
+:root { --border:var(--line); --text:var(--ink); --text-muted:var(--muted); --surface-muted:var(--green); --accent-strong:var(--accent); --radius-sm:5px; --radius-md:8px; --shadow-soft:0 2px 8px #2d302908; --space-2:.6rem; --space-3:1rem; --space-4:1.3rem; }
+input, select { font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:.45rem; max-width:100%; }
+input:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.tree-tabs { margin:1rem 0; display:flex; gap:.5rem; }
+.tree-tabs [aria-pressed="true"] { background:var(--ink); color:var(--surface); }
+.canvas-tree-stratum-title-group { min-width:0; flex:1; }
+.canvas-tree-node-text-editor h3 { margin:.25rem 0; font-size:1.03rem; font-weight:500; white-space:pre-wrap; overflow-wrap:anywhere; }
+.canvas-tree-node-edit-trigger { opacity:1; pointer-events:auto; }
+.canvas-tree-inline-text-form { width:100%; }
+.canvas-tree-inline-text-form textarea { background:var(--surface); padding:.4rem; border:1px solid var(--line); }
+.canvas-tree-stratum h4 { margin:0; }
+.canvas-tree-output p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.canvas-tree-side-door-node span { white-space:normal; overflow-wrap:anywhere; }
+.btn-icon { padding:.25rem .45rem; }
+.btn-utility { font-size:.78rem; }
+.canvas-tree-node-tools { display:flex; gap:.4rem; justify-content:flex-end; margin-top:.4rem; }
+.tree-guide { font-size:.8rem; color:var(--muted); margin:1rem 0; max-width:75ch; }
+.canvas-tree-inline-form { margin:.6rem 0; padding:.8rem; border:1px solid var(--line); background:var(--surface); border-radius:5px; }
+.canvas-tree-inline-form label { display:block; font-size:.8rem; }
+.canvas-tree-inline-form input, .canvas-tree-inline-form textarea { width:100%; }
+.canvas-tree-inline-form-connector { position:static; transform:none; grid-column:1/-1; }
+.canvas-tree-connector-zone { flex-wrap:wrap; }
+.canvas-tree-inline-form { flex-basis:100%; }
+.canvas-tree-terminal-action-link { position:static; transform:none; flex-basis:100%; text-align:center; }
+.canvas-tree-tip-controls { justify-content:flex-start; }
+.canvas-tree-overview-overlay { display:block; position:fixed; inset:0; padding:0; border:0; background:transparent; width:100vw; max-width:100vw; height:100vh; max-height:100vh; }
+.canvas-tree-overview-overlay:not([open]) { display:none; }
+.canvas-tree-overview-panel { margin:4vh auto; }
+.canvas-tree-overview-node { height:86px; overflow:hidden; }
+.canvas-tree-overview-node-text { overflow-wrap:anywhere; }
+.canvas-tree-overview-output-group { pointer-events:auto; }
+.canvas-tree-overview-output-card { max-height:100px; overflow:auto; overflow-wrap:anywhere; }
+.canvas-tree-overview-node:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.proposed-child { padding:.65rem; margin:.5rem 0; border-left:3px solid var(--accent); white-space:pre-wrap; overflow-wrap:anywhere; }
+@media(max-width:560px) { .brand { flex-wrap:wrap; gap:.2rem; } .toolbar { align-items:flex-start; } .export-actions { flex-wrap:wrap; } .canvas-tree-board { min-width:720px; } .canvas-tree-level-row { grid-template-columns:minmax(340px,52%) minmax(240px,1fr); } }
+
+/* Show both expansion choices without opening a select menu. */
+.expansion-modes { border:0; padding:0; margin:1rem 0; min-width:0; }
+.expansion-modes legend { font-size:.8rem; font-weight:600; padding:0; }
+.expansion-modes label { display:flex; align-items:flex-start; gap:.6rem; font-weight:400; margin:.6rem 0; cursor:pointer; }
+.expansion-modes input { flex:none; margin:.25rem 0 0; accent-color:var(--accent); }
+.expansion-modes label:has(input:disabled) { color:var(--muted); opacity:.65; cursor:default; }

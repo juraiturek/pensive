@@ -1,0 +1,1927 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Pensive — 5 Whys</title>
+<style>
+:root {
+  --paper: #f6f1e8; --surface: #fffdf8; --ink: #2d3029; --muted: #66685f;
+  --line: #d9d7cc; --accent: #345c49; --danger: #a2392e;
+  --green: #e7edde; --orange: #f3e6d6; --blue: #e4eced; --rose: #f2e1dc;
+  font-family: "Avenir Next", "Segoe UI", sans-serif; color: var(--ink);
+  background: var(--paper); font-size: 15px; line-height: 1.5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(ellipse at 10% 0%, #fffdf7 0, transparent 55%); }
+[hidden] { display: none !important; }
+button, textarea { font: inherit; }
+button, summary { cursor: pointer; }
+button { color: var(--ink); border: 1px solid var(--line); background: var(--surface); border-radius: 5px; padding: .55rem .9rem; transition: background .15s; }
+button:hover { background: #eeeee5; }
+button:focus-visible, textarea:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button:disabled { opacity: .5; cursor: default; }
+textarea { width: 100%; min-width: 0; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: .5rem 0; resize: vertical; border-radius: 0; }
+textarea::placeholder { color: #777a70; }
+p { margin: 0; }
+.shell { width: min(1320px, calc(100% - 5rem)); margin: 0 auto; }
+.masthead { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1.5rem 0; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: baseline; gap: 1.5rem; min-width: 0; }
+.wordmark { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 2rem; letter-spacing: -.07em; color: var(--ink); text-decoration: none; }
+.wordmark span { color: var(--accent); }
+.eyebrow { text-transform: uppercase; font-size: .67rem; letter-spacing: .14em; font-weight: 600; color: var(--muted); }
+.framing { display: grid; grid-template-columns: 1fr 1.4fr; gap: .9rem 2rem; padding: 1.3rem 0; }
+.framing label { display: block; font-size: .75rem; font-weight: 600; }
+.framing textarea { display: block; font-size: .95rem; font-weight: 400; min-height: 2.25rem; }
+.framing details { grid-column: 1 / -1; font-size: .75rem; color: var(--muted); }
+.framing details[open] summary { margin-bottom: .8rem; }
+.optional { font-weight: 400; font-size: .7rem; margin-left: .3rem; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+.view-tabs { display: flex; gap: .2rem; padding: .2rem; border: 1px solid var(--line); border-radius: 6px; }
+.view-tabs button { border: 0; background: transparent; font-size: .78rem; font-weight: 600; min-width: 5.5rem; }
+.view-tabs button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.count { display: inline-flex; align-items: center; justify-content: center; min-width: 1.25rem; height: 1.25rem; padding: 0 .25rem; margin-left: .35rem; font-size: .65rem; border: 1px solid currentColor; border-radius: 1rem; opacity: .55; }
+.count.has-content { opacity: 1; background: #d7e5ce; color: #274c35; border-color: #a9bd9c; }
+.export-actions { display: flex; gap: .55rem; font-size: .76rem; }
+.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.primary:hover { background: #284a3a; }
+.primary span { margin-left: 1rem; }
+.swot-grid { display: grid; grid-template-columns: 5rem minmax(0, 1fr) minmax(0, 1fr); gap: .75rem; }
+.axis { font-size: .8rem; font-weight: 600; display: flex; flex-direction: column; justify-content: center; }
+.axis span { font-size: .65rem; font-weight: 400; color: var(--muted); }
+.axis.helpful, .axis.harmful { padding: 0 1.3rem .15rem; }
+.axis.internal, .axis.external { writing-mode: vertical-rl; transform: rotate(180deg); align-items: center; gap: .4rem; }
+.cell { min-width: 0; padding: 1.25rem 1.3rem 1rem; border: 1px solid #0000000d; border-radius: 5px; min-height: 230px; display: flex; flex-direction: column; }
+.strengths, .so { background: var(--green); --category: #4c6a43; }
+.weaknesses, .wo { background: var(--orange); --category: #8a6034; }
+.opportunities, .st { background: var(--blue); --category: #486c73; }
+.threats, .wt { background: var(--rose); --category: #905344; }
+.empty-factor { cursor: text; }
+.cell-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+h2 { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 1.55rem; line-height: 1.2; font-weight: 400; margin: 0; }
+.cell-symbol { color: var(--category); font-size: .75rem; font-weight: 600; }
+.cell-description { font-size: .7rem; color: #575d52; margin: .35rem 0 1rem; }
+.items { padding: 0; margin: 0 0 1rem; list-style: none; }
+.item { display: flex; align-items: start; gap: .6rem; border-top: 1px solid #00000014; padding: .55rem 0; }
+.item::before { content: "·"; color: var(--category); padding-top: .15rem; }
+.item textarea { border: none; min-height: 2rem; padding: .15rem 0; font-size: .9rem; line-height: 1.6; resize: vertical; overflow: hidden; }
+.delete { padding: .1rem .35rem; font-size: 1rem; background: transparent; border: 0; color: #6c6d63; }
+.delete:hover { color: var(--danger); background: #ffffff66; }
+.add { margin-top: auto; align-self: start; padding: .25rem 0; font-size: .75rem; border: 0; background: transparent; color: var(--category); font-weight: 600; }
+.add::before { content: "+"; margin-right: .4rem; font-size: 1rem; }
+.add:hover { background: transparent; text-decoration: underline; }
+.empty { font-size: .8rem; color: #707367; margin: .6rem 0 1rem; font-style: italic; }
+.tows-grid { display: grid; grid-template-columns: minmax(0, .8fr) repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.tows-guide { padding: 1rem .5rem; align-self: center; }
+.tows-guide > p { font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: 1.25rem; line-height: 1.35; margin: .5rem 0 .75rem; }
+.tows-guide small { font-size: .68rem; color: var(--muted); }
+.context { padding: 1rem 1.2rem; min-width: 0; border-radius: 5px; border: 1px solid #0000000d; }
+.context h2 { font-size: 1.2rem; }
+.context ul { padding-left: 1rem; margin: .7rem 0 0; font-size: .8rem; }
+.context li { margin: .3rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.context .readonly-label { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: .25rem; }
+.status { font-size: .75rem; color: var(--muted); padding: 1rem 0; min-height: 3rem; }
+.status.error { color: var(--danger); }
+.clipboard-fallback { background: var(--surface); border: 1px solid var(--line); padding: 1.25rem; margin-top: 1rem; border-radius: 5px; }
+.clipboard-fallback label { font-weight: 600; }
+.clipboard-fallback p { font-size: .8rem; margin-top: .4rem; }
+.clipboard-fallback textarea { display: block; font-family: monospace; font-size: .8rem; margin: 1rem 0; }
+footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem 0 1.6rem; border-top: 1px solid var(--line); font-size: .65rem; color: var(--muted); }
+@media (max-width: 850px) {
+  .shell { width: calc(100% - 2rem); }
+  .swot-grid { grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1fr); }
+  .cell { padding: 1rem; }
+  .tows-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tows-guide { grid-column: 1 / -1; }
+  .context { min-height: 120px; }
+  .context.opportunities, .context.threats { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .framing { grid-template-columns: 1fr; gap: .85rem; }
+  .toolbar { flex-wrap: wrap; }
+  .export-actions { width: 100%; }
+  .export-actions button { flex: 1; padding-inline: .55rem; }
+  .swot-grid, .tows-grid { grid-template-columns: minmax(0, 1fr); }
+  .axis { display: none; }
+  .cell { min-height: 210px; }
+  .cell-description { margin-bottom: .75rem; }
+  .tows-guide { padding: .5rem 0; }
+  footer { flex-direction: column; gap: .2rem; }
+}
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
+
+/* Local AI request preparation and whole-canvas review, not an API client. */
+.toolbar { flex-wrap: wrap; }
+.ai-actions { display: flex; flex-wrap: wrap; gap: .35rem; font-size: .76rem; }
+.thoughts, .proposal-panel { margin: .5rem 0 1.25rem; }
+.thought, .proposal-panel { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 5px; padding: 1rem 1.2rem; }
+.thought + .thought { margin-top: .5rem; }
+.thought h3, .proposal-panel h3 { font-size: .8rem; margin: 0 0 .4rem; color: var(--accent); }
+.thought p, .proposal-panel p { font-size: .85rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.proposal-panel summary { font-size: .8rem; padding: .8rem 0; }
+.proposal-actions { display: flex; flex-wrap: wrap; gap: .5rem; font-size: .8rem; margin-top: .6rem; }
+.proposal-diff { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; border-top: 1px solid var(--line); padding: .8rem 0; }
+.proposal-diff h4 { grid-column: 1 / -1; margin: 0; font-size: .85rem; }
+.proposal-diff ul { padding-left: 1.2rem; font-size: .8rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.proposal-diff strong { font-size: .75rem; }
+.review-node-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: .7rem; flex-wrap: wrap; }
+.review-node-heading h4 { margin: 0; }
+.review-node-controls { display: flex; align-items: center; gap: .45rem; font-size: .75rem; flex-wrap: wrap; }
+.review-node-controls button { padding: .3rem .65rem; }
+.review-select { display: inline-flex; align-items: center; gap: .3rem; margin-right: .3rem; cursor: pointer; }
+.review-select input { accent-color: var(--accent); }
+.review-select input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.node-status { font-size: .7rem; border-radius: 3px; padding: .2rem .5rem; }
+.node-status.accepted { color: #34553c; background: var(--green); }
+.node-status.rejected { color: #804539; background: var(--rose); }
+.proposal-panel .review-hint { color: var(--muted); font-size: .75rem; margin-top: .6rem; }
+.proposal-panel .review-error { color: var(--danger); font-size: .8rem; }
+.proposal-tag { display: inline-block; margin-left: .5rem; padding: .1rem .4rem; border-radius: 3px; background: var(--green); color: #34553c; font-size: .65rem; font-weight: 600; line-height: 1.5; vertical-align: baseline; white-space: nowrap; }
+dialog { width: min(540px, calc(100% - 2rem)); max-height: calc(100% - 2rem); overflow: auto; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 1.5rem; }
+dialog::backdrop { background: #26332866; }
+dialog h2 { margin-bottom: .7rem; }
+dialog label { display: block; font-size: .8rem; font-weight: 600; margin: 1rem 0 .4rem; }
+dialog .dialog-note { font-size: .8rem; color: var(--muted); }
+dialog select { width: 100%; padding: .55rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: .85rem; }
+dialog select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+dialog textarea { display: block; font-size: .9rem; }
+.checkbox-label { display: flex; align-items: center; gap: .5rem; font-weight: 400; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1.2rem; font-size: .8rem; }
+@media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
+
+/* Focused V2 tree styles; geometry retained. Destination token aliases below. */
+.canvas-tree-strand {
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+}
+
+.canvas-tree-board {
+  min-width: 860px;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.canvas-tree-level-row {
+  display: grid;
+  grid-template-columns: minmax(360px, 52%) minmax(240px, 1fr);
+  align-items: start;
+  gap: 0.85rem;
+}
+
+.canvas-tree-spine-cell {
+  position: relative;
+}
+
+.canvas-tree-spine-cell.has-connector-down::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 0.85rem;
+  background: color-mix(in oklab, var(--border) 80%, var(--text-muted) 20%);
+}
+
+.canvas-tree-side-door-lane {
+  position: relative;
+  min-height: 100%;
+}
+
+.canvas-tree-side-door-lane.has-door-connector::before {
+  content: "";
+  position: absolute;
+  left: -0.85rem;
+  top: 1.15rem;
+  width: 0.85rem;
+  height: 1px;
+  background: color-mix(in oklab, var(--border) 78%, var(--text-muted) 22%);
+}
+
+.canvas-tree-stratum {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-3);
+}
+
+.canvas-tree-stratum.is-cursor-tip {
+  border-color: color-mix(in oklab, var(--accent-strong) 38%, var(--border) 62%);
+}
+
+.canvas-tree-stratum.is-terminal {
+  background: color-mix(in oklab, var(--surface) 88%, var(--surface-muted) 12%);
+}
+
+.canvas-tree-stratum-header {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin-bottom: 0.35rem;
+}
+
+.canvas-tree-depth-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.45rem;
+  height: 1.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.canvas-tree-role-label {
+  margin: 0 0 0.2rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.canvas-tree-stratum-title-group h3 {
+  margin: 0;
+}
+
+.canvas-tree-node-text-editor {
+  display: flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.canvas-tree-node-text-editor h3.is-clickable {
+  cursor: text;
+}
+
+.canvas-tree-node-edit-trigger {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.canvas-tree-node-text-editor.is-editable:hover .canvas-tree-node-edit-trigger,
+.canvas-tree-node-text-editor.is-editable:focus-within .canvas-tree-node-edit-trigger {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.canvas-tree-inline-text-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: min(760px, 100%);
+}
+
+.canvas-tree-inline-text-form input[type="text"] {
+  min-width: 16rem;
+}
+
+.canvas-tree-inline-text-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.canvas-tree-output {
+  margin-top: 0.58rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface-muted) 72%, var(--surface) 28%);
+}
+
+.canvas-tree-output h4 {
+  margin: 0 0 0.2rem;
+  font-size: 0.9rem;
+}
+
+.canvas-tree-output p {
+  margin: 0;
+}
+
+.canvas-tree-side-doors {
+  margin-bottom: var(--space-2);
+}
+
+.canvas-tree-side-doors-label {
+  margin: 0 0 0.32rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.canvas-tree-side-doors-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.canvas-tree-side-doors-list form {
+  margin: 0;
+}
+
+.canvas-tree-side-door-node {
+  border: 1px solid color-mix(in oklab, var(--border) 84%, var(--text-muted) 16%);
+  background: color-mix(in oklab, var(--surface) 82%, var(--surface-muted) 18%);
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 0.42rem 0.58rem;
+  min-height: 2.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 520;
+  line-height: 1.2;
+  max-width: 260px;
+  text-align: left;
+}
+
+.canvas-tree-side-door-node .lucide {
+  width: 0.85rem;
+  height: 0.85rem;
+  opacity: 0.82;
+}
+
+.canvas-tree-side-door-node span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.canvas-tree-side-door-node:hover {
+  background: color-mix(in oklab, var(--surface-muted) 82%, var(--surface) 18%);
+  border-color: color-mix(in oklab, var(--border) 62%, var(--text-muted) 38%);
+  color: var(--text);
+}
+
+.canvas-tree-tip-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.canvas-tree-connector-zone {
+  position: relative;
+  margin-left: 0;
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  padding: 0.08rem 0 0.18rem;
+}
+
+.canvas-tree-connector-half {
+  width: 1px;
+  height: 0.5rem;
+  background: color-mix(in oklab, var(--border) 80%, var(--text-muted) 20%);
+}
+
+.canvas-tree-connector-half.is-terminal-link {
+  height: 0.8rem;
+}
+
+.canvas-tree-connector-gap {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.canvas-tree-connector-add {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--border) 76%, var(--text-muted) 24%);
+  background: color-mix(in oklab, var(--surface) 93%, white 7%);
+  color: color-mix(in oklab, var(--text-muted) 82%, var(--text) 18%);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.canvas-tree-connector-add .lucide {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.canvas-tree-connector-add:hover {
+  border-color: color-mix(in oklab, var(--border) 52%, var(--text) 48%);
+  color: var(--text);
+  background: color-mix(in oklab, var(--surface) 88%, var(--surface-muted) 12%);
+}
+
+.canvas-tree-inline-form-connector {
+  margin-top: 0.28rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--surface) 90%, var(--surface-muted) 10%);
+  padding: 0.5rem;
+  width: min(540px, 100%);
+}
+
+.canvas-tree-terminal-action-link {
+  margin-top: 0.15rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  width: min(540px, 100%);
+}
+
+.canvas-tree-inline-form-terminal {
+  width: min(540px, 100%);
+}
+
+.canvas-tree-inline-form {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 0.45rem;
+}
+
+.canvas-tree-inline-form input[type="text"],
+.canvas-tree-inline-form textarea {
+  width: 100%;
+}
+
+.canvas-tree-inline-form-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.canvas-tree-trifurcation-hint {
+  margin: 0.1rem 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  max-width: 560px;
+  text-align: center;
+}
+
+.canvas-problem-inline-warning {
+  border: 1px solid color-mix(in oklab, var(--border) 70%, #d18f51 30%);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface-muted) 76%, #f8e3ce 24%);
+  color: color-mix(in oklab, var(--text) 78%, #8d5f2f 22%);
+  padding: 0.45rem 0.65rem;
+  font-size: 0.9rem;
+}
+
+.canvas-problem-inline-confirm {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface) 90%, var(--surface-muted) 10%);
+  padding: 0.52rem 0.68rem;
+}
+
+.canvas-problem-inline-confirm p {
+  margin: 0 0 0.35rem;
+}
+
+.canvas-problem-inline-confirm-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.canvas-tree-overview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: grid;
+  place-items: center;
+}
+
+.canvas-tree-overview-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(245, 242, 235, 0.92);
+  backdrop-filter: blur(1.5px);
+}
+
+.canvas-tree-overview-panel {
+  position: relative;
+  width: min(96vw, 1680px);
+  height: min(92vh, 980px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--surface) 93%, var(--surface-muted) 7%);
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.canvas-tree-overview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.canvas-tree-overview-header h3 {
+  margin: 0;
+}
+
+.canvas-tree-overview-close {
+  color: var(--text-muted);
+}
+
+.canvas-tree-overview-scroll {
+  overflow: auto;
+  padding: var(--space-4);
+}
+
+.canvas-tree-overview-board {
+  position: relative;
+  margin: 0 auto;
+}
+
+.canvas-tree-overview-edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.canvas-tree-overview-edges path {
+  fill: none;
+  stroke: color-mix(in oklab, var(--border) 72%, var(--text-muted) 28%);
+  stroke-width: 1.2;
+}
+
+.canvas-tree-overview-level-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border-top: 1px dashed color-mix(in oklab, var(--border) 60%, transparent 40%);
+  z-index: 0;
+}
+
+.canvas-tree-overview-node-form {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  z-index: 2;
+}
+
+.canvas-tree-overview-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 196px;
+  min-height: 86px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  z-index: 2;
+}
+
+button.canvas-tree-overview-node {
+  position: static;
+  transform: none;
+  width: 196px;
+  min-height: 86px;
+}
+
+.canvas-tree-overview-node:hover {
+  border-color: color-mix(in oklab, var(--border) 58%, var(--accent-strong) 42%);
+  background: color-mix(in oklab, var(--surface) 95%, var(--surface-muted) 5%);
+}
+
+.canvas-tree-overview-node.is-active {
+  border-color: color-mix(in oklab, var(--accent-strong) 44%, var(--border) 56%);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent-strong) 16%, transparent 84%),
+    var(--shadow-soft);
+}
+
+.canvas-tree-overview-node.is-tip {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent-strong) 22%, transparent 78%),
+    var(--shadow-soft);
+}
+
+.canvas-tree-overview-node.is-terminal {
+  background: color-mix(in oklab, var(--surface) 87%, var(--surface-muted) 13%);
+}
+
+.canvas-tree-overview-node.is-unresolved-leaf {
+  border-style: dashed;
+}
+
+.canvas-tree-overview-node-role {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.canvas-tree-overview-node-text {
+  margin: 0.25rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.canvas-tree-overview-terminal-flag {
+  position: absolute;
+  right: 0.45rem;
+  top: 0.45rem;
+  color: color-mix(in oklab, var(--accent-strong) 45%, var(--text-muted) 55%);
+  display: inline-flex;
+  align-items: center;
+}
+
+.canvas-tree-overview-terminal-flag .lucide {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.canvas-tree-overview-output-group {
+  position: absolute;
+  transform: translateX(-50%);
+  width: 188px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.canvas-tree-overview-output-connector {
+  display: block;
+  width: 1px;
+  height: 0.62rem;
+  margin: 0 auto;
+  background: color-mix(in oklab, var(--border) 62%, var(--text-muted) 38%);
+  opacity: 0.58;
+}
+
+.canvas-tree-overview-output-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--surface-muted) 72%, var(--surface) 28%);
+  padding: 0.42rem 0.58rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.canvas-tree-overview-output-card h4 {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.canvas-tree-overview-output-card p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.28;
+  color: var(--text);
+}
+
+
+:root { --border:var(--line); --text:var(--ink); --text-muted:var(--muted); --surface-muted:var(--green); --accent-strong:var(--accent); --radius-sm:5px; --radius-md:8px; --shadow-soft:0 2px 8px #2d302908; --space-2:.6rem; --space-3:1rem; --space-4:1.3rem; }
+input, select { font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:.45rem; max-width:100%; }
+input:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.tree-tabs { margin:1rem 0; display:flex; gap:.5rem; }
+.tree-tabs [aria-pressed="true"] { background:var(--ink); color:var(--surface); }
+.canvas-tree-stratum-title-group { min-width:0; flex:1; }
+.canvas-tree-node-text-editor h3 { margin:.25rem 0; font-size:1.03rem; font-weight:500; white-space:pre-wrap; overflow-wrap:anywhere; }
+.canvas-tree-node-edit-trigger { opacity:1; pointer-events:auto; }
+.canvas-tree-inline-text-form { width:100%; }
+.canvas-tree-inline-text-form textarea { background:var(--surface); padding:.4rem; border:1px solid var(--line); }
+.canvas-tree-stratum h4 { margin:0; }
+.canvas-tree-output p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.canvas-tree-side-door-node span { white-space:normal; overflow-wrap:anywhere; }
+.btn-icon { padding:.25rem .45rem; }
+.btn-utility { font-size:.78rem; }
+.canvas-tree-node-tools { display:flex; gap:.4rem; justify-content:flex-end; margin-top:.4rem; }
+.tree-guide { font-size:.8rem; color:var(--muted); margin:1rem 0; max-width:75ch; }
+.canvas-tree-inline-form { margin:.6rem 0; padding:.8rem; border:1px solid var(--line); background:var(--surface); border-radius:5px; }
+.canvas-tree-inline-form label { display:block; font-size:.8rem; }
+.canvas-tree-inline-form input, .canvas-tree-inline-form textarea { width:100%; }
+.canvas-tree-inline-form-connector { position:static; transform:none; grid-column:1/-1; }
+.canvas-tree-connector-zone { flex-wrap:wrap; }
+.canvas-tree-inline-form { flex-basis:100%; }
+.canvas-tree-terminal-action-link { position:static; transform:none; flex-basis:100%; text-align:center; }
+.canvas-tree-tip-controls { justify-content:flex-start; }
+.canvas-tree-overview-overlay { display:block; position:fixed; inset:0; padding:0; border:0; background:transparent; width:100vw; max-width:100vw; height:100vh; max-height:100vh; }
+.canvas-tree-overview-overlay:not([open]) { display:none; }
+.canvas-tree-overview-panel { margin:4vh auto; }
+.canvas-tree-overview-node { height:86px; overflow:hidden; }
+.canvas-tree-overview-node-text { overflow-wrap:anywhere; }
+.canvas-tree-overview-output-group { pointer-events:auto; }
+.canvas-tree-overview-output-card { max-height:100px; overflow:auto; overflow-wrap:anywhere; }
+.canvas-tree-overview-node:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.proposed-child { padding:.65rem; margin:.5rem 0; border-left:3px solid var(--accent); white-space:pre-wrap; overflow-wrap:anywhere; }
+@media(max-width:560px) { .brand { flex-wrap:wrap; gap:.2rem; } .toolbar { align-items:flex-start; } .export-actions { flex-wrap:wrap; } .canvas-tree-board { min-width:720px; } .canvas-tree-level-row { grid-template-columns:minmax(340px,52%) minmax(240px,1fr); } }
+
+/* Show both expansion choices without opening a select menu. */
+.expansion-modes { border:0; padding:0; margin:1rem 0; min-width:0; }
+.expansion-modes legend { font-size:.8rem; font-weight:600; padding:0; }
+.expansion-modes label { display:flex; align-items:flex-start; gap:.6rem; font-weight:400; margin:.6rem 0; cursor:pointer; }
+.expansion-modes input { flex:none; margin:.25rem 0 0; accent-color:var(--accent); }
+.expansion-modes label:has(input:disabled) { color:var(--muted); opacity:.65; cursor:default; }
+</style>
+</head><body><div class="shell">
+<header class="masthead"><div class="brand"><a class="wordmark" href="#main" aria-label="Pensive, skip to investigation">pensive<span aria-hidden="true">.</span></a><p class="eyebrow">5 WHYS: A CAUSAL INVESTIGATION</p></div></header>
+<main id="main">
+<div class="tree-tabs" role="group" aria-label="Canvas view"><button type="button" id="investigation-tab" aria-pressed="true">Investigation</button><button type="button" id="framing-tab" aria-pressed="false">Framing</button></div>
+<section class="framing" id="framing-view" aria-label="Problem framing" hidden>
+<label>Observable Symptom<textarea data-framing="observable_symptom" rows="2" placeholder="What was actually seen, measured or reported?"></textarea></label>
+<label>Expected Condition<textarea data-framing="expected_condition" rows="2" placeholder="What should be happening instead?"></textarea></label>
+<label>System or Process<textarea data-framing="system_or_process" rows="2" placeholder="Which system, process and boundaries are involved?"></textarea></label>
+<label>Investigation Owner<textarea data-framing="investigation_owner" rows="2" placeholder="Who can investigate and act on the findings?"></textarea></label>
+</section>
+<div class="toolbar"><div class="ai-actions" role="group" aria-label="Investigation actions"><button type="button" data-ai="evaluate">Reflect</button><button type="button" id="overview-open">View full tree</button></div><div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File ↗</button></div></div>
+<section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section><section id="proposal-panel" class="proposal-panel" aria-label="AI expansion proposal" hidden></section>
+<section id="investigation-view" aria-label="Causal investigation"><section class="canvas-tree-strand" data-recursive-tree="strand" data-tree-layout="connected"><section class="canvas-tree-board" id="tree-board"></section></section>
+<p class="tree-guide">Ask why while the next question is useful. Follow side doors to explore alternatives. Use Observed, Reported, Hypothesis or Inference in text to preserve evidence distinctions. Closing a branch records a decision and countermeasure; it does not prove causation.</p></section>
+<section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden><label for="clipboard-json">Canvas JSON</label><p>Clipboard access was blocked. Copy the selected JSON manually.</p><textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button type="button" id="close-copy">Close</button></section>
+<p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p></main>
+<footer><span>Less conversation. More thinking.</span><span>5 Whys · Pensive</span></footer></div>
+<dialog id="overview-dialog" class="canvas-tree-overview-overlay" aria-labelledby="overview-title"><section class="canvas-tree-overview-backdrop" id="overview-backdrop" aria-hidden="true"></section><section class="canvas-tree-overview-panel"><header class="canvas-tree-overview-header"><h2 id="overview-title">Full Tree</h2><button type="button" id="overview-close" aria-label="Close full tree view">×</button></header><section class="canvas-tree-overview-scroll"><section class="canvas-tree-overview-board" id="overview-board" data-tree-overview-board="1"></section></section></section></dialog>
+<dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><h2 id="import-title">Import 5 Whys JSON</h2><p class="dialog-note">Paste complete exported state. Validation happens before replacement.</p><label for="import-json">Import canvas JSON</label><textarea id="import-json" rows="10" spellcheck="false"></textarea><p id="import-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel-import">Cancel import</button><button type="submit" class="primary">Replace canvas</button></div></form></dialog>
+<dialog id="ai-dialog" aria-labelledby="ai-title"><form id="ai-form"><h2 id="ai-title">Reflect on 5 Whys</h2><p class="dialog-note">Copy this request into Codex or ChatGPT with the Pensive skill.</p><fieldset id="mode-label" class="expansion-modes" hidden><legend>Expansion mode</legend><label><input type="radio" name="expand-mode" id="deepen-option" value="deepen" checked><span>Deepen — direct causes of this condition</span></label><label><input type="radio" name="expand-mode" id="branch-option" value="branch"><span>Branch — alternative explanations of its parent</span></label></fieldset><p id="ai-scope" class="dialog-note"></p><label for="ai-guidance">Steering guidance</label><textarea id="ai-guidance" rows="3" placeholder="Focus, observations, evidence and constraints…"></textarea><label class="checkbox-label"><input id="use-thoughts" type="checkbox" checked> Use existing thoughts as guidance</label><p id="ai-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel-ai">Cancel</button><button type="submit" class="primary">Copy AI request</button></div></form></dialog>
+<noscript>This canvas needs JavaScript for local editing. No server is needed.</noscript>
+<!--pensive-state-start-->
+<script id="canvas-state" type="application/json">{
+  "framework": "five_whys",
+  "schema_version": "1.0",
+  "content": {
+    "framing": {
+      "observable_symptom": "",
+      "expected_condition": "",
+      "system_or_process": "",
+      "investigation_owner": ""
+    },
+    "tree": {
+      "id": "root",
+      "text": "",
+      "children": [],
+      "is_terminal": false,
+      "output": null
+    }
+  },
+  "cursor": [
+    "root"
+  ]
+}</script>
+<!--pensive-state-end-->
+<script data-implementation>
+/* Framework-local deterministic operations. V2 source/port details: docs/extraction-map.md. */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.FiveWhys = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  const framing = [
+    'observable_symptom',
+    'expected_condition',
+    'system_or_process',
+    'investigation_owner',
+  ];
+  const clone = (value) => JSON.parse(JSON.stringify(value));
+  const fail = (message) => {
+    throw new Error(message);
+  };
+  function object(value, label) {
+    if (!value || typeof value !== 'object' || Array.isArray(value))
+      fail(label + ' must be an object.');
+  }
+  function keys(value, required, optional = [], label = 'Object') {
+    object(value, label);
+    for (const k of required) if (!Object.hasOwn(value, k)) fail(label + ' missing ' + k);
+    for (const k of Object.keys(value))
+      if (!required.includes(k) && !optional.includes(k)) fail(label + ' unsupported key ' + k);
+  }
+  function string(v, label, nonempty = false) {
+    if (typeof v !== 'string' || (nonempty && !v.trim()))
+      fail(label + ' must be ' + (nonempty ? 'nonempty ' : '') + 'text.');
+  }
+  function identity(v, seen) {
+    if (typeof v !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(v)) fail('Invalid ID.');
+    if (seen.has(v)) fail('Duplicate ID: ' + v);
+    seen.add(v);
+  }
+  function initialState() {
+    return {
+      framework: 'five_whys',
+      schema_version: '1.0',
+      content: {
+        framing: Object.fromEntries(framing.map((k) => [k, ''])),
+        tree: { id: 'root', text: '', children: [], is_terminal: false, output: null },
+      },
+      cursor: ['root'],
+    };
+  }
+  function validateContent(content) {
+    keys(content, ['framing', 'tree'], [], 'Content');
+    keys(content.framing, framing, [], 'Framing');
+    for (const k of framing) string(content.framing[k], k);
+    const seen = new Set(),
+      objects = new Set(),
+      stack = [content.tree];
+    while (stack.length) {
+      const n = stack.pop();
+      keys(n, ['id', 'text', 'children', 'is_terminal', 'output'], [], 'Tree node');
+      if (objects.has(n)) fail('Cyclic/shared tree node.');
+      objects.add(n);
+      identity(n.id, seen);
+      string(n.text, 'Node text');
+      if (!Array.isArray(n.children)) fail('Children must be an array.');
+      if (typeof n.is_terminal !== 'boolean') fail('Terminal flag must be boolean.');
+      if (n.is_terminal) {
+        if (n === content.tree || n.children.length) fail('Only a non-root leaf can be closed.');
+        string(n.output, 'Countermeasure', true);
+      } else if (n.output !== null) fail('Open node output must be null.');
+      for (let i = n.children.length - 1; i >= 0; i--) stack.push(n.children[i]);
+    }
+    return seen;
+  }
+  function validate(s) {
+    keys(
+      s,
+      ['framework', 'schema_version', 'content', 'cursor'],
+      ['thoughts', 'proposals'],
+      'Canvas',
+    );
+    if (s.framework !== 'five_whys' || s.schema_version !== '1.0')
+      fail('Unsupported framework/version.');
+    const ids = validateContent(s.content);
+    if (s.thoughts !== undefined) {
+      if (!Array.isArray(s.thoughts)) fail('Thoughts must be an array.');
+      for (const t of s.thoughts) {
+        keys(t, ['id', 'kind', 'text'], [], 'Thought');
+        identity(t.id, ids);
+        if (!['evaluation', 'expansion'].includes(t.kind)) fail('Unsupported thought kind.');
+        string(t.text, 'Thought', true);
+      }
+    }
+    if (s.proposals !== undefined) {
+      if (!Array.isArray(s.proposals) || s.proposals.length > 1)
+        fail('At most one pending proposal.');
+      for (const p of s.proposals) validateProposal(p, ids);
+    }
+    if (!Array.isArray(s.cursor) || !s.cursor.length || s.cursor[0] !== s.content.tree.id)
+      fail('Invalid cursor.');
+    let node = s.content.tree;
+    for (const id of s.cursor.slice(1)) {
+      node = node.children.find((c) => c.id === id);
+      if (!node) fail('Invalid cursor path.');
+    }
+    return s;
+  }
+  function find(s, id) {
+    const stack = [{ node: s.content.tree, parent: null, path: [s.content.tree.id] }];
+    while (stack.length) {
+      const r = stack.pop();
+      if (r.node.id === id) return r;
+      for (let i = r.node.children.length - 1; i >= 0; i--) {
+        const n = r.node.children[i];
+        stack.push({ node: n, parent: r.node, path: [...r.path, n.id] });
+      }
+    }
+    fail('Node not found: ' + id);
+  }
+  function allIds(s) {
+    const ids = validateContent(s.content);
+    for (const t of s.thoughts || []) ids.add(t.id);
+    for (const p of s.proposals || []) {
+      ids.add(p.id);
+      ids.add(p.thought.id);
+      for (const c of p.children) ids.add(c.id);
+      for (const id of validateContent(p.base_content)) ids.add(id);
+    }
+    return ids;
+  }
+  function newId(s, prefix = 'cause') {
+    const used = allIds(s);
+    let id;
+    do {
+      id = prefix + '_' + globalThis.crypto.randomUUID();
+    } while (used.has(id));
+    return id;
+  }
+  function preferred(s, path) {
+    const result = [...path];
+    let n = find(s, result.at(-1)).node;
+    while (!n.is_terminal && n.children.length) {
+      n = n.children[0];
+      result.push(n.id);
+    }
+    return result;
+  }
+  function navigate(s, id) {
+    validate(s);
+    const path = find(s, id).path;
+    s.cursor = preferred(s, path);
+  }
+  function editFraming(s, key, text) {
+    validate(s);
+    if (!framing.includes(key)) fail('Unknown framing field.');
+    string(text, 'Framing');
+    s.content.framing[key] = text;
+  }
+  function editText(s, id, text) {
+    validate(s);
+    string(text, 'Node text', true);
+    const { node, parent } = find(s, id);
+    if (!parent && node.children.length) fail('Problem statement is locked once branching begins.');
+    node.text = text.trim();
+  }
+  function addChild(s, id, text) {
+    validate(s);
+    string(text, 'Cause text', true);
+    const { node, path } = find(s, id);
+    if (node.is_terminal) fail('Cannot add to a closed branch.');
+    if (!s.content.tree.text.trim()) fail('State the problem before adding causes.');
+    const child = {
+      id: newId(s),
+      text: text.trim(),
+      children: [],
+      is_terminal: false,
+      output: null,
+    };
+    node.children.push(child);
+    s.cursor = [...path, child.id];
+    return child.id;
+  }
+  function closeBranch(s, id, output) {
+    validate(s);
+    string(output, 'Countermeasure', true);
+    const { node, parent } = find(s, id);
+    if (!parent || node.children.length) fail('Only a non-root leaf can be closed.');
+    node.is_terminal = true;
+    node.output = output.trim();
+  }
+  function reopen(s, id) {
+    validate(s);
+    const { node } = find(s, id);
+    if (!node.is_terminal) fail('Branch is not closed.');
+    node.is_terminal = false;
+    node.output = null;
+  }
+  function deleteNode(s, id) {
+    validate(s);
+    const { node, parent, path } = find(s, id);
+    if (!parent) fail('Cannot delete the problem statement.');
+    const active = s.cursor.includes(id);
+    parent.children.splice(parent.children.indexOf(node), 1);
+    if (active) s.cursor = preferred(s, path.slice(0, -1));
+  }
+  const truncate = (text, max = 72) =>
+    text.trim().length > max
+      ? text
+          .trim()
+          .slice(0, max - 1)
+          .trimEnd() + '…'
+      : text.trim() || 'No text yet.';
+  const role = (node, isRoot) =>
+    node.is_terminal ? 'Investigated cause' : isRoot ? 'Problem Statement' : 'Cause';
+  function strand(s) {
+    validate(s);
+    return s.cursor.map((id, i) => {
+      const { node, parent } = find(s, id);
+      return {
+        id,
+        text: node.text,
+        depth: i,
+        is_root: !parent,
+        is_terminal: node.is_terminal,
+        output: node.output,
+        role_label: role(node, !parent),
+        can_edit_text: !!parent || !node.children.length,
+        can_add_child: !node.is_terminal,
+        show_trifurcation_hint: !node.is_terminal && node.children.length >= 3,
+        is_cursor_tip: i === s.cursor.length - 1,
+        side_doors: parent
+          ? parent.children
+              .filter((n) => n.id !== id)
+              .map((n) => ({
+                target_node_id: n.id,
+                label: n.text.trim() ? truncate(n.text, 48) : '(untitled)',
+                full_text: n.text,
+              }))
+          : [],
+        can_mark_terminal: !!parent && !node.is_terminal && !node.children.length,
+      };
+    });
+  }
+  // Mechanical port of V2 _build_tree_overview: leaf-unit spacing and orthogonal paths.
+  function overview(s) {
+    validate(s);
+    const tree = s.content.tree,
+      widths = new Map(),
+      stack = [[tree, false]];
+    while (stack.length) {
+      const [n, visited] = stack.pop();
+      if (visited)
+        widths.set(
+          n.id,
+          Math.max(
+            1,
+            n.children.reduce((sum, c) => sum + widths.get(c.id), 0),
+          ),
+        );
+      else {
+        stack.push([n, true]);
+        for (const c of n.children) stack.push([c, false]);
+      }
+    }
+    const nodes = [],
+      edges = [],
+      todo = [{ n: tree, parent: null, depth: 0, start: 0 }],
+      byId = new Map();
+    let maxDepth = 0;
+    while (todo.length) {
+      const { n, parent, depth, start } = todo.pop(),
+        x = 122 + (start + widths.get(n.id) / 2 - 0.5) * 228,
+        y = 52 + depth * 148;
+      maxDepth = Math.max(maxDepth, depth);
+      const row = {
+        id: n.id,
+        text: truncate(n.text),
+        full_text: n.text,
+        output_text: n.output || '',
+        x,
+        y,
+        depth,
+        is_root: !parent,
+        is_terminal: n.is_terminal,
+        is_active_strand: s.cursor.includes(n.id),
+        is_cursor_tip: n.id === s.cursor.at(-1),
+        is_unresolved_leaf: !n.children.length && !n.is_terminal,
+        role_label: role(n, !parent),
+      };
+      nodes.push(row);
+      byId.set(n.id, row);
+      if (parent) {
+        const p = byId.get(parent),
+          y1 = p.y + 43,
+          y2 = y - 43,
+          mid = (y1 + y2) / 2;
+        edges.push({
+          parent_id: parent,
+          child_id: n.id,
+          path: `M ${p.x.toFixed(2)} ${y1.toFixed(2)} L ${p.x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${y2.toFixed(2)}`,
+        });
+      }
+      let next = start;
+      const children = [];
+      for (const c of n.children) {
+        children.push({ n: c, parent: n.id, depth: depth + 1, start: next });
+        next += widths.get(c.id);
+      }
+      todo.push(...children.reverse());
+    }
+    return {
+      nodes,
+      edges,
+      board_width: Math.max(960, widths.get(tree.id) * 228 + 244),
+      board_height: Math.max(320, (maxDepth + 1) * 148 + 104),
+    };
+  }
+  // Scopes are resolved against submitted state, never inferred from navigation cursor.
+  function resolveTarget(s, action) {
+    keys(action.target, ['type', 'id'], [], 'Target');
+    if (action.target.type !== 'node') fail('Target must be a node.');
+    string(action.target.id, 'Target ID', true);
+    const found = find(s, action.target.id);
+    if (!['deepen', 'branch'].includes(action.mode)) fail('Choose deepen or branch mode.');
+    if (action.mode === 'branch' && !found.parent) fail('Cannot branch at root; use Deepen.');
+    const parent = action.mode === 'deepen' ? found.node : found.parent;
+    if (parent.is_terminal) fail('Cannot expand a closed branch.');
+    return parent;
+  }
+  function validateProposal(p, ids) {
+    keys(
+      p,
+      ['id', 'action', 'target', 'mode', 'parent_id', 'base_content', 'children', 'thought'],
+      [],
+      'Proposal',
+    );
+    identity(p.id, ids);
+    if (p.action !== 'expand') fail('Unsupported proposal action.');
+    validateContent(p.base_content);
+    const base = { content: p.base_content };
+    const parent = resolveTarget(base, p);
+    if (parent.id !== p.parent_id) fail('Proposal parent does not match target/mode.');
+    if (!Array.isArray(p.children) || !p.children.length) fail('Proposal must contain children.');
+    const baseIds = validateContent(p.base_content),
+      texts = new Set(parent.children.map((c) => c.text.trim().toLowerCase()));
+    const ancestorTexts = new Set(
+      find(base, parent.id).path.map((id) => find(base, id).node.text.trim().toLowerCase()),
+    );
+    for (const c of p.children) {
+      keys(c, ['id', 'text', 'children', 'is_terminal', 'output'], [], 'Proposed cause');
+      identity(c.id, ids);
+      if (baseIds.has(c.id)) fail('Proposed ID collides with existing cause.');
+      string(c.text, 'Proposed cause', true);
+      if (
+        !Array.isArray(c.children) ||
+        c.children.length ||
+        c.is_terminal !== false ||
+        c.output !== null
+      )
+        fail('Only new direct open leaf causes may be proposed.');
+      const normalized = c.text.trim().toLowerCase();
+      if (texts.has(normalized) || ancestorTexts.has(normalized))
+        fail('Redundant or circular cause text.');
+      texts.add(normalized);
+    }
+    keys(p.thought, ['id', 'kind', 'text'], [], 'Proposal thought');
+    identity(p.thought.id, ids);
+    if (baseIds.has(p.id) || baseIds.has(p.thought.id))
+      fail('Proposal identity collides with base content.');
+    if (p.thought.kind !== 'expansion') fail('Invalid proposal thought.');
+    string(p.thought.text, 'Thought', true);
+  }
+  function validateRequest(request) {
+    keys(request, ['canvas', 'action'], [], 'Request');
+    validate(request.canvas);
+    if (request.canvas.proposals?.length) fail('Resolve pending proposal first.');
+    const a = request.action;
+    keys(
+      a,
+      ['id'],
+      ['comment', 'use_thoughts', ...(a.id === 'expand' ? ['target', 'mode'] : [])],
+      'Action',
+    );
+    if (!['evaluate', 'expand'].includes(a.id)) fail('Unsupported action.');
+    if (a.comment !== undefined) string(a.comment, 'Comment');
+    if (a.use_thoughts !== undefined && typeof a.use_thoughts !== 'boolean')
+      fail('use_thoughts must be boolean.');
+    if (a.id === 'expand') {
+      if (!request.canvas.content.tree.text.trim()) fail('State the problem before expansion.');
+      resolveTarget(request.canvas, a);
+    }
+    return request;
+  }
+  function buildRequest(s, action) {
+    validateRequest({ canvas: s, action });
+    return clone({ canvas: s, action });
+  }
+  function composeResult(request, response) {
+    validateRequest(request);
+    const expanding = request.action.id === 'expand';
+    keys(response, ['thought', ...(expanding ? ['children'] : [])], [], 'Response');
+    string(response.thought, 'Thought', true);
+    const s = clone(request.canvas);
+    if (!expanding) {
+      s.thoughts = [
+        ...(s.thoughts || []),
+        { id: newId(s, 'thought'), kind: 'evaluation', text: response.thought },
+      ];
+      return validate(s);
+    }
+    if (!Array.isArray(response.children)) fail('Children response must be an array.');
+    if (!response.children.length) {
+      s.thoughts = [
+        ...(s.thoughts || []),
+        { id: newId(s, 'thought'), kind: 'expansion', text: response.thought },
+      ];
+      return validate(s);
+    }
+    const ids = allIds(s),
+      allocate = (prefix) => {
+        let id;
+        do {
+          id = prefix + '_' + globalThis.crypto.randomUUID();
+        } while (ids.has(id));
+        ids.add(id);
+        return id;
+      };
+    const children = response.children.map((c) => {
+      keys(c, ['text'], [], 'Child response');
+      string(c.text, 'Cause', true);
+      return {
+        id: allocate('cause'),
+        text: c.text,
+        children: [],
+        is_terminal: false,
+        output: null,
+      };
+    });
+    s.proposals = [
+      {
+        id: allocate('proposal'),
+        action: 'expand',
+        target: clone(request.action.target),
+        mode: request.action.mode,
+        parent_id: resolveTarget(s, request.action).id,
+        base_content: clone(s.content),
+        children,
+        thought: { id: allocate('thought'), kind: 'expansion', text: response.thought },
+      },
+    ];
+    return validate(s);
+  }
+  function resolveProposal(s, decision) {
+    validate(s);
+    if (!['accept', 'reject'].includes(decision)) fail('Unknown review decision.');
+    const p = s.proposals?.[0];
+    if (!p) fail('No pending proposal.');
+    if (decision === 'reject') {
+      delete s.proposals;
+      return;
+    }
+    if (JSON.stringify(s.content) !== JSON.stringify(p.base_content))
+      fail(
+        'Proposal is stale after content or framing edits. Reject it and request a fresh expansion.',
+      );
+    const candidate = clone(s);
+    delete candidate.proposals;
+    const parent = resolveTarget(candidate, p);
+    if (parent.id !== p.parent_id) fail('Proposal parent mismatch.');
+    parent.children.push(...clone(p.children));
+    candidate.thoughts = [...(candidate.thoughts || []), clone(p.thought)];
+    validate(candidate);
+    s.content = candidate.content;
+    s.thoughts = candidate.thoughts;
+    delete s.proposals;
+  }
+  function parseState(json) {
+    let s;
+    try {
+      s = JSON.parse(json);
+    } catch {
+      fail('Invalid JSON.');
+    }
+    return validate(s);
+  }
+  function packageHtml(html, s) {
+    validate(s);
+    const start = '<!--pensive-' + 'state-start-->',
+      end = '<!--pensive-' + 'state-end-->';
+    if (html.split(start).length !== 2 || html.split(end).length !== 2)
+      fail('Expected one state slot.');
+    const a = html.indexOf(start),
+      b = html.indexOf(end);
+    if (b < a) fail('Invalid state slot.');
+    const json = JSON.stringify(s, null, 2)
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')
+      .replace(/&/g, '\\u0026')
+      .replace(/\u2028/g, '\\u2028')
+      .replace(/\u2029/g, '\\u2029');
+    return (
+      html.slice(0, a + start.length) +
+      '\n<script id="canvas-state" type="application/json">' +
+      json +
+      '<' +
+      '/script>\n' +
+      html.slice(b)
+    );
+  }
+  return {
+    resolveProposal,
+    buildRequest,
+    validateRequest,
+    composeResult,
+    parseState,
+    packageHtml,
+    framing,
+    initialState,
+    validate,
+    validateContent,
+    find,
+    navigate,
+    editFraming,
+    editText,
+    addChild,
+    closeBranch,
+    reopen,
+    deleteNode,
+    strand,
+    overview,
+    clone,
+  };
+});
+</script>
+<script data-implementation>
+/* Local tree UI. Strand, side doors, connector forms and overview preserve V2 geometry. */
+(() => {
+  'use strict';
+  const W = FiveWhys,
+    $ = (selector) => document.querySelector(selector),
+    source = '<!doctype html>\n' + document.documentElement.outerHTML;
+  let state, requestedAction;
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function button(text, cls, fn, label) {
+    const b = el('button', cls, text);
+    b.type = 'button';
+    if (label) b.setAttribute('aria-label', label);
+    b.addEventListener('click', fn);
+    return b;
+  }
+  function status(text, error = false) {
+    $('#status').textContent = text;
+    $('#status').classList.toggle('error', error);
+  }
+  function edited() {
+    $('#clipboard-fallback').hidden = true;
+    status('Unsaved edits in this tab. Export or save to keep this investigation.');
+  }
+  function run(fn) {
+    try {
+      fn();
+      edited();
+    } catch (e) {
+      status(e.message, true);
+    }
+  }
+  function focusNode(id) {
+    const nodes = [...document.querySelectorAll('[data-tree-node-id]')],
+      card = nodes.find((n) => n.dataset.treeNodeId === id);
+    if (card) {
+      card.querySelector('button')?.focus();
+      card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+  }
+  function textEditor(card, row) {
+    const wrap = el(
+        'section',
+        'canvas-tree-node-text-editor' + (row.can_edit_text ? ' is-editable' : ''),
+      ),
+      heading = el('h3', '', row.text || 'No text yet.');
+    wrap.append(heading);
+    if (!row.can_edit_text) {
+      heading.title = 'Problem statement is locked once the investigation has begun.';
+      return wrap;
+    }
+    card.dataset.treeTextEditable = '1';
+    if (row.is_root) card.dataset.treeRootEditable = '1';
+    const trigger = button(
+      '✎',
+      'btn-icon canvas-tree-node-edit-trigger',
+      begin,
+      'Edit ' + row.role_label,
+    );
+    wrap.append(trigger);
+    function begin() {
+      if (wrap.querySelector('form')) return;
+      heading.hidden = true;
+      trigger.hidden = true;
+      const form = el('form', 'canvas-tree-inline-text-form'),
+        input = el('textarea'),
+        actions = el('section', 'canvas-tree-inline-text-actions');
+      input.rows = 3;
+      input.value = row.text;
+      input.setAttribute('aria-label', 'Node text');
+      let done = false;
+      function cancel() {
+        if (done) return;
+        done = true;
+        form.remove();
+        heading.hidden = false;
+        trigger.hidden = false;
+        trigger.focus();
+      }
+      function save() {
+        if (done) return;
+        const text = input.value.trim();
+        if (!text || text === row.text.trim()) {
+          cancel();
+          return;
+        }
+        try {
+          W.editText(state, row.id, text);
+          done = true;
+          renderTree();
+          edited();
+          focusNode(row.id);
+        } catch (e) {
+          status(e.message, true);
+        }
+      }
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        save();
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cancel();
+        } else if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          save();
+        }
+      });
+      input.addEventListener('blur', (e) => {
+        if (form.contains(e.relatedTarget)) return;
+        save();
+      });
+      actions.append(
+        button('✓', 'btn-icon', save, 'Save text'),
+        button('×', 'btn-icon', cancel, 'Cancel text edit'),
+      );
+      form.append(input, actions);
+      wrap.append(form);
+      input.focus();
+      input.select();
+    }
+    heading.addEventListener('click', begin);
+    return wrap;
+  }
+  function renderTree() {
+    const board = $('#tree-board');
+    board.replaceChildren();
+    for (const row of W.strand(state)) {
+      const line = el('section', 'canvas-tree-level-row');
+      line.dataset.treeLevelRow = row.depth;
+      const spine = el(
+          'section',
+          'canvas-tree-spine-cell' + (!row.is_terminal ? ' has-connector-down' : ''),
+        ),
+        card = el(
+          'article',
+          'canvas-tree-stratum' +
+            (row.is_cursor_tip ? ' is-cursor-tip' : '') +
+            (row.is_terminal ? ' is-terminal' : ''),
+        );
+      card.dataset.treeNodeId = row.id;
+      card.dataset.treeDepth = row.depth;
+      const header = el('header', 'canvas-tree-stratum-header'),
+        group = el('section', 'canvas-tree-stratum-title-group');
+      group.append(el('p', 'canvas-tree-role-label', row.role_label), textEditor(card, row));
+      header.append(el('span', 'canvas-tree-depth-badge', row.depth), group);
+      card.append(header);
+      if (row.is_terminal) {
+        card.dataset.treeTerminalNode = '1';
+        const out = el('section', 'canvas-tree-output');
+        out.append(el('h4', '', 'Countermeasure'), el('p', '', row.output));
+        card.append(out);
+      }
+      const tools = el('div', 'canvas-tree-node-tools');
+      if (!state.proposals?.length)
+        tools.append(
+          button(
+            'Expand',
+            'btn-utility',
+            () =>
+              openAI({
+                id: 'expand',
+                target: { type: 'node', id: row.id },
+                mode: row.is_terminal ? 'branch' : 'deepen',
+              }),
+            'Expand',
+          ),
+        );
+      if (!row.is_root)
+        tools.append(
+          button(
+            'Delete subtree',
+            'btn-utility',
+            () =>
+              run(() => {
+                const count = W.overview({ ...state, cursor: [...state.cursor] }).nodes.filter(
+                  (n) => W.find(state, n.id).path.includes(row.id),
+                ).length;
+                if (
+                  !confirm(
+                    `Delete this cause and ${count - 1} descendant(s)? This cannot be undone.`,
+                  )
+                )
+                  return;
+                W.deleteNode(state, row.id);
+                renderTree();
+                focusNode(state.cursor.at(-1));
+              }),
+            'Delete subtree',
+          ),
+        );
+      card.append(tools);
+      spine.append(card);
+      if (!row.is_terminal) {
+        const zone = el('section', 'canvas-tree-connector-zone');
+        zone.dataset.treeConnectorParent = row.id;
+        const first = el('span', 'canvas-tree-connector-half'),
+          second = el('span', 'canvas-tree-connector-half');
+        first.setAttribute('aria-hidden', 'true');
+        second.setAttribute('aria-hidden', 'true');
+        const add = button(
+          '+',
+          'canvas-tree-connector-add',
+          () => {
+            const existing = zone.querySelector('.canvas-tree-inline-form-connector');
+            if (existing) {
+              existing.remove();
+              add.setAttribute('aria-expanded', 'false');
+              return;
+            }
+            document.querySelectorAll('.canvas-tree-inline-form').forEach((f) => f.remove());
+            document
+              .querySelectorAll('.canvas-tree-connector-add')
+              .forEach((b) => b.setAttribute('aria-expanded', 'false'));
+            const form = el('form', 'canvas-tree-inline-form canvas-tree-inline-form-connector'),
+              input = el('input'),
+              label = el('label', '', 'Why does this occur?');
+            input.type = 'text';
+            input.required = true;
+            input.setAttribute('aria-label', 'Direct cause');
+            input.placeholder = 'A direct cause; qualify hypotheses';
+            label.append(input);
+            const cancel = () => {
+              form.remove();
+              add.setAttribute('aria-expanded', 'false');
+              add.focus();
+            };
+            form.append(
+              label,
+              button('Save cause', 'btn-save', () => form.requestSubmit()),
+              button('Cancel', 'btn-cancel', cancel),
+            );
+            form.addEventListener('submit', (e) => {
+              e.preventDefault();
+              run(() => {
+                const id = W.addChild(state, row.id, input.value);
+                renderTree();
+                focusNode(id);
+              });
+            });
+            form.addEventListener('keydown', (e) => {
+              if (e.key === 'Escape') {
+                e.preventDefault();
+                cancel();
+              }
+            });
+            zone.append(form);
+            add.setAttribute('aria-expanded', 'true');
+            input.focus();
+          },
+          'Add cause',
+        );
+        add.dataset.treeConnectorAddToggle = '1';
+        add.dataset.connectorParentId = row.id;
+        add.setAttribute('aria-expanded', 'false');
+        if (!state.content.tree.text.trim()) add.disabled = true;
+        zone.append(first, add, second);
+        if (row.show_trifurcation_hint)
+          zone.append(
+            el(
+              'p',
+              'canvas-tree-trifurcation-hint',
+              'More than three causes may mean the problem is broad. Consider narrowing it; alternatives remain allowed.',
+            ),
+          );
+        if (row.can_mark_terminal) {
+          const terminal = el('section', 'canvas-tree-terminal-action-link');
+          terminal.append(
+            button('Close branch', 'btn-utility', () => {
+              if (terminal.querySelector('form')) return;
+              const form = el('form', 'canvas-tree-inline-form canvas-tree-inline-form-terminal'),
+                label = el('label', '', 'Countermeasure'),
+                input = el('textarea');
+              input.required = true;
+              input.rows = 3;
+              input.setAttribute('aria-label', 'Countermeasure');
+              label.append(input);
+              form.append(
+                label,
+                el(
+                  'p',
+                  'tree-guide',
+                  'A closure decision does not establish this hypothesis as fact.',
+                ),
+                button('Save countermeasure', 'btn-save', () => form.requestSubmit()),
+                button('Cancel', 'btn-cancel', () => form.remove()),
+              );
+              form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                run(() => {
+                  W.closeBranch(state, row.id, input.value);
+                  renderTree();
+                  focusNode(row.id);
+                });
+              });
+              terminal.append(form);
+              input.focus();
+            }),
+          );
+          zone.append(terminal);
+        }
+        spine.append(zone);
+      } else
+        spine.append(
+          button('Unmark', 'btn-utility', () =>
+            run(() => {
+              W.reopen(state, row.id);
+              renderTree();
+              focusNode(row.id);
+            }),
+          ),
+        );
+      const lane = el(
+        'section',
+        'canvas-tree-side-door-lane' + (row.side_doors.length ? ' has-door-connector' : ''),
+      );
+      if (row.side_doors.length) {
+        lane.append(el('p', 'canvas-tree-side-doors-label', 'Side doors'));
+        const list = el('section', 'canvas-tree-side-doors-list');
+        for (const door of row.side_doors) {
+          const b = button('', 'canvas-tree-side-door-node', () =>
+            run(() => {
+              W.navigate(state, door.target_node_id);
+              renderTree();
+              focusNode(state.cursor.at(-1));
+            }),
+          );
+          b.dataset.sideDoorNode = door.target_node_id;
+          b.title = door.full_text;
+          b.append(el('span', '', '↪'), el('span', '', door.label));
+          list.append(b);
+        }
+        lane.append(list);
+      }
+      line.append(spine, lane);
+      board.append(line);
+    }
+  }
+  function renderOverview() {
+    const v = W.overview(state),
+      board = $('#overview-board');
+    board.replaceChildren();
+    board.style.width = v.board_width + 'px';
+    board.style.minWidth = v.board_width + 'px';
+    board.style.height = v.board_height + 100 + 'px';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.classList.add('canvas-tree-overview-edges');
+    svg.setAttribute('width', v.board_width);
+    svg.setAttribute('height', v.board_height);
+    svg.setAttribute('aria-hidden', 'true');
+    for (const edge of v.edges) {
+      const path = document.createElementNS(svg.namespaceURI, 'path');
+      path.setAttribute('d', edge.path);
+      path.dataset.treeOverviewEdge = edge.parent_id + ':' + edge.child_id;
+      svg.append(path);
+    }
+    board.append(svg);
+    const depths = new Set();
+    for (const n of v.nodes) {
+      if (!depths.has(n.depth)) {
+        const line = el('section', 'canvas-tree-overview-level-line');
+        line.style.top = n.y + 'px';
+        board.append(line);
+        depths.add(n.depth);
+      }
+      const form = el('div', 'canvas-tree-overview-node-form');
+      form.style.left = n.x + 'px';
+      form.style.top = n.y + 'px';
+      const card = button(
+        '',
+        'canvas-tree-overview-node' +
+          (n.is_active_strand ? ' is-active' : '') +
+          (n.is_cursor_tip ? ' is-tip' : '') +
+          (n.is_terminal ? ' is-terminal' : '') +
+          (n.is_unresolved_leaf ? ' is-unresolved-leaf' : ''),
+        () => {
+          if (!n.is_root)
+            run(() => {
+              W.navigate(state, n.id);
+              renderTree();
+            });
+          $('#overview-dialog').close();
+          focusNode(state.cursor.at(-1));
+        },
+      );
+      card.dataset.treeOverviewNodeId = n.id;
+      card.title = n.full_text;
+      card.append(
+        el('p', 'canvas-tree-overview-node-role', n.role_label),
+        el('p', 'canvas-tree-overview-node-text', n.text),
+      );
+      if (n.is_terminal) card.append(el('span', 'canvas-tree-overview-terminal-flag', '✓'));
+      form.append(card);
+      board.append(form);
+      if (n.is_terminal && n.output_text) {
+        const group = el('section', 'canvas-tree-overview-output-group');
+        group.style.left = n.x + 'px';
+        group.style.top = n.y + 55 + 'px';
+        const out = el('article', 'canvas-tree-overview-output-card');
+        out.tabIndex = 0;
+        out.setAttribute('aria-label', 'Countermeasure for ' + n.full_text);
+        out.append(el('h4', '', 'Countermeasure'), el('p', '', n.output_text));
+        group.append(el('span', 'canvas-tree-overview-output-connector'), out);
+        board.append(group);
+      }
+    }
+  }
+  function renderThoughts() {
+    const panel = $('#thoughts');
+    panel.replaceChildren();
+    panel.hidden = !state.thoughts?.length;
+    for (const t of state.thoughts || []) {
+      const card = el('article', 'thought');
+      card.append(
+        el('h3', '', t.kind === 'evaluation' ? 'Reflection' : 'Expansion rationale'),
+        el('p', '', t.text),
+      );
+      panel.append(card);
+    }
+  }
+  function renderProposal() {
+    const panel = $('#proposal-panel');
+    panel.replaceChildren();
+    const p = state.proposals?.[0];
+    panel.hidden = !p;
+    document.querySelector('[data-ai="evaluate"]').disabled = !!p;
+    if (!p) return;
+    panel.append(
+      el('h2', '', 'Proposed causes'),
+      el('p', '', `Append beneath: ${W.find({ content: p.base_content }, p.parent_id).node.text}`),
+      el('p', '', p.thought.text),
+    );
+    for (const c of p.children) panel.append(el('div', 'proposed-child', c.text));
+    const controls = el('div', 'dialog-actions');
+    for (const [decision, label] of [
+      ['reject', 'Reject proposed causes'],
+      ['accept', 'Accept proposed causes'],
+    ])
+      controls.append(
+        button(label, decision === 'accept' ? 'primary' : '', () =>
+          run(() => {
+            W.resolveProposal(state, decision);
+            refresh();
+          }),
+        ),
+      );
+    panel.append(controls);
+  }
+  function updateScope() {
+    if (requestedAction.id === 'evaluate') {
+      $('#ai-scope').textContent =
+        'Review the full tree. Only an assessment is added; causes and framing stay unchanged.';
+      return;
+    }
+    requestedAction.mode = $('input[name="expand-mode"]:checked').value;
+    const { node, parent } = W.find(state, requestedAction.target.id);
+    $('#ai-scope').textContent =
+      `Target: ${node.text}. Context: framing, ancestor chain and full tree. Propose new ${requestedAction.mode === 'deepen' ? 'children of this node' : 'siblings under: ' + (parent?.text || 'unavailable at root')}. Existing nodes and framing stay unchanged.`;
+  }
+  function openAI(action) {
+    try {
+      W.buildRequest(state, action);
+      requestedAction = action;
+      $('#ai-form').reset();
+      $('#ai-error').textContent = '';
+      $('#ai-title').textContent =
+        action.id === 'evaluate' ? 'Reflect on 5 Whys' : 'Expand causal hypotheses';
+      $('#mode-label').hidden = action.id !== 'expand';
+      if (action.id === 'expand') {
+        $('#deepen-option').checked = action.mode === 'deepen';
+        $('#branch-option').checked = action.mode === 'branch';
+        $('#branch-option').disabled = !W.find(state, action.target.id).parent;
+        $('#deepen-option').disabled = W.find(state, action.target.id).node.is_terminal;
+      }
+      updateScope();
+      $('#ai-dialog').showModal();
+    } catch (e) {
+      status(e.message, true);
+    }
+  }
+  function refresh() {
+    for (const field of W.framing)
+      $(`[data-framing="${field}"]`).value = state.content.framing[field];
+    renderTree();
+    renderThoughts();
+    renderProposal();
+  }
+  async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
+    try {
+      await navigator.clipboard.writeText(json);
+      $('#clipboard-fallback').hidden = true;
+      status(message);
+    } catch {
+      $('#clipboard-fallback').hidden = false;
+      $('#clipboard-json').value = json;
+      $('#clipboard-json').focus();
+      $('#clipboard-json').select();
+      status('Clipboard access blocked. Copy the selected JSON below.', true);
+    }
+  }
+  function view(framing) {
+    $('#framing-view').hidden = !framing;
+    $('#investigation-view').hidden = framing;
+    $('#framing-tab').setAttribute('aria-pressed', String(framing));
+    $('#investigation-tab').setAttribute('aria-pressed', String(!framing));
+  }
+  try {
+    // Native dialogs can briefly focus the document body at the end of a Tab cycle.
+    // Keep keyboard focus on visible controls within the current local dialog.
+    document.querySelectorAll('dialog').forEach((dialog) => {
+      dialog.addEventListener('keydown', (event) => {
+        if (event.key !== 'Tab') return;
+        const controls = [
+          ...dialog.querySelectorAll('button, input, textarea, select, [tabindex="0"]'),
+        ].filter((node) => !node.disabled && node.getClientRects().length);
+        const first = controls[0],
+          last = controls.at(-1);
+        if (!first) {
+          event.preventDefault();
+          return;
+        }
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+    });
+    state = W.parseState($('#canvas-state').textContent);
+    refresh();
+    for (const field of W.framing)
+      $(`[data-framing="${field}"]`).addEventListener('input', (e) =>
+        run(() => W.editFraming(state, field, e.target.value)),
+      );
+    document
+      .querySelector('[data-ai="evaluate"]')
+      .addEventListener('click', () => openAI({ id: 'evaluate' }));
+    document.querySelectorAll('input[name="expand-mode"]').forEach(input => input.addEventListener('change', updateScope));
+    $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());
+    $('#ai-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const request = W.buildRequest(state, {
+          ...requestedAction,
+          comment: $('#ai-guidance').value,
+          use_thoughts: $('#use-thoughts').checked,
+        });
+        $('#ai-dialog').close();
+        await copyJson(
+          JSON.stringify(request, null, 2),
+          'Copied AI request. Paste it into Codex or ChatGPT with the Pensive skill.',
+        );
+      } catch (err) {
+        $('#ai-error').textContent = err.message;
+      }
+    });
+    $('#framing-tab').addEventListener('click', () => view(true));
+    $('#investigation-tab').addEventListener('click', () => view(false));
+    $('#overview-open').addEventListener('click', () => {
+      renderOverview();
+      $('#overview-dialog').showModal();
+    });
+    $('#overview-close').addEventListener('click', () => $('#overview-dialog').close());
+    $('#overview-backdrop').addEventListener('click', () => $('#overview-dialog').close());
+    $('#copy').addEventListener('click', () =>
+      run(() => {
+        copyJson(JSON.stringify(W.validate(state), null, 2));
+      }),
+    );
+    $('#close-copy').addEventListener('click', () => {
+      $('#clipboard-fallback').hidden = true;
+      $('#copy').focus();
+    });
+    $('#save').addEventListener('click', () => {
+      try {
+        const url = URL.createObjectURL(
+            new Blob([W.packageHtml(source, state)], { type: 'text/html;charset=utf-8' }),
+          ),
+          link = el('a');
+        link.href = url;
+        link.download = 'pensive-five-whys.html';
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        status('HTML download started. Keep the downloaded file to preserve your work.');
+      } catch (e) {
+        status(e.message, true);
+      }
+    });
+    $('#import').addEventListener('click', () => {
+      $('#import-form').reset();
+      $('#import-error').textContent = '';
+      $('#import-dialog').showModal();
+    });
+    $('#cancel-import').addEventListener('click', () => $('#import-dialog').close());
+    $('#import-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      try {
+        const next = W.parseState($('#import-json').value);
+        if (!confirm('Replace the current canvas? Save or export first if you want to keep it.'))
+          return;
+        state = next;
+        $('#import-dialog').close();
+        refresh();
+        edited();
+      } catch (err) {
+        $('#import-error').textContent = err.message;
+      }
+    });
+  } catch (e) {
+    document.querySelectorAll('button,textarea,input').forEach((n) => (n.disabled = true));
+    status('Invalid canvas: ' + e.message + ' Embedded state has not been changed.', true);
+  }
+})();
+</script>
+</body></html>

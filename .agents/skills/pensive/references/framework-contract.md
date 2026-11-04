@@ -30,6 +30,14 @@ New initialization produces a reviewable draft without proposals or acceptance c
 The committed `canvas.html` is standalone. Separate source markup, styles, state operations, and UI runtime are assembled by the small SWOT-specific packaging script. No source file is loaded over the network when opening HTML.
 
 
+## Framework-specific fit
+
+Use the [internal and external fit guidance](framing-content.md) during creation and applicable evaluation/revision. Each framework owns its framing nodes, content relationships, fit criteria and appropriate reframing conditions. The shared principle does not authorize new fields, scores or actions.
+
 ## VPC specialization
 
-VPC keeps five framing strings and six content collections; see its [manifest](../frameworks/vpc/framework.yaml) and [handoff](vpc-workflow.md). The [framing–content contract](framing-content.md) supplies the lightweight creation/coherence principle specialized by VPC. This does not change existing SWOT/PAGES methods. VPC Evaluate is thought-only and Improve preserves framing. VPC proposals use the shared collection-level and bulk review protocol, specialized to its six content collections. Ripple, framing restatement and generic thinking tools remain deferred.
+VPC keeps five framing strings and six content collections; see its [manifest](../frameworks/vpc/framework.yaml) and [handoff](vpc-workflow.md). The [framing–content contract](framing-content.md) supplies the lightweight creation/coherence principle specialized by VPC. SWOT/PAGES apply the same distinction through their own methods, without adopting VPC criteria. VPC Evaluate is thought-only and Improve preserves framing. VPC proposals use the shared collection-level and bulk review protocol, specialized to its six content collections. Ripple, framing restatement and generic thinking tools remain deferred.
+
+## 5 Whys specialization
+
+[5 Whys](../frameworks/five_whys/framework.yaml) owns a recursive tree and four framing fields; [handoff](five-whys-workflow.md) defines its separate append-batch review. Navigation cursor is view state outside analytical content. Reflect is thought-only; Expand uses an explicit node target with Deepen/Branch mode, full-tree/framing context and a narrower deterministic append boundary. Do not map recursive branches onto the fixed collection-review protocol. Root generation, broad Improve/reframing, generic scope interfaces and individual-child acceptance are deferred.

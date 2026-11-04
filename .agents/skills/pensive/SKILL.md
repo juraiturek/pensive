@@ -1,21 +1,37 @@
 ---
 name: pensive
-description: Use for Pensive canvas requests, SWOT/TOWS, PAGES or Value Proposition Canvas (VPC) analysis, framework selection, analytical actions on supplied canvas JSON, or exploring the assumptions and structure of a limiting perspective.
+description: Use for Pensive canvas requests, SWOT/TOWS, PAGES, Value Proposition Canvas (VPC), or 5 Whys causal investigation, framework selection, analytical actions on supplied canvas JSON, or exploring the assumptions and structure of a limiting perspective.
 ---
 
 # Pensive
 
 ## Availability
 
-SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve requests, and manual SWOT/TOWS editing. PAGES supports creation, Evaluate/Improve/Ripple, five editable dimensions, JSON import/export and artifact-persisted Ripple baselines. VPC supports blank/context-based creation, Evaluate/Improve, six editable content collections and JSON import/export. Transformations use the full submitted state and return new standalone HTML; pages do not call AI. SWOT, PAGES and VPC support node-level and bulk acceptance/rejection; read [proposal review](references/proposal-review.md) when coordinating review. Bullet-level acceptance, Six Hats, research, revision history and other frameworks are unavailable. SWOT has no import UI; PAGES and VPC import pasted complete JSON.
+SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve requests, and manual SWOT/TOWS editing. PAGES supports creation, Evaluate/Improve/Ripple, five editable dimensions, JSON import/export and artifact-persisted Ripple baselines. VPC supports blank/context-based creation, Evaluate/Improve, six editable content collections and JSON import/export. 5 Whys supports blank/context creation, causal strand/side-door/full-tree navigation, manual branching/editing/deletion/closure, JSON import/export, Reflect (thought-only) and node-targeted Expand (Deepen/Branch) with atomic append-batch review. Transformations use the full submitted state and return new standalone HTML; pages do not call AI. SWOT, PAGES and VPC support node-level and bulk acceptance/rejection; read [proposal review](references/proposal-review.md) when coordinating review. Bullet-level acceptance, Six Hats, built-in research actions, revision history and other frameworks are unavailable. SWOT has no import UI; PAGES, VPC and 5 Whys import pasted complete JSON. 5 Whys can use explicitly requested conversational research with available tools.
+
+For context-based creation and existing-state analytical actions, read the shared [internal and external fit guidance](references/framing-content.md) with the selected framework method. Framework methodology and action boundaries remain authoritative; blank copying and JSON-only packaging need no analytical review.
 
 ## Select a framework without imposing one
 
-- Honor explicit framework choice. An explicit PAGES or VPC request needs no recommendation or permission step; distinguish blank, context-driven creation and actions on existing state.
+- Honor explicit framework choice. An explicit 5 Whys, PAGES or VPC request needs no recommendation or permission step; distinguish blank, context-driven creation and actions on existing state.
 - PAGES can help discover how a current perspective is composed, or shift a limiting lens: assumptions, interpretations, repeated conclusions, an impasse or an established viewpoint the user wants to question. Read its [semantics](frameworks/pages/framework.yaml). These are contextual opportunities, not automatic triggers.
 - When only implicitly relevant, normally offer it once as an option with a brief concrete reason: “We could map the parts, actions, goals, events and self-concepts behind this view, then test what changes when one premise shifts.” Wait for the user's choice before creating a canvas. Respect a decline; do not suggest it again unless the user reopens it or the situation materially changes.
 - VPC examines one customer segment’s jobs, pains and gains against an offering’s products/services, pain relievers and gain creators. Use it for customer needs, offering design or uncertain customer–offering fit; read its [semantics](frameworks/vpc/framework.yaml). When only implicitly useful, offer it selectively with a concrete reason and wait for the user’s choice. Respect a decline; ordinary product questions do not automatically require a canvas.
-- Ordinary uncertainty, disagreement or a simple factual/logistical question usually needs ordinary conversation. Do not turn every difficulty into PAGES. SWOT/TOWS fits strategic internal/external assessment and options; PAGES fits the structure of a perspective; VPC fits the relationship between customer needs and an offering. Ask a brief purpose question only if the choice materially affects usefulness.
+- 5 Whys investigates recurring problems, failures or unexpected effects through alternative causal explanations. Read its [semantics](frameworks/five_whys/framework.yaml). Offer it selectively when moving beyond symptoms would help; wait for the user’s choice when only implicitly relevant. Respect a decline. It investigates possible causes rather than guaranteeing a root cause or exactly five levels.
+- Ordinary uncertainty, disagreement or a simple factual/logistical question usually needs ordinary conversation. Do not turn every difficulty into PAGES. SWOT/TOWS fits strategic internal/external assessment and options; PAGES fits the structure of a perspective; VPC fits the relationship between customer needs and an offering; 5 Whys fits causal investigation of an observed problem. Ask a brief purpose question only if the choice materially affects usefulness.
+
+## Create, package or investigate 5 Whys
+
+Read [5 Whys framework](frameworks/five_whys/framework.yaml) and [handoff](references/five-whys-workflow.md). Preserve the established [tree interface](frameworks/five_whys/canvas.html), including the active strand, sibling side doors and full-tree overview.
+
+- Blank: copy the established empty canvas exclusively to a new output path.
+- Context draft: follow [Create](frameworks/five_whys/prompts/create.md). Extract framing first, clarify essential gaps adaptively, generate supported causes and check internal causal coherence separately from external framing fit. No five-question wizard, required depth or invented evidence.
+- Complete JSON: `node scripts/package-five-whys.mjs state.json new-output.html` from the skill directory.
+- Existing state: validate complete `{canvas,action}` and load only [Reflect/Evaluate](frameworks/five_whys/prompts/evaluate.md) or [Expand/Hypothesize](frameworks/five_whys/prompts/expand.md). Reflect adds an assessment only. Expand requires an explicit node ID and `deepen` or `branch` mode; wider context never authorizes wider mutation. Use `--result` packaging. Resolve pending proposals first.
+- Expand proposes new direct children of the target (Deepen) or its parent (Branch). Review accepts/rejects the whole append batch; existing collection/bullet resolution does not apply. Root has no Branch mode. Closure/countermeasures do not prove causation.
+- Research is an explicit conversational follow-up when useful, with available authorized tools; never automatic during editing. General sources inform hypotheses, not proof of the local chain. Framing changes, standalone root generation, generic Improve, history, explicit collapse and reparent/reorder controls are unavailable.
+
+Return a new standalone HTML link. Import validates complete destination state and confirms replacement; Export copies complete JSON; Save to File preserves the editable artifact and pending review. Changes stay in the tab until exported.
 
 ## Create, package or transform VPC
 

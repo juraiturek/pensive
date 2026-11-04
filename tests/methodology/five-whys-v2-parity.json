@@ -1,0 +1,518 @@
+[
+  {
+    "name": "blank",
+    "tree": {
+      "id": "root",
+      "text": "",
+      "children": [],
+      "is_terminal": false,
+      "output": null
+    },
+    "cursor": [
+      "root"
+    ],
+    "strand": [
+      {
+        "id": "root",
+        "text": "",
+        "raw_text": "",
+        "depth": 0,
+        "is_root": true,
+        "is_terminal": false,
+        "output": "",
+        "can_add_child": true,
+        "show_trifurcation_hint": false,
+        "can_mark_terminal": false,
+        "can_unmark_terminal": false,
+        "can_edit_text": true,
+        "side_doors": [],
+        "is_cursor_tip": true,
+        "role_label": "Problem Statement",
+        "show_vertical_connector_below": true,
+        "show_horizontal_door_line": false
+      }
+    ],
+    "overview": {
+      "enabled": true,
+      "levels": [
+        [
+          {
+            "id": "root",
+            "text": "No text yet.",
+            "full_text": "No text yet.",
+            "output_text": "",
+            "depth": 0,
+            "x": 122.0,
+            "y": 52,
+            "is_root": true,
+            "is_terminal": false,
+            "is_unresolved_leaf": true,
+            "is_active_strand": true,
+            "is_cursor_tip": true,
+            "state": "leaf-unresolved",
+            "role_label": "Problem Statement"
+          }
+        ]
+      ],
+      "edges": [],
+      "active_strand_ids": [
+        "root"
+      ],
+      "cursor_tip_id": "root",
+      "output_label": "Countermeasure",
+      "layout": {
+        "board_width": 960,
+        "board_height": 320,
+        "svg_width": 960,
+        "svg_height": 320,
+        "card_width": 196,
+        "card_height": 86
+      }
+    },
+    "navigation": {
+      "root": [
+        "root"
+      ]
+    }
+  },
+  {
+    "name": "branching",
+    "tree": {
+      "id": "root",
+      "text": "Observed: invoices arrive late",
+      "children": [
+        {
+          "id": "queue",
+          "text": "Hypothesis: dispatch queue",
+          "children": [
+            {
+              "id": "batch",
+              "text": "Hypothesis: batch processing",
+              "children": [],
+              "is_terminal": false,
+              "output": null
+            }
+          ],
+          "is_terminal": false,
+          "output": null
+        },
+        {
+          "id": "transport",
+          "text": "Hypothesis: transport delay",
+          "children": [],
+          "is_terminal": false,
+          "output": null
+        }
+      ],
+      "is_terminal": false,
+      "output": null
+    },
+    "cursor": [
+      "root",
+      "queue",
+      "batch"
+    ],
+    "strand": [
+      {
+        "id": "root",
+        "text": "Observed: invoices arrive late",
+        "raw_text": "Observed: invoices arrive late",
+        "depth": 0,
+        "is_root": true,
+        "is_terminal": false,
+        "output": "",
+        "can_add_child": true,
+        "show_trifurcation_hint": false,
+        "can_mark_terminal": false,
+        "can_unmark_terminal": false,
+        "can_edit_text": false,
+        "side_doors": [],
+        "is_cursor_tip": false,
+        "role_label": "Problem Statement",
+        "show_vertical_connector_below": true,
+        "show_horizontal_door_line": false
+      },
+      {
+        "id": "queue",
+        "text": "Hypothesis: dispatch queue",
+        "raw_text": "Hypothesis: dispatch queue",
+        "depth": 1,
+        "is_root": false,
+        "is_terminal": false,
+        "output": "",
+        "can_add_child": true,
+        "show_trifurcation_hint": false,
+        "can_mark_terminal": false,
+        "can_unmark_terminal": false,
+        "can_edit_text": true,
+        "side_doors": [
+          {
+            "target_node_id": "transport",
+            "label": "Hypothesis: transport delay",
+            "full_text": "Hypothesis: transport delay"
+          }
+        ],
+        "is_cursor_tip": false,
+        "role_label": "Cause",
+        "show_vertical_connector_below": true,
+        "show_horizontal_door_line": true
+      },
+      {
+        "id": "batch",
+        "text": "Hypothesis: batch processing",
+        "raw_text": "Hypothesis: batch processing",
+        "depth": 2,
+        "is_root": false,
+        "is_terminal": false,
+        "output": "",
+        "can_add_child": true,
+        "show_trifurcation_hint": false,
+        "can_mark_terminal": true,
+        "can_unmark_terminal": false,
+        "can_edit_text": true,
+        "side_doors": [],
+        "is_cursor_tip": true,
+        "role_label": "Cause",
+        "show_vertical_connector_below": true,
+        "show_horizontal_door_line": false
+      }
+    ],
+    "overview": {
+      "enabled": true,
+      "levels": [
+        [
+          {
+            "id": "root",
+            "text": "Observed: invoices arrive late",
+            "full_text": "Observed: invoices arrive late",
+            "output_text": "",
+            "depth": 0,
+            "x": 236.0,
+            "y": 52,
+            "is_root": true,
+            "is_terminal": false,
+            "is_unresolved_leaf": false,
+            "is_active_strand": true,
+            "is_cursor_tip": false,
+            "state": "active",
+            "role_label": "Problem Statement"
+          }
+        ],
+        [
+          {
+            "id": "queue",
+            "text": "Hypothesis: dispatch queue",
+            "full_text": "Hypothesis: dispatch queue",
+            "output_text": "",
+            "depth": 1,
+            "x": 122.0,
+            "y": 200,
+            "is_root": false,
+            "is_terminal": false,
+            "is_unresolved_leaf": false,
+            "is_active_strand": true,
+            "is_cursor_tip": false,
+            "state": "active",
+            "role_label": "Cause"
+          },
+          {
+            "id": "transport",
+            "text": "Hypothesis: transport delay",
+            "full_text": "Hypothesis: transport delay",
+            "output_text": "",
+            "depth": 1,
+            "x": 350.0,
+            "y": 200,
+            "is_root": false,
+            "is_terminal": false,
+            "is_unresolved_leaf": true,
+            "is_active_strand": false,
+            "is_cursor_tip": false,
+            "state": "leaf-unresolved",
+            "role_label": "Cause"
+          }
+        ],
+        [
+          {
+            "id": "batch",
+            "text": "Hypothesis: batch processing",
+            "full_text": "Hypothesis: batch processing",
+            "output_text": "",
+            "depth": 2,
+            "x": 122.0,
+            "y": 348,
+            "is_root": false,
+            "is_terminal": false,
+            "is_unresolved_leaf": true,
+            "is_active_strand": true,
+            "is_cursor_tip": true,
+            "state": "leaf-unresolved",
+            "role_label": "Cause"
+          }
+        ]
+      ],
+      "edges": [
+        {
+          "parent_id": "root",
+          "child_id": "queue",
+          "path": "M 236.00 95.00 L 236.00 126.00 L 122.00 126.00 L 122.00 157.00"
+        },
+        {
+          "parent_id": "queue",
+          "child_id": "batch",
+          "path": "M 122.00 243.00 L 122.00 274.00 L 122.00 274.00 L 122.00 305.00"
+        },
+        {
+          "parent_id": "root",
+          "child_id": "transport",
+          "path": "M 236.00 95.00 L 236.00 126.00 L 350.00 126.00 L 350.00 157.00"
+        }
+      ],
+      "active_strand_ids": [
+        "root",
+        "queue",
+        "batch"
+      ],
+      "cursor_tip_id": "batch",
+      "output_label": "Countermeasure",
+      "layout": {
+        "board_width": 960,
+        "board_height": 548,
+        "svg_width": 960,
+        "svg_height": 548,
+        "card_width": 196,
+        "card_height": 86
+      }
+    },
+    "navigation": {
+      "root": [
+        "root",
+        "queue",
+        "batch"
+      ],
+      "queue": [
+        "root",
+        "queue",
+        "batch"
+      ],
+      "transport": [
+        "root",
+        "transport"
+      ],
+      "batch": [
+        "root",
+        "queue",
+        "batch"
+      ]
+    }
+  },
+  {
+    "name": "closed",
+    "tree": {
+      "id": "root",
+      "text": "Observed: service interruption",
+      "children": [
+        {
+          "id": "overload",
+          "text": "Hypothesis: load exceeds capacity",
+          "children": [],
+          "is_terminal": true,
+          "output": "Test a staged capacity adjustment"
+        },
+        {
+          "id": "restart",
+          "text": "Hypothesis: restart failure",
+          "children": [
+            {
+              "id": "config",
+              "text": "Hypothesis: stale configuration",
+              "children": [],
+              "is_terminal": false,
+              "output": null
+            }
+          ],
+          "is_terminal": false,
+          "output": null
+        }
+      ],
+      "is_terminal": false,
+      "output": null
+    },
+    "cursor": [
+      "root",
+      "overload"
+    ],
+    "strand": [
+      {
+        "id": "root",
+        "text": "Observed: service interruption",
+        "raw_text": "Observed: service interruption",
+        "depth": 0,
+        "is_root": true,
+        "is_terminal": false,
+        "output": "",
+        "can_add_child": true,
+        "show_trifurcation_hint": false,
+        "can_mark_terminal": false,
+        "can_unmark_terminal": false,
+        "can_edit_text": false,
+        "side_doors": [],
+        "is_cursor_tip": false,
+        "role_label": "Problem Statement",
+        "show_vertical_connector_below": true,
+        "show_horizontal_door_line": false
+      },
+      {
+        "id": "overload",
+        "text": "Hypothesis: load exceeds capacity",
+        "raw_text": "Hypothesis: load exceeds capacity",
+        "depth": 1,
+        "is_root": false,
+        "is_terminal": true,
+        "output": "Test a staged capacity adjustment",
+        "can_add_child": false,
+        "show_trifurcation_hint": false,
+        "can_mark_terminal": false,
+        "can_unmark_terminal": true,
+        "can_edit_text": true,
+        "side_doors": [
+          {
+            "target_node_id": "restart",
+            "label": "Hypothesis: restart failure",
+            "full_text": "Hypothesis: restart failure"
+          }
+        ],
+        "is_cursor_tip": true,
+        "role_label": "Root Cause",
+        "show_vertical_connector_below": false,
+        "show_horizontal_door_line": true
+      }
+    ],
+    "overview": {
+      "enabled": true,
+      "levels": [
+        [
+          {
+            "id": "root",
+            "text": "Observed: service interruption",
+            "full_text": "Observed: service interruption",
+            "output_text": "",
+            "depth": 0,
+            "x": 236.0,
+            "y": 52,
+            "is_root": true,
+            "is_terminal": false,
+            "is_unresolved_leaf": false,
+            "is_active_strand": true,
+            "is_cursor_tip": false,
+            "state": "active",
+            "role_label": "Problem Statement"
+          }
+        ],
+        [
+          {
+            "id": "overload",
+            "text": "Hypothesis: load exceeds capacity",
+            "full_text": "Hypothesis: load exceeds capacity",
+            "output_text": "Test a staged capacity adjustment",
+            "depth": 1,
+            "x": 122.0,
+            "y": 200,
+            "is_root": false,
+            "is_terminal": true,
+            "is_unresolved_leaf": false,
+            "is_active_strand": true,
+            "is_cursor_tip": true,
+            "state": "terminal",
+            "role_label": "Root Cause"
+          },
+          {
+            "id": "restart",
+            "text": "Hypothesis: restart failure",
+            "full_text": "Hypothesis: restart failure",
+            "output_text": "",
+            "depth": 1,
+            "x": 350.0,
+            "y": 200,
+            "is_root": false,
+            "is_terminal": false,
+            "is_unresolved_leaf": false,
+            "is_active_strand": false,
+            "is_cursor_tip": false,
+            "state": "standard",
+            "role_label": "Cause"
+          }
+        ],
+        [
+          {
+            "id": "config",
+            "text": "Hypothesis: stale configuration",
+            "full_text": "Hypothesis: stale configuration",
+            "output_text": "",
+            "depth": 2,
+            "x": 350.0,
+            "y": 348,
+            "is_root": false,
+            "is_terminal": false,
+            "is_unresolved_leaf": true,
+            "is_active_strand": false,
+            "is_cursor_tip": false,
+            "state": "leaf-unresolved",
+            "role_label": "Cause"
+          }
+        ]
+      ],
+      "edges": [
+        {
+          "parent_id": "root",
+          "child_id": "overload",
+          "path": "M 236.00 95.00 L 236.00 126.00 L 122.00 126.00 L 122.00 157.00"
+        },
+        {
+          "parent_id": "root",
+          "child_id": "restart",
+          "path": "M 236.00 95.00 L 236.00 126.00 L 350.00 126.00 L 350.00 157.00"
+        },
+        {
+          "parent_id": "restart",
+          "child_id": "config",
+          "path": "M 350.00 243.00 L 350.00 274.00 L 350.00 274.00 L 350.00 305.00"
+        }
+      ],
+      "active_strand_ids": [
+        "root",
+        "overload"
+      ],
+      "cursor_tip_id": "overload",
+      "output_label": "Countermeasure",
+      "layout": {
+        "board_width": 960,
+        "board_height": 548,
+        "svg_width": 960,
+        "svg_height": 548,
+        "card_width": 196,
+        "card_height": 86
+      }
+    },
+    "navigation": {
+      "root": [
+        "root",
+        "overload"
+      ],
+      "overload": [
+        "root",
+        "overload"
+      ],
+      "restart": [
+        "root",
+        "restart",
+        "config"
+      ],
+      "config": [
+        "root",
+        "restart",
+        "config"
+      ]
+    }
+  }
+]

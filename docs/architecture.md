@@ -29,6 +29,21 @@ Framework-specific JSON is authoritative within a small envelope. Preserve teste
 
 Contracts are maintained once in [framework-contract.md](../.agents/skills/pensive/references/framework-contract.md) and [state-action-contract.md](../.agents/skills/pensive/references/state-action-contract.md). Operational details are in [canvas-workflow.md](../.agents/skills/pensive/references/canvas-workflow.md).
 
+## Internal and external analytical fit
+
+Analytical quality concerns both relationships within a framework and the relationship between its content and framing. These are distinct concerns, relevant during both creation and evaluation; neither is a universal consistency test.
+
+- **Internal fit** concerns relationships among analytical content nodes: alignment, complementarity, causal/logical links, contradictions, tensions, and meaningful completeness or balance where the methodology warrants them. Each framework defines its own criteria. Harmony, symmetry and agreement are not universal goals; exposing tension can be the useful result.
+- **External fit (framing–content fit)** concerns how content relates to the focal entity, perspective, objective, scope and boundaries established by that framework's framing. Creation follows conversation context → framing extraction → framing clarification if needed → methodological content generation → fit review. Subsequent review is bidirectional: content may drift, framing may be incomplete, or a credible discovery may warrant reframing. Recommend content adjustment, framing reconsideration or further investigation as appropriate; never automatically declare the content wrong.
+
+The operational [framing–content guidance](../.agents/skills/pensive/references/framing-content.md) is shared; framework methods remain authoritative about relevant fields, relationships, criteria and conditions for reframing. SWOT's internal/external *factor classification* is separate from these two types of fit. PAGES deliberate perspective shifts can be productive, even when they expose a need to reconsider framing. Existing framing-preserving actions diagnose that need without applying a framing change.
+
+Neither fit automatically becomes a numerical score. Preserve the possibility of framework-specific evaluation without a generic fit engine, mandatory fields, dependency graph or universal review template. Reviews should surface consequential analytical tensions rather than reward superficial consistency. This principle guides future extractions and AI actions; it does not expand action permissions.
+
+### Qualitative visualization opportunities
+
+Existing evaluation thoughts are sufficient for this refinement. SWOT/TOWS could eventually highlight a strategy's unsupported factor link or objective mismatch; PAGES could explain which changed premise implies a consequence and when the situation/purpose needs reconsideration; VPC may benefit from specific customer–offering relationship or scope-mismatch cues. Such cues must explain their evidence and distinguish hypothesis, tension and drift. A textual review may remain more useful than a dedicated visual element. No immediate visual requirement justifies changing the canvases; persistent indicators would require separate decisions about user edits, freshness and review semantics. No universal dashboard, arbitrary score or persistent fit status is introduced.
+
 ## Legacy extraction policy
 
 V1 and V2 remain read-only libraries. For every authorized slice:
@@ -109,3 +124,13 @@ The approved initial sequence is core/creation → Evaluate → Improve. Evaluat
 ## VPC review harmonization — user authorization, 2026-11-03
 
 The user explicitly extended VPC review to match SWOT/PAGES. This supersedes the initial whole-canvas-only restriction: reuse the shared collection resolver and UI for per-collection Accept/Reject, selection and bulk decisions, persisted resolutions, stale-edit checks and labeled mixed-result rationale. Existing proposals without resolutions remain valid. Framing stays fixed; bullet acceptance, Ripple, Restate and generic thinking tools remain deferred. No existing framework implementation changes are required.
+
+## 5 Whys — approved fourth framework
+
+The user approved the [5 Whys extraction design](plans/2026-11-03-five-whys-phase-a-review.md): core/creation → Reflect → Expand Deepen → Expand Branch. See [extraction provenance](extraction-map.md). The framework preserves V2's active strand, sibling side doors and scrollable full-tree overview rather than adopting a matrix or generic node editor. Focused V2 CSS is reused; Python path/layout/state helpers are ported to framework-local JavaScript. Static HTML needs no backend, HTMX, Alpine or graph dependency.
+
+State retains nested causal nodes and four framing fields, with navigation `cursor` outside analytical `content`. Root edits lock while children exist. Branches may exceed three causes and five levels. Confirmed deletion repairs navigation; branch closure requires a countermeasure but proves no causal claim. Explicit collapse, drag/reparent/reorder and history are absent, consistent with the approved scope.
+
+Reflect appends a qualitative evaluation thought only. Expand has an explicit node target and mode: Deepen proposes immediate children of the selected condition; Branch proposes siblings under its parent. The full tree/framing/ancestor chain is context, without granting whole-canvas mutation. The composer accepts only new child text, allocates identities and constructs a framework-local append-batch proposal. Accepted content remains untouched until explicit atomic acceptance. Full analytical content is the stale guard; cursor-only navigation is allowed. Existing collection review is unchanged and not generalized to trees. Empty expansion results append rationale only. Root generation as a standalone action, generic Improve/reframing and new action engines remain deferred.
+
+Creation extracts framing before supported causes and reviews internal causal coherence separately from external framing fit. Observations/reports/hypotheses remain explicit in readable text; no numeric confidence/evidence model is introduced. Research is an authorized conversational follow-up using available tools, not a built-in runtime mode or pipeline. General evidence informs hypotheses without establishing the local chain.

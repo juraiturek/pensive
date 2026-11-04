@@ -1,0 +1,59 @@
+{
+  "audit_date": "2026-11-03",
+  "source_root": "/Users/juraj/Code/Codex workspace/pensive-v2",
+  "head": "a75617205cf342ebe851379ab43db52e35a07a5e",
+  "files": [
+    {
+      "path": "app/frameworks/registry.py",
+      "sha256": "f6bfe38cc987fba62cee8e949a2fa44ef75fc94614141349985495cd4204910d"
+    },
+    {
+      "path": "app/services/canvas_service.py",
+      "sha256": "7cbc35199ad290554abc7317bc8092b659a8164d19b7b0d80470d9973a9d292a"
+    },
+    {
+      "path": "app/services/canvas_ai_service.py",
+      "sha256": "3b5d2f72f0e8b8e91cd1fb68a1c220d2357a16c698f66691820841e858d3e728"
+    },
+    {
+      "path": "app/routes/canvas_pages.py",
+      "sha256": "d1988026ee0fb7f3ab47209574620ffe429b6be6744507068b628dcade3fb192"
+    },
+    {
+      "path": "templates/partials/canvas_tree_strand.html",
+      "sha256": "4d8a61e9bef419bde8d8dc4d85a917a297005e71ccf87920709206abb78ee7c9"
+    },
+    {
+      "path": "templates/partials/canvas_tree_overview_overlay.html",
+      "sha256": "67217a0a4b2642924c2f5617dab3283d33f6c77b2f5a40e46cc936e97452e62b"
+    },
+    {
+      "path": "templates/partials/canvas_detail_body.html",
+      "sha256": "d54c90b3e6bf36a550b3949b159e30775ecfdbe5e0f3fd814c29280283e8bbab"
+    },
+    {
+      "path": "static/css/pensive.css",
+      "sha256": "ad612bdae96b4f31ad02a1edf7f050802a2fac88216c560851df453d738139da"
+    },
+    {
+      "path": "prompt_templates/rules.json",
+      "sha256": "52cfa844d8aee65b0965696b5047e03b1e7e56a35634593d5c687d4207ae206f"
+    },
+    {
+      "path": "prompt_templates/system/generate_problem_statement_base.j2",
+      "sha256": "8b6276aaa9c2ad0d736a7edf576411e62429ac83a82c6982fdf01e9aa9878198"
+    },
+    {
+      "path": "prompt_templates/user/five_whys_generate_problem_statement.j2",
+      "sha256": "502968a11e5800a6c1e7f341032b6cd3e7aed2461d7862eadf6a428e7fd0143d"
+    },
+    {
+      "path": "tests/views/test_canvas_pages.py",
+      "sha256": "5f565a8512542c78ceee042d2429545d5a7115558746dc9f5779683a64702fc5"
+    },
+    {
+      "path": "docs/reports/session-2026-03-05-five-whys-framing-and-editing.md",
+      "sha256": "c4bcc4af8ebcbde6cfad15ad2ae4281569f73e68f620c80ac1a583e6ce509a58"
+    }
+  ]
+}

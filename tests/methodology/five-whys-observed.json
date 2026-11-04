@@ -1,0 +1,448 @@
+{
+  "observation_type": "Implementation-author synthetic walkthroughs using the implemented Markdown methods; reference examples, not independent model sampling or live-user evidence.",
+  "creation": [
+    {
+      "name": "rich-context",
+      "input": "Use 5 Whys. Three of ten orders arrived one day late last week. Orders should arrive on the promised day. The operations lead owns investigation. We do not have dispatch timestamps or carrier logs yet. Either dispatch or transit might be responsible.",
+      "output": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: three of ten orders arrived one day late last week.",
+            "expected_condition": "Orders arrive on the promised day.",
+            "system_or_process": "Order dispatch and delivery for last week’s ten orders.",
+            "investigation_owner": "Operations lead"
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: three of ten orders arrived one day late last week.",
+            "children": [
+              {
+                "id": "cause_e27f62ee-1410-4378-a3b2-0a1b9240d1ce",
+                "text": "Hypothesis: dispatch was late enough to miss the carrier cut-off; check order-level dispatch times.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              },
+              {
+                "id": "cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19",
+                "text": "Hypothesis: carrier transit took longer than planned; compare dispatch-to-delivery intervals.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              }
+            ],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root",
+          "cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19"
+        ]
+      },
+      "notes": "Framing extracted first; both causal branches explicitly hypothetical; no invented deep causes or terminal verdict."
+    },
+    {
+      "name": "adaptive-sparse",
+      "turns": [
+        {
+          "user": "Help investigate why this keeps happening.",
+          "assistant": "What recurring effect did you observe, and in which process?"
+        },
+        {
+          "user": "Invoices are sent late, but I do not know the timing.",
+          "assistant": "We can start a sparse billing-dispatch investigation with that reported effect and leave causes empty until we have timestamps. Shall I create that draft?"
+        },
+        {
+          "user": "Yes, create the sparse draft."
+        }
+      ],
+      "output": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: invoices are sent late.",
+            "expected_condition": "",
+            "system_or_process": "Billing dispatch; timeframe and mechanism remain unknown.",
+            "investigation_owner": ""
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: invoices are sent late.",
+            "children": [],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root"
+        ]
+      },
+      "notes": "Two focused question turns including explicit sparse agreement; no five-step wizard."
+    }
+  ],
+  "routing": [
+    {
+      "input": "Open an empty 5 Whys canvas.",
+      "decision": "Copy established blank HTML; no elicitation."
+    },
+    {
+      "input": "Our dispatch failures keep recurring. Can we explore what causes them?",
+      "decision": "Offer 5 Whys as an optional causal investigation; wait before creating if not explicitly chosen."
+    },
+    {
+      "input": "No canvas please. Help draft the incident email.",
+      "decision": "Respect decline and continue the requested conversation."
+    },
+    {
+      "input": "Compare our offering with customer jobs and pains.",
+      "decision": "VPC is the relevant framework; do not impose 5 Whys."
+    }
+  ],
+  "research": {
+    "input": "Would research on batch scheduling help?",
+    "decision": "Offer a bounded conversational lookup. If authorized, use available tools and cite actual sources; general scheduling mechanisms suggest hypotheses and tests, not proof of this dispatch chain. No research was executed in these walkthroughs."
+  },
+  "cases": [
+    {
+      "name": "competing-causes",
+      "input": "Use 5 Whys. Three of ten orders arrived one day late last week. Orders should arrive on the promised day. The operations lead owns investigation. We do not have dispatch timestamps or carrier logs yet. Either dispatch or transit might be responsible.",
+      "canvas": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: three of ten orders arrived one day late last week.",
+            "expected_condition": "Orders arrive on the promised day.",
+            "system_or_process": "Order dispatch and delivery for last week’s ten orders.",
+            "investigation_owner": "Operations lead"
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: three of ten orders arrived one day late last week.",
+            "children": [
+              {
+                "id": "cause_e27f62ee-1410-4378-a3b2-0a1b9240d1ce",
+                "text": "Hypothesis: dispatch was late enough to miss the carrier cut-off; check order-level dispatch times.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              },
+              {
+                "id": "cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19",
+                "text": "Hypothesis: carrier transit took longer than planned; compare dispatch-to-delivery intervals.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              }
+            ],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root",
+          "cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19"
+        ]
+      },
+      "action": {
+        "id": "evaluate"
+      },
+      "response": {
+        "thought": "The dispatch hypothesis (cause_e27f62ee-1410-4378-a3b2-0a1b9240d1ce) and transit hypothesis (cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19) are both plausible but unverified. They may compete for some orders or contribute together. Obtain order-level promised, dispatched and delivered timestamps plus carrier cut-offs: a missed dispatch cut-off supports the first link; a normal dispatch followed by an unusually long transit supports the second. Compare late and on-time orders before favoring either. Both branches fit the dispatch/delivery framing. No root cause is established."
+      }
+    },
+    {
+      "name": "unsupported-attractive-story",
+      "input": "The tree says our releases are late because the team is lazy and does not care. We have no supporting observations.",
+      "canvas": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: weekly releases repeatedly miss their planned date.",
+            "expected_condition": "",
+            "system_or_process": "Release process for the last four weeks.",
+            "investigation_owner": ""
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: weekly releases repeatedly miss their planned date.",
+            "children": [
+              {
+                "id": "cause_c13c369b-f547-4b52-b7ce-bee87d25cda2",
+                "text": "Hypothesis: the team is lazy.",
+                "children": [
+                  {
+                    "id": "cause_20a68a4e-a6d8-410a-b21a-ec9c7bdf2ae5",
+                    "text": "Hypothesis: they do not care.",
+                    "children": [],
+                    "is_terminal": false,
+                    "output": null
+                  }
+                ],
+                "is_terminal": false,
+                "output": null
+              }
+            ],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root",
+          "cause_c13c369b-f547-4b52-b7ce-bee87d25cda2",
+          "cause_20a68a4e-a6d8-410a-b21a-ec9c7bdf2ae5"
+        ]
+      },
+      "action": {
+        "id": "evaluate"
+      },
+      "response": {
+        "thought": "The blame-based explanations are unsupported interpretations, not observed mechanisms. “Does not care” restates the presumed attitude rather than directly explaining a missed release. Neither timing nor evidence shows how the attitude produced a delay. Inspect the last four releases for review queues, unplanned work, dependency waits and failed checks, without presuming any of them occurred. Compare the timeline of a late release with an on-time one. Keep the observed release gap as framing; investigate process conditions before assigning responsibility."
+      }
+    },
+    {
+      "name": "credible-outside-framing",
+      "input": "Review this Monday service-deployment tree. The procurement hypothesis may be credible, but nobody has linked a delayed purchase to this restart.",
+      "canvas": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: one service had two restarts during the Monday deployment.",
+            "expected_condition": "",
+            "system_or_process": "Deployment and runtime process for service A on Monday.",
+            "investigation_owner": ""
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: one service had two restarts during the Monday deployment.",
+            "children": [
+              {
+                "id": "cause_bddd4e15-e4c9-4ebb-a085-0f327fc3a6bc",
+                "text": "Hypothesis: organization-wide quarterly procurement approval delays prevent replacement hardware.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              }
+            ],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root",
+          "cause_bddd4e15-e4c9-4ebb-a085-0f327fc3a6bc"
+        ]
+      },
+      "action": {
+        "id": "evaluate"
+      },
+      "response": {
+        "thought": "The procurement branch crosses from one Monday deployment/runtime incident into an organization-wide quarterly process. That is an external-fit tension, not automatic proof the branch is wrong. Internally, the link skips several steps: what component failed, whether replacement was necessary, and whether a purchase delay prevented it. Check incident logs and the specific blocked purchase. If those establish a relevant mechanism, propose broadening framing with the user; otherwise retain it as a qualified possibility or investigate a more direct cause. Do not silently rewrite scope or delete a credible discovery."
+      }
+    },
+    {
+      "name": "suspected-root-needs-test",
+      "input": "We suspect lubrication is the root cause of pump P2 stopping. No samples or traces have been checked.",
+      "canvas": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: pump P2 stopped twice during the morning shift.",
+            "expected_condition": "",
+            "system_or_process": "Pump P2 and upstream feed during today’s morning shift.",
+            "investigation_owner": ""
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: pump P2 stopped twice during the morning shift.",
+            "children": [
+              {
+                "id": "cause_4488538b-424d-4161-ad8a-29e2d4bb7856",
+                "text": "Hypothesis: inadequate lubrication caused bearing friction; no lubricant sample or temperature trace has been inspected.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              }
+            ],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root",
+          "cause_4488538b-424d-4161-ad8a-29e2d4bb7856"
+        ]
+      },
+      "action": {
+        "id": "evaluate"
+      },
+      "response": {
+        "thought": "Inadequate lubrication is a plausible mechanism for friction, but no local sample, bearing inspection or temperature sequence establishes it here. First confirm which condition triggered the stop and whether evidence of friction preceded it. Compare lubrication condition and load before each stop; consider feed or protection-system explanations if supported. Actionability does not prove causation. Keep the branch open and describe lubrication as a hypothesis until discriminating evidence is available; do not declare it the root cause."
+      }
+    },
+    {
+      "name": "insufficient-evidence-deepen",
+      "input": "What causes late invoices? We have only the symptom and do not know when the delay occurs.",
+      "canvas": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: invoices are sent late.",
+            "expected_condition": "",
+            "system_or_process": "Billing dispatch; timeframe and mechanism remain unknown.",
+            "investigation_owner": ""
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: invoices are sent late.",
+            "children": [],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root"
+        ]
+      },
+      "action": {
+        "id": "expand",
+        "target": {
+          "type": "node",
+          "id": "root"
+        },
+        "mode": "deepen"
+      },
+      "response": {
+        "thought": "There is not enough information to add a useful direct cause. Compare completion, approval, dispatch and receipt timestamps for one late invoice and one on-time invoice. That identifies which interval needs investigation without fabricating a deep causal chain.",
+        "children": []
+      }
+    },
+    {
+      "name": "deepen-selected-branch",
+      "input": "Explore possible direct causes of the dispatch-delay hypothesis, not transit. No queue records are available.",
+      "canvas": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: three of ten orders arrived one day late last week.",
+            "expected_condition": "Orders arrive on the promised day.",
+            "system_or_process": "Order dispatch and delivery for last week’s ten orders.",
+            "investigation_owner": "Operations lead"
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: three of ten orders arrived one day late last week.",
+            "children": [
+              {
+                "id": "cause_e27f62ee-1410-4378-a3b2-0a1b9240d1ce",
+                "text": "Hypothesis: dispatch was late enough to miss the carrier cut-off; check order-level dispatch times.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              },
+              {
+                "id": "cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19",
+                "text": "Hypothesis: carrier transit took longer than planned; compare dispatch-to-delivery intervals.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              }
+            ],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root",
+          "cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19"
+        ]
+      },
+      "action": {
+        "id": "expand",
+        "target": {
+          "type": "node",
+          "id": "cause_e27f62ee-1410-4378-a3b2-0a1b9240d1ce"
+        },
+        "mode": "deepen"
+      },
+      "response": {
+        "thought": "The selected condition is late dispatch; both proposed mechanisms are hypotheses, not queue findings. They may contribute together. Check arrival and service times and release schedule before accepting them. They fit the order dispatch boundary; the carrier branch is preserved.",
+        "children": [
+          {
+            "text": "Hypothesis: orders waited for a scheduled batch release that occurred after the carrier cut-off; compare release and cut-off times."
+          },
+          {
+            "text": "Hypothesis: work arriving before cut-off exceeded available dispatch capacity, leaving orders queued; compare arrival rate, processing times and capacity."
+          }
+        ]
+      }
+    },
+    {
+      "name": "branch-alternative-explanations",
+      "input": "Consider alternative explanations beside dispatch delay for the same late-delivery problem. Preserve existing dispatch and transit branches.",
+      "canvas": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: three of ten orders arrived one day late last week.",
+            "expected_condition": "Orders arrive on the promised day.",
+            "system_or_process": "Order dispatch and delivery for last week’s ten orders.",
+            "investigation_owner": "Operations lead"
+          },
+          "tree": {
+            "id": "root",
+            "text": "Reported: three of ten orders arrived one day late last week.",
+            "children": [
+              {
+                "id": "cause_e27f62ee-1410-4378-a3b2-0a1b9240d1ce",
+                "text": "Hypothesis: dispatch was late enough to miss the carrier cut-off; check order-level dispatch times.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              },
+              {
+                "id": "cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19",
+                "text": "Hypothesis: carrier transit took longer than planned; compare dispatch-to-delivery intervals.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              }
+            ],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "root",
+          "cause_64254fd6-3cb3-4159-98a3-2ae79b3ddd19"
+        ]
+      },
+      "action": {
+        "id": "expand",
+        "target": {
+          "type": "node",
+          "id": "cause_e27f62ee-1410-4378-a3b2-0a1b9240d1ce"
+        },
+        "mode": "branch"
+      },
+      "response": {
+        "thought": "This adds a sibling explanation of late delivery, not another cause under dispatch delay. It could compete with or complement dispatch/transit delays. Check planned versus actual route timing before treating it as applicable.",
+        "children": [
+          {
+            "text": "Hypothesis: the promised delivery date assumed a route lead time shorter than the actual scheduled route; compare the promise rule with the carrier schedule."
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -8,6 +8,8 @@ Review the current analysis for concrete meaning, duplication, internal/external
 
 Then review all existing strategies for their SO/ST/WO/WT pairing, practical mechanism, consistency with factors, feasibility, and conflicting resource demands. Improve a strategy when a factor edit affects its reasoning. Keep useful user-written choices; do not automatically regenerate every quadrant or populate empty strategy areas unrelated to the requested improvement. Missing knowledge is not itself an organizational weakness.
 
+Distinguish content drift from ambiguous framing and credible evidence questioning the objective or scope. Correct clear drift when supported; do not remove a credible discovery merely to make the canvas consistent. Where the right boundary is unresolved, retain useful evidence with its uncertainty and explain the framing choice or investigation needed.
+
 Preserve framing exactly. If framing is the real problem, explain the issue in the thought and ask the user to edit it for a subsequent request. Do not silently change the entity or objective. Respect user constraints; do not treat “better” as permission to choose a new strategic direction.
 
 Retain IDs for retained items, including wording changes or reclassification. New ideas receive new IDs. Consolidate or remove only when justified by duplication, misclassification, unsupported claims, inconsistency, or the user's guidance. Explain consequential removals or mergers. Do not re-ID the canvas, strip attribution/uncertainty, normalize away meaningful detail, enforce list counts, or fabricate claims to fill gaps.

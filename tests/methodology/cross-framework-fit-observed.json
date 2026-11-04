@@ -1,0 +1,1548 @@
+{
+  "kind": "Synthetic instruction-following observations, not live API execution or a statistical model benchmark",
+  "date": "2026-11-03",
+  "baseline": "Read-only inspection before edits found partial existing coverage, not a sampled model failure. Shared triage was not routed to SWOT/PAGES; PAGES reframing boundaries were implicit.",
+  "creation_cases": [
+    {
+      "id": "swot-rich-aligned",
+      "input": "Create a SWOT for River pottery studio to increase regional sales next year without hiring. Its experienced production team can prepare retailer samples, but the kiln is at peak capacity. Two regional retailers invited samples; clay prices are rising.",
+      "question_turns": 0,
+      "state": {
+        "framework": "swot",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "focal_entity": "River pottery studio",
+            "objective": "Increase regional sales next year without hiring",
+            "environment": "Two regional retailers invited samples; clay prices are rising"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Experienced production team can prepare retailer samples"
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "Kiln is at peak capacity, limiting extra production"
+            }
+          ],
+          "opportunities": [
+            {
+              "id": "o1",
+              "text": "Two regional retailers invited samples"
+            }
+          ],
+          "threats": [
+            {
+              "id": "t1",
+              "text": "Rising clay prices may reduce margins"
+            }
+          ],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        }
+      },
+      "observation": "Entity, objective and environment precede factors; factors remain relevant and strategies empty."
+    },
+    {
+      "id": "pages-rich-aligned",
+      "input": "Map Maya’s current perspective. She manages four support agents and personally rereads escalated replies. Eleven replies waited during her half-day absence. She says she alone can protect quality. Help understand the lens behind delays and explore reliable alternatives.",
+      "question_turns": 0,
+      "state": {
+        "framework": "pages",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "what": "Maya’s perspective on her support team’s reply approval delays",
+            "why": "Understand the lens behind delays and explore reliable alternatives",
+            "intuition": "Maya reports believing that she alone can protect reply quality"
+          },
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya manages four support agents"
+            }
+          ],
+          "actions": [
+            {
+              "id": "a1",
+              "text": "Maya personally rereads and approves escalated replies"
+            }
+          ],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Reduce reply delays while maintaining quality"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Maya reports: I alone can protect reply quality"
+            }
+          ]
+        },
+        "ripple_baseline": {
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya manages four support agents"
+            }
+          ],
+          "actions": [
+            {
+              "id": "a1",
+              "text": "Maya personally rereads and approves escalated replies"
+            }
+          ],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Reduce reply delays while maintaining quality"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Maya reports: I alone can protect reply quality"
+            }
+          ]
+        }
+      },
+      "observation": "Framing names Maya and the situation before generation; self-belief is reported, not asserted as truth. Baseline matches initialized content."
+    },
+    {
+      "id": "swot-creation-drift-exclusion",
+      "input": "Create a SWOT for River pottery studio to increase regional sales next year without hiring. Its experienced production team can prepare retailer samples, but the kiln is at peak capacity. Two regional retailers invited samples; clay prices are rising. The parent company also has an overseas hotel acquisition team; that is unrelated to River.",
+      "question_turns": 0,
+      "state": {
+        "framework": "swot",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "focal_entity": "River pottery studio",
+            "objective": "Increase regional sales next year without hiring",
+            "environment": "Two regional retailers invited samples; clay prices are rising"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Experienced production team can prepare retailer samples"
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "Kiln is at peak capacity, limiting extra production"
+            }
+          ],
+          "opportunities": [
+            {
+              "id": "o1",
+              "text": "Two regional retailers invited samples"
+            }
+          ],
+          "threats": [
+            {
+              "id": "t1",
+              "text": "Rising clay prices may reduce margins"
+            }
+          ],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        }
+      },
+      "observation": "Framing remains River/regional sales. Excluded the explicitly unrelated parent-company capability instead of broadening the entity."
+    },
+    {
+      "id": "swot-creation-discovery",
+      "input": "Create River’s SWOT to increase regional wholesale pottery sales without hiring. experienced production team can prepare retailer samples, but the kiln is at peak capacity. Two regional retailers invited samples; clay prices are rising. Retailer interviews favor prepaid workshops over wholesale pots.",
+      "question_turns": 1,
+      "state": {
+        "framework": "swot",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "focal_entity": "River pottery studio",
+            "objective": "Increase regional wholesale pottery sales next year without hiring",
+            "environment": "Two regional retailers invited samples; clay prices are rising"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Experienced production team can prepare retailer samples"
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "Kiln is at peak capacity, limiting extra production"
+            }
+          ],
+          "opportunities": [
+            {
+              "id": "o1",
+              "text": "Two regional retailers invited samples"
+            },
+            {
+              "id": "o2",
+              "text": "Reported interviews favor prepaid workshops over wholesale pots; possible scope change to investigate, not an established wholesale opportunity"
+            }
+          ],
+          "threats": [
+            {
+              "id": "t1",
+              "text": "Rising clay prices may reduce margins"
+            }
+          ],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        }
+      },
+      "observation": "Extracted wholesale scope before generation, clarified discovery once, retained reported interview evidence with a scope qualifier rather than discarding it or silently changing objective.",
+      "simulated_exchange": [
+        {
+          "assistant": "Should this stay focused on wholesale pottery, or explore workshops as a possible change of scope?"
+        },
+        {
+          "user": "Keep wholesale pottery for now, but retain the interview finding as a scope question."
+        }
+      ]
+    },
+    {
+      "id": "pages-creation-drift-exclusion",
+      "input": "Map Maya’s current perspective. She manages four support agents and personally rereads escalated replies. Eleven replies waited during her half-day absence. She says she alone can protect quality. Help understand the lens behind delays and explore reliable alternatives. The CEO separately talks about company acquisitions; no link to Maya’s delays is known.",
+      "question_turns": 0,
+      "state": {
+        "framework": "pages",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "what": "Maya’s perspective on her support team’s reply approval delays",
+            "why": "Understand the lens behind delays and explore reliable alternatives",
+            "intuition": "Maya reports believing that she alone can protect reply quality"
+          },
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya manages four support agents"
+            }
+          ],
+          "actions": [
+            {
+              "id": "a1",
+              "text": "Maya personally rereads and approves escalated replies"
+            }
+          ],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Reduce reply delays while maintaining quality"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Maya reports: I alone can protect reply quality"
+            }
+          ]
+        },
+        "ripple_baseline": {
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya manages four support agents"
+            }
+          ],
+          "actions": [
+            {
+              "id": "a1",
+              "text": "Maya personally rereads and approves escalated replies"
+            }
+          ],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Reduce reply delays while maintaining quality"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Maya reports: I alone can protect reply quality"
+            }
+          ]
+        }
+      },
+      "observation": "Retained Maya’s team situation and perspective; excluded unrelated CEO identity instead of merging perspective owners."
+    },
+    {
+      "id": "pages-creation-intentional-reframe",
+      "input": "Use Maya’s delay account above as context. Explicitly create a hypothetical perspective of Maya as a company-wide approval-policy designer, to explore policy effects; do not assert authority or other people’s beliefs.",
+      "question_turns": 0,
+      "state": {
+        "framework": "pages",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "what": "Hypothetical perspective of Maya as a company-wide approval-policy designer",
+            "why": "Explore how approval policy might affect delays without assuming authority",
+            "intuition": "Hypothesis: policy design may matter alongside individual review habits"
+          },
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya, exploring a hypothetical policy-design role; authority unconfirmed"
+            }
+          ],
+          "actions": [],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Hypothetical: understand policy-related delays before proposing changes"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Hypothetical: I can examine approval-policy design rather than only personally review replies"
+            }
+          ]
+        },
+        "ripple_baseline": {
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya, exploring a hypothetical policy-design role; authority unconfirmed"
+            }
+          ],
+          "actions": [],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Hypothetical: understand policy-related delays before proposing changes"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Hypothetical: I can examine approval-policy design rather than only personally review replies"
+            }
+          ]
+        }
+      },
+      "observation": "An explicitly requested new analysis adopts a labeled hypothetical wider framing before generating policy-oriented content. This is appropriate intentional reframing at creation, not retrospective drift correction."
+    }
+  ],
+  "action_cases": [
+    {
+      "id": "swot-aligned-evaluate",
+      "request": {
+        "canvas": {
+          "framework": "swot",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "focal_entity": "River pottery studio",
+              "objective": "Increase regional sales next year without hiring",
+              "environment": "Two regional retailers invited samples; clay prices are rising"
+            },
+            "strengths": [
+              {
+                "id": "s1",
+                "text": "Experienced production team can prepare retailer samples"
+              }
+            ],
+            "weaknesses": [
+              {
+                "id": "w1",
+                "text": "Kiln is at peak capacity, limiting extra production"
+              }
+            ],
+            "opportunities": [
+              {
+                "id": "o1",
+                "text": "Two regional retailers invited samples"
+              }
+            ],
+            "threats": [
+              {
+                "id": "t1",
+                "text": "Rising clay prices may reduce margins"
+              }
+            ],
+            "strategies": {
+              "so": [],
+              "st": [],
+              "wo": [],
+              "wt": []
+            }
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "evaluate",
+          "scope": "both"
+        }
+      },
+      "response": {
+        "thought": "The experienced team and retailer invitations are relevant to regional sales, and the capacity limit is a meaningful constraint rather than evidence of poor framing fit. The strengths and opportunities are distinct internal and external factors. Empty strategies limit TOWS assessment; test whether the kiln can support samples without assuming extra capacity."
+      },
+      "observation": "Good external fit can coexist with unresolved internal feasibility; no forced balance or score."
+    },
+    {
+      "id": "swot-drift-evaluate",
+      "request": {
+        "canvas": {
+          "framework": "swot",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "focal_entity": "River pottery studio",
+              "objective": "Increase regional sales next year without hiring",
+              "environment": "Two regional retailers invited samples; clay prices are rising"
+            },
+            "strengths": [
+              {
+                "id": "s1",
+                "text": "Experienced production team can prepare retailer samples"
+              },
+              {
+                "id": "s2",
+                "text": "Parent company has an overseas hotel acquisition team"
+              }
+            ],
+            "weaknesses": [
+              {
+                "id": "w1",
+                "text": "Kiln is at peak capacity, limiting extra production"
+              }
+            ],
+            "opportunities": [
+              {
+                "id": "o1",
+                "text": "Two regional retailers invited samples"
+              }
+            ],
+            "threats": [
+              {
+                "id": "t1",
+                "text": "Rising clay prices may reduce margins"
+              }
+            ],
+            "strategies": {
+              "so": [],
+              "st": [],
+              "wo": [],
+              "wt": []
+            }
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "evaluate",
+          "scope": "swot"
+        }
+      },
+      "response": {
+        "thought": "The retailer invitations fit River’s regional sales objective, but the parent company’s hotel acquisition team belongs to another entity and has no supplied link to the studio. That is a content-boundary mismatch, not a reason to broaden River’s scope automatically. Remove or substantiate the hotel claim while retaining the kiln constraint."
+      },
+      "observation": "Identifies another entity without silently changing framing."
+    },
+    {
+      "id": "swot-drift-improve",
+      "request": {
+        "canvas": {
+          "framework": "swot",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "focal_entity": "River pottery studio",
+              "objective": "Increase regional sales next year without hiring",
+              "environment": "Two regional retailers invited samples; clay prices are rising"
+            },
+            "strengths": [
+              {
+                "id": "s1",
+                "text": "Experienced production team can prepare retailer samples"
+              },
+              {
+                "id": "s2",
+                "text": "Parent company has an overseas hotel acquisition team"
+              }
+            ],
+            "weaknesses": [
+              {
+                "id": "w1",
+                "text": "Kiln is at peak capacity, limiting extra production"
+              }
+            ],
+            "opportunities": [
+              {
+                "id": "o1",
+                "text": "Two regional retailers invited samples"
+              }
+            ],
+            "threats": [
+              {
+                "id": "t1",
+                "text": "Rising clay prices may reduce margins"
+              }
+            ],
+            "strategies": {
+              "so": [],
+              "st": [],
+              "wo": [],
+              "wt": []
+            }
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "improve"
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "focal_entity": "River pottery studio",
+            "objective": "Increase regional sales next year without hiring",
+            "environment": "Two regional retailers invited samples; clay prices are rising"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Experienced production team can prepare retailer samples"
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "Kiln is at peak capacity, limiting extra production"
+            }
+          ],
+          "opportunities": [
+            {
+              "id": "o1",
+              "text": "Two regional retailers invited samples"
+            }
+          ],
+          "threats": [
+            {
+              "id": "t1",
+              "text": "Rising clay prices may reduce margins"
+            }
+          ],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        },
+        "thought": "Removed the parent-company hotel capability because no evidence links it to River’s studio or regional sales. Retained the studio team, retailer invitations and capacity constraint; framing and retained identities are unchanged."
+      },
+      "observation": "Corrects unsupported drift instead of redefining the entity."
+    },
+    {
+      "id": "swot-reframe-evaluate",
+      "request": {
+        "canvas": {
+          "framework": "swot",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "focal_entity": "River pottery studio",
+              "objective": "Increase regional wholesale pottery sales next year without hiring",
+              "environment": "Two regional retailers invited samples; clay prices are rising"
+            },
+            "strengths": [
+              {
+                "id": "s1",
+                "text": "Experienced production team can prepare retailer samples"
+              }
+            ],
+            "weaknesses": [
+              {
+                "id": "w1",
+                "text": "Kiln is at peak capacity, limiting extra production"
+              }
+            ],
+            "opportunities": [
+              {
+                "id": "o1",
+                "text": "Two regional retailers invited samples"
+              },
+              {
+                "id": "o2",
+                "text": "Reported retailer interviews favor prepaid workshops over wholesale pots; scope implication to investigate"
+              }
+            ],
+            "threats": [
+              {
+                "id": "t1",
+                "text": "Rising clay prices may reduce margins"
+              }
+            ],
+            "strategies": {
+              "so": [],
+              "st": [],
+              "wo": [],
+              "wt": []
+            }
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "evaluate",
+          "scope": "both"
+        }
+      },
+      "response": {
+        "thought": "The regional invitations and kiln limit remain relevant, but the reported preference for prepaid workshops questions whether the wholesale-pottery scope excludes a more promising offering. This is a credible discovery to investigate, not automatically irrelevant content. Check who was interviewed and whether the objective should expand beyond wholesale pottery; the user may then reconsider offering scope rather than merely deleting the insight."
+      },
+      "observation": "Distinguishes credible discovery, uncertain evidence and objective/scope choice."
+    },
+    {
+      "id": "swot-reframe-improve",
+      "request": {
+        "canvas": {
+          "framework": "swot",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "focal_entity": "River pottery studio",
+              "objective": "Increase regional wholesale pottery sales next year without hiring",
+              "environment": "Two regional retailers invited samples; clay prices are rising"
+            },
+            "strengths": [
+              {
+                "id": "s1",
+                "text": "Experienced production team can prepare retailer samples"
+              }
+            ],
+            "weaknesses": [
+              {
+                "id": "w1",
+                "text": "Kiln is at peak capacity, limiting extra production"
+              }
+            ],
+            "opportunities": [
+              {
+                "id": "o1",
+                "text": "Two regional retailers invited samples"
+              },
+              {
+                "id": "o2",
+                "text": "Reported retailer interviews favor prepaid workshops over wholesale pots; scope implication to investigate"
+              }
+            ],
+            "threats": [
+              {
+                "id": "t1",
+                "text": "Rising clay prices may reduce margins"
+              }
+            ],
+            "strategies": {
+              "so": [],
+              "st": [],
+              "wo": [],
+              "wt": []
+            }
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "improve"
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "focal_entity": "River pottery studio",
+            "objective": "Increase regional wholesale pottery sales next year without hiring",
+            "environment": "Two regional retailers invited samples; clay prices are rising"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Experienced production team can prepare retailer samples"
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "Kiln is at peak capacity, limiting extra production"
+            }
+          ],
+          "opportunities": [
+            {
+              "id": "o1",
+              "text": "Two regional retailers invited samples"
+            },
+            {
+              "id": "o2",
+              "text": "Reported retailer interviews favor prepaid workshops over wholesale pots; scope implication to investigate"
+            }
+          ],
+          "threats": [
+            {
+              "id": "t1",
+              "text": "Rising clay prices may reduce margins"
+            }
+          ],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        },
+        "thought": "No supported rewrite improves this fit decision yet: retained the reported workshop insight and its investigation qualifier rather than deleting it for consistency. Confirm interview evidence and decide whether to expand the wholesale-pottery objective to include workshops. If the intended scope changes, edit framing locally and submit a fresh request; this candidate preserves framing."
+      },
+      "observation": "Unchanged candidate is legitimate pending investigation/reframing."
+    },
+    {
+      "id": "pages-aligned-evaluate",
+      "request": {
+        "canvas": {
+          "framework": "pages",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "what": "Maya’s perspective on her support team’s reply approval delays",
+              "why": "Understand the lens behind delays and explore reliable alternatives",
+              "intuition": "Maya reports believing that she alone can protect reply quality"
+            },
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          },
+          "ripple_baseline": {
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "evaluate"
+        }
+      },
+      "response": {
+        "thought": "The reported half-day absence and eleven waiting replies ground Maya’s current lens in a concrete event. Her sole-protector self-belief conflicts with reducing delays, which is a useful internal tension rather than framing drift. The entries concern the same team and purpose; investigate actual review quality before treating delegation as proven safe."
+      },
+      "observation": "Preserves valuable tension while finding good external fit."
+    },
+    {
+      "id": "pages-drift-evaluate",
+      "request": {
+        "canvas": {
+          "framework": "pages",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "what": "Maya’s perspective on her support team’s reply approval delays",
+              "why": "Understand the lens behind delays and explore reliable alternatives",
+              "intuition": "Maya reports believing that she alone can protect reply quality"
+            },
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              },
+              {
+                "id": "sc2",
+                "text": "The CEO believes only acquisitions can save the company"
+              }
+            ]
+          },
+          "ripple_baseline": {
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "evaluate"
+        }
+      },
+      "response": {
+        "thought": "The waiting-reply event and Maya’s own reported quality belief fit the stated situation. The CEO’s acquisition identity belongs to another perspective and lacks a supplied link to these delays. Remove or investigate that entry instead of merging the CEO’s identity into Maya’s; this is accidental owner/situation drift, not a demonstrated perspective shift."
+      },
+      "observation": "Separates perspective owners without diagnosing either person."
+    },
+    {
+      "id": "pages-drift-improve",
+      "request": {
+        "canvas": {
+          "framework": "pages",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "what": "Maya’s perspective on her support team’s reply approval delays",
+              "why": "Understand the lens behind delays and explore reliable alternatives",
+              "intuition": "Maya reports believing that she alone can protect reply quality"
+            },
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              },
+              {
+                "id": "sc2",
+                "text": "The CEO believes only acquisitions can save the company"
+              }
+            ]
+          },
+          "ripple_baseline": {
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "improve"
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "what": "Maya’s perspective on her support team’s reply approval delays",
+            "why": "Understand the lens behind delays and explore reliable alternatives",
+            "intuition": "Maya reports believing that she alone can protect reply quality"
+          },
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya manages four support agents"
+            }
+          ],
+          "actions": [
+            {
+              "id": "a1",
+              "text": "Maya personally rereads and approves escalated replies"
+            }
+          ],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Reduce reply delays while maintaining quality"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Maya reports: I alone can protect reply quality"
+            }
+          ]
+        },
+        "thought": "Removed the ungrounded CEO acquisition belief because it changed the perspective owner and situation. Retained Maya’s reported belief, the waiting replies and the tension with reducing delays. Framing, baseline and useful item identities remain unchanged."
+      },
+      "observation": "Repairs owner drift without imposing a new self-concept."
+    },
+    {
+      "id": "pages-reframe-evaluate",
+      "request": {
+        "canvas": {
+          "framework": "pages",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "what": "Maya’s perspective on her support team’s reply approval delays",
+              "why": "Understand the lens behind delays and explore reliable alternatives",
+              "intuition": "Maya reports believing that she alone can protect reply quality"
+            },
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              },
+              {
+                "id": "e2",
+                "text": "Maya reports all four agents say the company-wide approval policy creates delays"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          },
+          "ripple_baseline": {
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          }
+        },
+        "action": {
+          "comment": "Review fit; preserve credible discoveries and distinguish them from accidental drift.",
+          "use_thoughts": false,
+          "id": "evaluate"
+        }
+      },
+      "response": {
+        "thought": "Maya’s sole-protector belief and the waiting replies still make her perspective worth exploring. The newly reported shared policy concern suggests her individual lens may not explain all delays. Investigate the policy and other agents’ accounts; an explicitly broader team or organizational framing may be appropriate, but this report does not establish their self-beliefs or invalidate Maya’s perspective."
+      },
+      "observation": "Credible evidence can warrant broader framing; does not invent other identities."
+    },
+    {
+      "id": "pages-reframe-improve",
+      "request": {
+        "canvas": {
+          "framework": "pages",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "what": "Maya’s perspective on her support team’s reply approval delays",
+              "why": "Understand the lens behind delays and explore reliable alternatives",
+              "intuition": "Maya reports believing that she alone can protect reply quality"
+            },
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              },
+              {
+                "id": "e2",
+                "text": "Maya reports all four agents say the company-wide approval policy creates delays"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          },
+          "ripple_baseline": {
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          }
+        },
+        "action": {
+          "comment": "Use this discovery to explore the whole team’s perspective instead of Maya’s.",
+          "use_thoughts": false,
+          "id": "improve"
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "what": "Maya’s perspective on her support team’s reply approval delays",
+            "why": "Understand the lens behind delays and explore reliable alternatives",
+            "intuition": "Maya reports believing that she alone can protect reply quality"
+          },
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya manages four support agents"
+            }
+          ],
+          "actions": [
+            {
+              "id": "a1",
+              "text": "Maya personally rereads and approves escalated replies"
+            }
+          ],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Reduce reply delays while maintaining quality"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            },
+            {
+              "id": "e2",
+              "text": "Maya reports all four agents say the company-wide approval policy creates delays"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Maya reports: I alone can protect reply quality"
+            }
+          ]
+        },
+        "thought": "Retained the reported policy concern without turning it into confirmed company-wide causation. Replacing Maya’s lens with the team’s changes the perspective owner and requires explicit local reframing plus evidence from those people. The current candidate remains unchanged rather than inventing team identities or silently applying that scope change."
+      },
+      "observation": "Requested new owner triggers reframing recommendation, not implicit permission to alter framing."
+    },
+    {
+      "id": "pages-intentional-shift-ripple",
+      "request": {
+        "canvas": {
+          "framework": "pages",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "what": "Maya’s perspective on her support team’s reply approval delays",
+              "why": "Understand the lens behind delays and explore reliable alternatives",
+              "intuition": "Maya reports believing that she alone can protect reply quality"
+            },
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Hypothetical, explicitly edited by Maya: I can develop reliable reviewers rather than be the sole reviewer"
+              }
+            ]
+          },
+          "ripple_baseline": {
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          }
+        },
+        "action": {
+          "comment": "I deliberately edited this premise; trace its implications within Maya’s support situation.",
+          "use_thoughts": false,
+          "id": "ripple",
+          "sources": [
+            "self_concepts"
+          ]
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "what": "Maya’s perspective on her support team’s reply approval delays",
+            "why": "Understand the lens behind delays and explore reliable alternatives",
+            "intuition": "Maya reports believing that she alone can protect reply quality"
+          },
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya manages four support agents"
+            }
+          ],
+          "actions": [
+            {
+              "id": "a1",
+              "text": "Maya personally rereads and approves escalated replies"
+            }
+          ],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Reduce reply delays while maintaining quality"
+            },
+            {
+              "id": "g2",
+              "text": "Hypothetical: develop reviewers whose quality can be tested before reducing Maya’s approvals"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Hypothetical, explicitly edited by Maya: I can develop reliable reviewers rather than be the sole reviewer"
+            }
+          ]
+        },
+        "thought": "The explicit shift from sole protector to developer of reviewers makes testing reviewer capability a relevant exploratory goal. Added a hypothetical capability-testing goal while preserving Maya’s source edit, current approval behavior and historical waiting event. This remains within the team-delay framing; it does not prove authority, quality or capacity and does not require reframing merely because the premise changed."
+      },
+      "observation": "Legitimate within-frame perspective shift; facts are preserved and new consequence labeled hypothetical."
+    },
+    {
+      "id": "pages-reframe-ripple",
+      "request": {
+        "canvas": {
+          "framework": "pages",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "what": "Maya’s perspective on her support team’s reply approval delays",
+              "why": "Understand the lens behind delays and explore reliable alternatives",
+              "intuition": "Maya reports believing that she alone can protect reply quality"
+            },
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Hypothetical, explicitly edited by Maya: I am a company-wide approval-policy designer"
+              }
+            ]
+          },
+          "ripple_baseline": {
+            "parts": [
+              {
+                "id": "p1",
+                "text": "Maya manages four support agents"
+              }
+            ],
+            "actions": [
+              {
+                "id": "a1",
+                "text": "Maya personally rereads and approves escalated replies"
+              }
+            ],
+            "goals": [
+              {
+                "id": "g1",
+                "text": "Reduce reply delays while maintaining quality"
+              }
+            ],
+            "events": [
+              {
+                "id": "e1",
+                "text": "Eleven replies waited during Maya’s reported half-day absence"
+              }
+            ],
+            "self_concepts": [
+              {
+                "id": "sc1",
+                "text": "Maya reports: I alone can protect reply quality"
+              }
+            ]
+          }
+        },
+        "action": {
+          "comment": "Explore my deliberate move from team manager to company-wide policy design.",
+          "use_thoughts": false,
+          "id": "ripple",
+          "sources": [
+            "self_concepts"
+          ]
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "what": "Maya’s perspective on her support team’s reply approval delays",
+            "why": "Understand the lens behind delays and explore reliable alternatives",
+            "intuition": "Maya reports believing that she alone can protect reply quality"
+          },
+          "parts": [
+            {
+              "id": "p1",
+              "text": "Maya manages four support agents"
+            }
+          ],
+          "actions": [
+            {
+              "id": "a1",
+              "text": "Maya personally rereads and approves escalated replies"
+            }
+          ],
+          "goals": [
+            {
+              "id": "g1",
+              "text": "Reduce reply delays while maintaining quality"
+            }
+          ],
+          "events": [
+            {
+              "id": "e1",
+              "text": "Eleven replies waited during Maya’s reported half-day absence"
+            }
+          ],
+          "self_concepts": [
+            {
+              "id": "sc1",
+              "text": "Hypothetical, explicitly edited by Maya: I am a company-wide approval-policy designer"
+            }
+          ]
+        },
+        "thought": "The selected change explicitly explores a company-wide policy-design identity; it is not accidental drift to erase. Company-wide policy consequences require a broader situation and purpose than this support-team-delay canvas, and the source edit does not grant company-wide authority. Retained current non-source content and the selected premise; edit framing locally and supply policy/authority context before a fresh request for those broader implications. The content-only baseline does not reveal whether framing changed earlier."
+      },
+      "observation": "Retains meaningful source shift while deferring incompatible consequences and naming framing-history limit."
+    }
+  ]
+}

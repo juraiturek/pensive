@@ -53,3 +53,7 @@ Implement the five-field V2-derived framing model and six standard VPC collectio
 ## VPC review harmonization — user authorization, 2026-11-03
 
 The user explicitly extended VPC review to match SWOT/PAGES. This supersedes the initial whole-canvas-only restriction: reuse the shared collection resolver and UI for per-collection Accept/Reject, selection and bulk decisions, persisted resolutions, stale-edit checks and labeled mixed-result rationale. Existing proposals without resolutions remain valid. Framing stays fixed; bullet acceptance, Ripple, Restate and generic thinking tools remain deferred. No existing framework implementation changes are required.
+
+## 5 Whys — delivered approved scope
+
+Core/creation, Reflect (whole-canvas thought-only), Expand Deepen then Branch (explicit node target; append-batch local review) implement the approved Phase A gate. Preserve V2's strand/side doors/overview. Deferred: standalone Generate Problem Statement, broad Improve, applied reframing, per-suggestion acceptance, explicit collapse, drag/reparent/reorder and dedicated research UI/actions. Conversational research is user-controlled; no infrastructure is planned. History and numerical causal confidence remain excluded.

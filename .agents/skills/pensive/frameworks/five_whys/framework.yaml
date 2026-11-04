@@ -1,0 +1,48 @@
+id: five_whys
+name: 5 Whys
+package_version: 0.1.0
+schema_version: '1.0'
+state_schema: canvas.schema.json
+canvas: canvas.html
+semantics:
+  framing: [observable_symptom, expected_condition, system_or_process, investigation_owner]
+  root: Observed problem or effect, distinct from inferred causes.
+  children: Possible direct causes of their parent, potentially competing or complementary.
+  cursor: Persisted navigation path; not implicit AI target authorization.
+  closure: A user decision with a countermeasure, not proof of a root cause.
+  fit: Causal links require internal investigation; framing alignment is separate and bidirectional.
+manual_capabilities: [edit_framing, edit_unlocked_root, add_edit_causes, delete_subtree, navigate_side_doors, view_full_tree, close_reopen_branch, import_validated_json, export_complete_json, save_standalone_html]
+ai_actions:
+  create:
+    method: prompts/create.md
+    effect: Extract framing, clarify material gaps, initialize a supported causal investigation.
+    required_context: An identifiable observed problem/system, or agreement to a sparse draft.
+  evaluate:
+    method: prompts/evaluate.md
+    effect: Reflect on evidence, causal coherence, alternatives and framing without changing content.
+    target_scope: canvas
+    context_scope: complete_canvas_framing_and_selected_current_thoughts
+    modification_scope: append_evaluation_thought_only
+  expand:
+    method: prompts/expand.md
+    effect: Propose reviewable direct causal hypotheses without replacing existing nodes.
+    modes: [deepen, branch]
+    target_scope: explicit_node
+    context_scope: framing_ancestors_siblings_and_complete_tree
+    modification_scope: append_children_of_target_for_deepen_or_parent_for_branch
+    required_context: Complete state, explicit node target, mode and nonterminal resolved parent.
+target_types: [canvas, node]
+action_compatibility:
+  create: new_canvas
+  evaluate: complete_canvas
+  expand: explicit_existing_node
+quality_criteria:
+  - No fixed depth or cause quota; stop when information or utility runs out.
+  - Distinguish observations, reports, hypotheses, inferences and supporting or contrary evidence.
+  - Child causes should explain parents through plausible mechanisms and temporal order.
+  - Investigate alternatives, missing intermediates and circular reasoning without artificial precision.
+  - Framing mismatch may indicate drift or a legitimate reframing opportunity.
+acceptance:
+  granularity: atomic_append_batch
+  proposal_actions: [expand]
+  stale_guard: complete_analytical_content_excluding_cursor

@@ -1,0 +1,358 @@
+{
+  "observation_type": "Synthetic application by a fresh test actor reading and applying the supplied method; not a deployed-model benchmark.",
+  "baseline": {
+    "input": "Create a 5 Whys investigation",
+    "source": "git show HEAD:.agents/skills/pensive/SKILL.md read before current method",
+    "observed_route": "The previous availability and routing describe SWOT, PAGES and VPC only. There is no supported 5 Whys method or package route in that revision. I would explain that limitation rather than invent a supported canvas implementation.",
+    "limit": "Read-only baseline route assessment, not an empirical without-skill behavior trial. No fabricated failure transcript or pre-change execution claim."
+  },
+  "creation": [
+    {
+      "name": "rich_creation",
+      "input": "Use 5 Whys. Our nightly report job missed 3 of 5 08:00 deadlines last week. Logs show input arrived after 07:50 on two late days; runtime durations have not been compared. It should finish by 08:00. Scope is this reporting pipeline; analytics lead owns investigation. We suspect slow processing but lack evidence.",
+      "turns": [],
+      "output": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: the nightly report job missed 3 of 5 08:00 deadlines last week.",
+            "expected_condition": "The nightly report job should finish by 08:00.",
+            "system_or_process": "This reporting pipeline; last week’s five runs.",
+            "investigation_owner": "Analytics lead"
+          },
+          "tree": {
+            "id": "report_gap",
+            "text": "Reported: the nightly report job should finish by 08:00 but missed that deadline on 3 of 5 runs last week.",
+            "children": [
+              {
+                "id": "late_input",
+                "text": "Hypothesis: late input availability left insufficient time to complete before 08:00. Supplied log observation: input arrived after 07:50 on two late days; start times and required processing time are not yet compared.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              },
+              {
+                "id": "processing",
+                "text": "Hypothesis: processing took longer than the available execution window. The team suspects slow processing; runtime durations have not been compared and this explanation is unverified.",
+                "children": [],
+                "is_terminal": false,
+                "output": null
+              }
+            ],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "report_gap"
+        ]
+      },
+      "reasoning": "Framing extracted first. Root retains reported deadline gap. Two shallow hypotheses separate supplied timing observation from causal inference and unsupported processing suspicion. No fixed depth, terminal closure or invented measurements. Internal fit requires comparison of input readiness, start and duration; scope stays within last week’s reporting pipeline."
+    },
+    {
+      "name": "adaptive_sparse",
+      "input": "Use 5 Whys. It keeps failing.",
+      "turns": [
+        {
+          "role": "assistant",
+          "text": "What is failing, and what did you observe in one recent occurrence?"
+        },
+        {
+          "role": "user",
+          "text": "The overnight data export. I don’t have an error or example with me."
+        },
+        {
+          "role": "assistant",
+          "text": "We can start a sparse draft with that reported export failure and leave causes open until you have an example. Shall I create that?"
+        },
+        {
+          "role": "user",
+          "text": "Yes, make that sparse draft."
+        }
+      ],
+      "output": {
+        "framework": "five_whys",
+        "schema_version": "1.0",
+        "content": {
+          "framing": {
+            "observable_symptom": "Reported: the overnight data export keeps failing; exact failure symptoms and frequency are unknown.",
+            "expected_condition": "",
+            "system_or_process": "Overnight data export.",
+            "investigation_owner": ""
+          },
+          "tree": {
+            "id": "export_gap",
+            "text": "Reported: the overnight data export keeps failing; the failure mode is not yet specified.",
+            "children": [],
+            "is_terminal": false,
+            "output": null
+          }
+        },
+        "cursor": [
+          "export_gap"
+        ]
+      },
+      "reasoning": "Two question turns including explicit sparse-draft agreement; no fixed wizard. Unknown expected condition and owner remain empty. Causes remain empty because failure mode is unknown."
+    }
+  ],
+  "cases": [
+    {
+      "name": "evaluate_blame_chain",
+      "input": "Reflect on this supplied tree without editing it. Are these explanations justified?",
+      "request": {
+        "canvas": {
+          "framework": "five_whys",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "observable_symptom": "Reported: the nightly report job missed 3 of 5 08:00 deadlines last week.",
+              "expected_condition": "The nightly report job should finish by 08:00.",
+              "system_or_process": "This reporting pipeline; last week’s five runs.",
+              "investigation_owner": "Analytics lead"
+            },
+            "tree": {
+              "id": "deadline",
+              "text": "Observed: report deadlines were missed.",
+              "children": [
+                {
+                  "id": "careless",
+                  "text": "Hypothesis: engineers are careless.",
+                  "children": [
+                    {
+                      "id": "motivation",
+                      "text": "Hypothesis: they don’t care.",
+                      "children": [],
+                      "is_terminal": false,
+                      "output": null
+                    }
+                  ],
+                  "is_terminal": false,
+                  "output": null
+                }
+              ],
+              "is_terminal": false,
+              "output": null
+            }
+          },
+          "cursor": [
+            "deadline"
+          ]
+        },
+        "action": {
+          "id": "evaluate"
+        }
+      },
+      "response": {
+        "thought": "Internal fit: deadline → careless → motivation is an unsupported story. Node careless labels people without identifying an action or condition that preceded and could cause the missed deadline. Node motivation guesses an internal state and does not establish why any specific behavior occurred. No evidence supports either link; there is no basis to identify a root cause or prescribe a motivation fix. External fit: this chain shifts attention from the reporting pipeline and last week’s deadlines to character judgments, without evidence that this shift serves the stated investigation. Keep the observed deadline gap and investigate the two links rather than accepting them: compare input-ready, scheduled-start, actual-start and completion timestamps across all five runs, then compare durations conditional on input availability. Inspect concrete execution or handoff failures if those comparisons locate a gap. These observations can distinguish upstream timing, scheduling delay and processing duration. This reflection leaves all nodes and framing unchanged."
+      },
+      "validation": {
+        "request": "FiveWhys.buildRequest and validateRequest passed",
+        "response": "FiveWhys.composeResult and validate composed state passed",
+        "preserved_accepted_content": true,
+        "preserved_cursor": true,
+        "pending_append_batch": false
+      }
+    },
+    {
+      "name": "deepen_input_arrival",
+      "input": "Deepen late_input only. Explore what could directly delay input availability; leave processing unchanged.",
+      "request": {
+        "canvas": {
+          "framework": "five_whys",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "observable_symptom": "Reported: the nightly report job missed 3 of 5 08:00 deadlines last week.",
+              "expected_condition": "The nightly report job should finish by 08:00.",
+              "system_or_process": "This reporting pipeline; last week’s five runs.",
+              "investigation_owner": "Analytics lead"
+            },
+            "tree": {
+              "id": "report_gap",
+              "text": "Reported: the nightly report job should finish by 08:00 but missed that deadline on 3 of 5 runs last week.",
+              "children": [
+                {
+                  "id": "late_input",
+                  "text": "Hypothesis: late input availability left insufficient time to complete before 08:00. Supplied log observation: input arrived after 07:50 on two late days; start times and required processing time are not yet compared.",
+                  "children": [],
+                  "is_terminal": false,
+                  "output": null
+                },
+                {
+                  "id": "processing",
+                  "text": "Hypothesis: processing took longer than the available execution window. The team suspects slow processing; runtime durations have not been compared and this explanation is unverified.",
+                  "children": [],
+                  "is_terminal": false,
+                  "output": null
+                }
+              ],
+              "is_terminal": false,
+              "output": null
+            }
+          },
+          "cursor": [
+            "report_gap"
+          ]
+        },
+        "action": {
+          "id": "expand",
+          "target": {
+            "type": "node",
+            "id": "late_input"
+          },
+          "mode": "deepen"
+        }
+      },
+      "response": {
+        "thought": "The selected explanation is late input leaving too little time; only two late runs have a reported input timing observation. A producer completion delay could explain that availability condition, but no producer timeline has been supplied. This is a proposed direct hypothesis, not an accepted cause. Check producer completion and delivery timestamps for late and on-time runs; an early completion followed by late arrival would instead point to transport or ingestion. Independently compare runtime and actual start times to test whether late input explains the deadline miss at all. The processing sibling remains unchanged. No deeper chain or closure is warranted.",
+        "children": [
+          {
+            "text": "Hypothesis: the upstream producer completed the required dataset late, delaying input availability and shrinking the reporting execution window; compare producer completion with reporting input-ready timestamps before attributing this locally."
+          }
+        ]
+      },
+      "validation": {
+        "request": "FiveWhys.buildRequest and validateRequest passed",
+        "response": "FiveWhys.composeResult and validate composed state passed",
+        "preserved_accepted_content": true,
+        "preserved_cursor": true,
+        "pending_append_batch": true
+      }
+    },
+    {
+      "name": "branch_beside_processing",
+      "input": "Branch at processing to explore other explanations of its parent deadline gap.",
+      "request": {
+        "canvas": {
+          "framework": "five_whys",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "observable_symptom": "Reported: the nightly report job missed 3 of 5 08:00 deadlines last week.",
+              "expected_condition": "The nightly report job should finish by 08:00.",
+              "system_or_process": "This reporting pipeline; last week’s five runs.",
+              "investigation_owner": "Analytics lead"
+            },
+            "tree": {
+              "id": "report_gap",
+              "text": "Reported: the nightly report job should finish by 08:00 but missed that deadline on 3 of 5 runs last week.",
+              "children": [
+                {
+                  "id": "late_input",
+                  "text": "Hypothesis: late input availability left insufficient time to complete before 08:00. Supplied log observation: input arrived after 07:50 on two late days; start times and required processing time are not yet compared.",
+                  "children": [],
+                  "is_terminal": false,
+                  "output": null
+                },
+                {
+                  "id": "processing",
+                  "text": "Hypothesis: processing took longer than the available execution window. The team suspects slow processing; runtime durations have not been compared and this explanation is unverified.",
+                  "children": [],
+                  "is_terminal": false,
+                  "output": null
+                }
+              ],
+              "is_terminal": false,
+              "output": null
+            }
+          },
+          "cursor": [
+            "report_gap"
+          ]
+        },
+        "action": {
+          "id": "expand",
+          "target": {
+            "type": "node",
+            "id": "processing"
+          },
+          "mode": "branch"
+        }
+      },
+      "response": {
+        "thought": "This proposes an alternative beside processing under report_gap. Delayed dispatch could reduce execution time even when inputs are ready and runtime is normal. It may coexist with late input, but there is no local scheduling evidence yet. Compare scheduled trigger, input-ready and actual-start timestamps across all five runs, then compare start-to-finish duration. Avoid adding another wording of the existing late-input hypothesis. Accepted nodes, IDs, framing and navigation remain unchanged until a batch is reviewed.",
+        "children": [
+          {
+            "text": "Hypothesis: dispatch or scheduling delay postponed the report job after inputs were ready, leaving too little time before 08:00; verify the interval between input readiness, scheduled trigger and actual start."
+          }
+        ]
+      },
+      "validation": {
+        "request": "FiveWhys.buildRequest and validateRequest passed",
+        "response": "FiveWhys.composeResult and validate composed state passed",
+        "preserved_accepted_content": true,
+        "preserved_cursor": true,
+        "pending_append_batch": true
+      }
+    },
+    {
+      "name": "insufficient_evidence_stops_expansion",
+      "input": "Deepen export_gap. We still have no error, timestamps or description beyond the reported failures; do not invent details.",
+      "request": {
+        "canvas": {
+          "framework": "five_whys",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "observable_symptom": "Reported: the overnight data export keeps failing; exact failure symptoms and frequency are unknown.",
+              "expected_condition": "",
+              "system_or_process": "Overnight data export.",
+              "investigation_owner": ""
+            },
+            "tree": {
+              "id": "export_gap",
+              "text": "Reported: the overnight data export keeps failing; the failure mode is not yet specified.",
+              "children": [],
+              "is_terminal": false,
+              "output": null
+            }
+          },
+          "cursor": [
+            "export_gap"
+          ]
+        },
+        "action": {
+          "id": "expand",
+          "target": {
+            "type": "node",
+            "id": "export_gap"
+          },
+          "mode": "deepen"
+        }
+      },
+      "response": {
+        "thought": "The reported failure has no defined observable mode. Another causal level would be arbitrary. For one recent failed run, obtain the expected result, actual result or exact error, and last successful stage with timestamps; compare the same stage in one successful run. An absent start points toward triggering or prerequisites, a running task that errors toward execution, and a completed task with absent delivery toward output handling. These are discriminating checks, not established causes. Leave the investigation open and add no speculative nodes.",
+        "children": []
+      },
+      "validation": {
+        "request": "FiveWhys.buildRequest and validateRequest passed",
+        "response": "FiveWhys.composeResult and validate composed state passed",
+        "preserved_accepted_content": true,
+        "preserved_cursor": true,
+        "pending_append_batch": false
+      }
+    }
+  ],
+  "routing": [
+    {
+      "input": "Create a 5 Whys investigation",
+      "current_route": "Honor explicit framework choice; context creation if context supplied, otherwise clarify the observed problem or distinguish a blank request. No recommendation permission step."
+    },
+    {
+      "input": "Could general research help distinguish queue delay mechanisms?",
+      "response": "As an explicit conversational follow-up, I can research which scheduler metrics distinguish dispatch delay from processing time. General findings would guide tests, not prove this local chain. No research action or automatic browsing is invoked here.",
+      "browsing_performed": false
+    }
+  ],
+  "limits": [
+    "Synthetic reasoning by one test actor; no user study, model population measurement or empirical pre-change behavior baseline.",
+    "Schema validation verifies shapes and permitted composition, not causal truth or methodological quality.",
+    "No browser/UI, packaging artifact, external research, server or external services exercised.",
+    "No existing-node mutation or acceptance tested here; composed nonempty responses remain pending atomic proposals."
+  ],
+  "checks": {
+    "complete_canvases": 3,
+    "requests_and_responses": 4
+  }
+}
