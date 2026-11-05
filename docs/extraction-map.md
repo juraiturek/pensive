@@ -193,3 +193,16 @@ Verification details and limits are in [testing.md](testing.md) and [methodology
 Source revision `a756172`. V2's `prompt_templates/system/viewpoint_base.j2` and the eighteen `user/{swot,pages,vpc}_viewpoint_{white,red,black,yellow,green,blue}.j2` templates supply the strict single-hat stance, six practical focus definitions and concise exploratory tone. SWOT and PAGES differed only by label. VPC had modest fit-oriented variants. The destination uses one shared Markdown method with separate, newly authored SWOT and 5 Whys application sections. PAGES and VPC use the common method directly.
 
 V2's `prompt_templates/rules.json`, `app/services/prompt_library_service.py`, `app/services/canvas_ai_service.py` and `templates/partials/canvas_detail_body.html` show one hat per invocation, latest coerced framework nodes as context, a thought-only response and a hat picker. The current skill retains the picker vocabulary and thought boundary. It uses complete submitted state, explicit stable targets, observations with optional suggestions, and existing standalone packaging. The V2 server, Jinja composition, database repository and mandatory next step were outside the extraction.
+
+## Manual Annotation Mode pilot
+
+V2 reference revision `a756172`. Its Thoughts stream kept independent note IDs and distinguished manual notes from system output. The optional state link captured creation context, while list retrieval was canvas-scoped. Pensive preserves that separation and introduces stable item/node attachments in portable JSON.
+
+| V2 source | Pensive destination | Treatment |
+|---|---|---|
+| [Thoughts pane and composer](../../pensive-v2/templates/partials/canvas_detail_body.html#L427) | `shared/annotations-ui.js` | Adapted disclosure and textarea with explicit Save/Cancel to local DOM events and a contextual panel. |
+| [Thought cards and composer spacing](../../pensive-v2/static/css/pensive.css#L1815) | `shared/annotations.css` | Adapted compact list spacing, borders, and grouped actions. |
+| [List and dismissal](../../pensive-v2/templates/partials/canvas_thoughts_list.html#L1) | `shared/annotations-ui.js` | Adapted the card pattern with visible Edit/Delete controls in Annotation Mode. |
+| [Canvas-scoped repository](../../pensive-v2/app/repositories/thought_repository.py#L16) | `shared/annotations.js` and pilot canvas schemas | Preserved independent IDs. Replaced database, soft dismissal, and state-version linkage with a parallel collection and retained unavailable references. |
+
+The pilot uses existing PAGES dimension keys and item IDs, plus 5 Whys tree IDs. Server infrastructure, reactions, and automatic prompt inclusion are outside this slice. Six Hats keeps its existing typed reflections and shares the target convention.

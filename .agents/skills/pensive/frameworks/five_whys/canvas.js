@@ -4,7 +4,7 @@
   const W = FiveWhys,
     $ = (selector) => document.querySelector(selector),
     source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction;
+  let state, requestedAction, annotations;
   function el(tag, cls, text) {
     const n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -38,7 +38,9 @@
     const nodes = [...document.querySelectorAll('[data-tree-node-id]')],
       card = nodes.find((n) => n.dataset.treeNodeId === id);
     if (card) {
-      card.querySelector('button')?.focus();
+      const first = 'button:not([hidden]):not(:disabled)';
+      const control = card.querySelector(first + ':not(.annotation-trigger)') || card.querySelector('.annotation-controls:not([hidden]) ' + first);
+      control?.focus();
       card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
   }
@@ -49,6 +51,7 @@
       ),
       heading = el('h3', '', row.text || 'No text yet.');
     wrap.append(heading);
+    if (annotations.isActive()) return wrap;
     if (!row.can_edit_text) {
       heading.title = 'Problem statement is locked once the investigation has begun.';
       return wrap;
@@ -147,6 +150,7 @@
         group = el('section', 'canvas-tree-stratum-title-group');
       group.append(el('p', 'canvas-tree-role-label', row.role_label), textEditor(card, row));
       header.append(el('span', 'canvas-tree-depth-badge', row.depth), group);
+      header.append(annotations.badge(row.id));
       card.append(header);
       if (row.is_terminal) {
         card.dataset.treeTerminalNode = '1';
@@ -155,7 +159,7 @@
         card.append(out);
       }
       const tools = el('div', 'canvas-tree-node-tools');
-      if (!state.proposals?.length)
+      if (!annotations.isActive() && !state.proposals?.length)
         tools.append(
           button(
             'Expand',
@@ -169,7 +173,7 @@
             'Expand',
           ),
         );
-      if (!row.is_root)
+      if (!annotations.isActive() && !row.is_root)
         tools.append(
           button(
             'Delete subtree',
@@ -179,11 +183,10 @@
                 const count = W.overview({ ...state, cursor: [...state.cursor] }).nodes.filter(
                   (n) => W.find(state, n.id).path.includes(row.id),
                 ).length;
-                if (
-                  !confirm(
-                    `Delete this cause and ${count - 1} descendant(s)? This cannot be undone.`,
-                  )
-                )
+                const noteCount = (state.annotations || []).filter(note =>
+                  note.target.type === 'node' && nodePath(note.target.id)?.includes(row.id)).length;
+                const impact = noteCount ? ` ${noteCount} attached note(s) will be kept under Unavailable targets.` : '';
+                if (!confirm(`Delete this cause and ${count - 1} descendant(s)? This cannot be undone.${impact}`))
                   return;
                 W.deleteNode(state, row.id);
                 renderTree();
@@ -256,7 +259,8 @@
         add.dataset.treeConnectorAddToggle = '1';
         add.dataset.connectorParentId = row.id;
         add.setAttribute('aria-expanded', 'false');
-        if (!state.content.tree.text.trim()) add.disabled = true;
+        if (!state.content.tree.text.trim() || annotations.isActive()) add.disabled = true;
+        add.hidden = annotations.isActive();
         zone.append(first, add, second);
         if (row.show_trifurcation_hint)
           zone.append(
@@ -266,7 +270,7 @@
               'More than three causes may mean the problem is broad. Consider narrowing it; alternatives remain allowed.',
             ),
           );
-        if (row.can_mark_terminal) {
+        if (!annotations.isActive() && row.can_mark_terminal) {
           const terminal = el('section', 'canvas-tree-terminal-action-link');
           terminal.append(
             button('Close branch', 'btn-utility', () => {
@@ -304,7 +308,7 @@
           zone.append(terminal);
         }
         spine.append(zone);
-      } else
+      } else if (!annotations.isActive())
         spine.append(
           button('Unmark', 'btn-utility', () =>
             run(() => {
@@ -339,6 +343,11 @@
       line.append(spine, lane);
       board.append(line);
     }
+    annotations.refresh();
+  }
+  function nodePath(id) {
+    try { return W.find(state, id).path; }
+    catch { return undefined; }
   }
   function renderOverview() {
     const v = W.overview(state),
@@ -432,7 +441,7 @@
     panel.replaceChildren();
     const p = state.proposals?.[0];
     panel.hidden = !p;
-    document.querySelector('[data-ai="evaluate"]').disabled = !!p;
+    document.querySelector('[data-ai="evaluate"]').disabled = annotations.isActive() || !!p;
     if (!p) return;
     panel.append(
       el('h2', '', 'Proposed causes'),
@@ -453,6 +462,7 @@
           }),
         ),
       );
+    if (annotations.isActive()) controls.querySelectorAll('button').forEach(control => { control.disabled = true; });
     panel.append(controls);
   }
   function updateScope() {
@@ -488,8 +498,11 @@
     }
   }
   function refresh() {
-    for (const field of W.framing)
-      $(`[data-framing="${field}"]`).value = state.content.framing[field];
+    for (const field of W.framing) {
+      const input = $(`[data-framing="${field}"]`);
+      input.readOnly = annotations.isActive();
+      input.value = state.content.framing[field];
+    }
     renderTree();
     renderThoughts();
     renderProposal();
@@ -538,12 +551,31 @@
       });
     });
     state = W.parseState($('#canvas-state').textContent);
+    annotations = AnnotationUI.install({
+      getState: () => state, targetType: 'node',
+      lookup: id => {
+        try {
+          const { node, parent } = W.find(state, id);
+          return node.text.trim() || (parent ? 'Blank cause' : 'Problem');
+        } catch { return undefined; }
+      },
+      setMode: active => {
+        $('#thinking-tools').disabled = $('#import').disabled = active;
+        refresh();
+      },
+      canEnter: () => {
+        if (!$('#tree-board form')) return true;
+        status('Save or cancel the open tree edit before entering Annotation Mode.', true);
+        return false;
+      },
+      onEdit: edited
+    });
     SixHatsUI.install(() => state, W, copyJson);
     refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of W.framing)
       $(`[data-framing="${field}"]`).addEventListener('input', (e) =>
-        run(() => W.editFraming(state, field, e.target.value)),
+        !annotations.isActive() && run(() => W.editFraming(state, field, e.target.value)),
       );
     document
       .querySelector('[data-ai="evaluate"]')
@@ -611,9 +643,10 @@
       e.preventDefault();
       try {
         const next = W.parseState($('#import-json').value);
-        if (!confirm('Replace the current canvas? Save or export first if you want to keep it.'))
+        if (!confirm('Replace the current canvas, including annotations? Save or export first if you want to keep it.'))
           return;
         state = next;
+        annotations.reset();
         $('#import-dialog').close();
         refresh();
         edited();

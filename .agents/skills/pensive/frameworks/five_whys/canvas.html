@@ -723,6 +723,88 @@ input:focus-visible, select:focus-visible { outline:2px solid var(--accent); out
 .expansion-modes input { flex:none; margin:.25rem 0 0; accent-color:var(--accent); }
 .expansion-modes label:has(input:disabled) { color:var(--muted); opacity:.65; cursor:default; }
 </style>
+<style>
+.annotation-toolbar, .annotation-controls, .annotation-actions, .annotation-note-actions {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+.annotation-controls { flex: 0 0 auto; }
+.band-heading > .annotation-controls { display: flex; margin-top: .55rem; }
+.annotation-toolbar button, .annotation-controls button { font-size: .75rem; }
+.annotation-controls .annotation-trigger {
+  min-height: 28px;
+  padding: .22rem .48rem;
+  border-radius: .4rem;
+}
+.annotation-trigger::before {
+  content: '';
+  display: inline-block;
+  width: .9em;
+  height: .9em;
+  margin-inline-end: .3em;
+  vertical-align: -.05em;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M2.5 2.5h11v7l-4 4h-7z M9.5 13.5v-4h4 M5 6h6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.annotation-controls .annotation-add, .annotation-add:not([hidden]) + .annotation-show {
+  background: #fff1ae;
+  border-color: #c6a94d;
+  color: #493907;
+}
+.annotation-add[hidden] + .annotation-show {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+.annotation-toolbar button, .annotation-toolbar .annotation-trigger {
+  min-height: 34px;
+  padding: .28rem .58rem;
+  border-radius: .4rem;
+}
+.annotation-panel .annotation-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+.annotation-panel .annotation-icon:hover { background: #eae6d8; color: var(--ink); }
+.annotation-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.annotation-panel .annotation-close { position: absolute; inset: .65rem .65rem auto auto; }
+.annotation-panel h2 { padding-inline-end: 1.5rem; }
+.annotation-panel h2 { margin: .25rem 0 1rem; overflow-wrap: anywhere; }
+.annotation-panel textarea { display: block; width: 100%; margin-block: .5rem; }
+.annotation-list { list-style: none; padding: 0; margin: .75rem 0 0; }
+.annotation-list li {
+  background: #fffae8;
+  border: 1px solid #e7dbaa;
+  border-radius: .45rem;
+  padding: .75rem;
+  margin-bottom: .45rem;
+}
+.annotation-list p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.annotation-note-actions { margin-top: .5rem; }
+@media (max-width: 600px) {
+  .item .annotation-controls, .canvas-tree-stratum-header .annotation-controls {
+    flex: 0 1 auto;
+    max-width: 38%;
+  }
+  .item .annotation-trigger, .canvas-tree-stratum-header .annotation-trigger { min-height: 32px; }
+}
+</style>
 </head><body><div class="shell">
 <header class="masthead"><div class="brand"><a class="wordmark" href="#main" aria-label="Pensive, skip to investigation">pensive<span aria-hidden="true">.</span></a><p class="eyebrow">5 WHYS: A CAUSAL INVESTIGATION</p></div></header>
 <main id="main">
@@ -902,6 +984,52 @@ const SixHats = (() => {
 if (typeof module !== 'undefined' && module.exports) module.exports = SixHats;
 </script>
 <script data-implementation>
+/* Portable manual notes, shared by standalone canvases and packagers. */
+const Annotations = (() => {
+  'use strict';
+  const id = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value);
+  const text = value => typeof value === 'string' && !!value.trim();
+  const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
+    Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
+  const sameTarget = (left, right) => left.type === right.type && left.id === right.id;
+
+  function validate(notes, targetType, sections = []) {
+    if (notes === undefined) return;
+    if (!Array.isArray(notes)) throw new Error('Annotations must be an array.');
+    const seen = new Set();
+    for (const note of notes) {
+      if (!exact(note, ['id', 'target', 'target_label', 'text']) ||
+          !id(note.id) || seen.has(note.id) || !text(note.text) || !text(note.target_label)) {
+        throw new Error('Invalid annotation or duplicate annotation ID.');
+      }
+      const target = note.target;
+      if (!(exact(target, ['type']) && target.type === 'canvas') &&
+          !(exact(target, ['type', 'id']) && (target.type === targetType && id(target.id) ||
+            target.type === 'section' && sections.includes(target.id)))) {
+        throw new Error('Invalid annotation target.');
+      }
+      seen.add(note.id);
+    }
+  }
+
+  function save(state, targetType, note, sections) {
+    const notes = [...(state.annotations || [])];
+    const index = notes.findIndex(entry => entry.id === note.id);
+    if (index < 0) notes.push(note);
+    else notes[index] = note;
+    validate(notes, targetType, sections);
+    state.annotations = notes;
+  }
+
+  function remove(state, id) {
+    state.annotations = (state.annotations || []).filter(note => note.id !== id);
+  }
+
+  return Object.freeze({ validate, sameTarget, save, remove });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = Annotations;
+</script>
+<script data-implementation>
 /* Framework-local deterministic operations. V2 source/port details: docs/extraction-map.md. */
 (function (root, factory) {
   const api = factory();
@@ -909,6 +1037,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = SixHats;
   else root.FiveWhys = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
+  const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const framing = [
     'observable_symptom',
@@ -978,12 +1107,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = SixHats;
     keys(
       s,
       ['framework', 'schema_version', 'content', 'cursor'],
-      ['thoughts', 'proposals'],
+      ['thoughts', 'proposals', 'annotations'],
       'Canvas',
     );
     if (s.framework !== 'five_whys' || s.schema_version !== '1.0')
       fail('Unsupported framework/version.');
     const ids = validateContent(s.content);
+    Notes.validate(s.annotations, 'node');
     if (s.thoughts !== undefined) {
       if (!Array.isArray(s.thoughts)) fail('Thoughts must be an array.');
       for (const t of s.thoughts) {
@@ -1640,13 +1770,250 @@ const CanvasEditing = (() => {
 })();
 </script>
 <script data-implementation>
+/* Shared manual annotation workspace for standalone canvases. */
+const AnnotationUI = (() => {
+  'use strict';
+  const canvas = { type: 'canvas' };
+  const overview = { type: 'overview' };
+  function element(tag, text) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function button(text, action) {
+    const node = element('button', text);
+    node.type = 'button';
+    node.addEventListener('click', action);
+    return node;
+  }
+  function iconButton(label, path, action) {
+    const control = button('', action);
+    control.className = 'annotation-icon';
+    control.setAttribute('aria-label', label);
+    control.title = label;
+    const namespace = 'http://www.w3.org/2000/svg';
+    const icon = document.createElementNS(namespace, 'svg');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.setAttribute('aria-hidden', 'true');
+    const shape = document.createElementNS(namespace, 'path');
+    shape.setAttribute('d', path);
+    icon.append(shape);
+    control.append(icon);
+    return control;
+  }
+  function install({ getState, targetType, sections, lookup, setMode, canEnter, onEdit }) {
+    let active = false, selected = canvas, draft, opener;
+    const toolbar = element('div');
+    toolbar.className = 'annotation-toolbar';
+    const panel = element('dialog');
+    panel.className = 'annotation-panel';
+    panel.setAttribute('aria-label', 'Annotations');
+    const mode = button('Annotation Mode', () => changeMode(true));
+    const exit = button('Exit annotation mode', () => changeMode(false));
+    exit.hidden = true;
+    const unavailable = button('', () => open(null, unavailable));
+    document.querySelector('.toolbar .export-actions').before(toolbar);
+    document.body.append(panel);
+    panel.addEventListener('cancel', event => {
+      event.preventDefault();
+      close();
+    });
+
+    const notes = () => getState().annotations || [];
+    const label = target => target === overview ? 'All thoughts' :
+      target.type === 'canvas' ? 'Whole canvas' : lookup(target.id, target.type);
+    const matches = target => notes().filter(note => Annotations.sameTarget(note.target, target));
+    const missing = () => notes().filter(note => label(note.target) === undefined);
+
+    function updateBadge(group, target) {
+      const count = matches(target).length;
+      const [add, show] = group.children;
+      if (target.type === 'canvas' && !active) {
+        const specific = notes().length - count;
+        group.hidden = show.hidden = !notes().length;
+        add.hidden = true;
+        show.textContent = `${count} | ${specific}`;
+        const description = `${count} general thoughts, ${specific} specific thoughts`;
+        show.setAttribute('aria-label', description);
+        show.title = description;
+        return;
+      }
+      group.hidden = !active && !count;
+      add.hidden = !active;
+      show.hidden = !count;
+      if (group.hidden) return;
+      const name = label(target);
+      const addText = target.type === 'canvas' ? 'Add general thought' : 'Add thought';
+      add.textContent = addText;
+      add.setAttribute('aria-label', target.type === 'canvas' ? addText : `${addText} for ${name}`);
+      show.textContent = active ? `Show thoughts (${count})` : String(count);
+      const showLabel = active ? `Show thoughts (${count}) for ${name}` : `${count} ${count === 1 ? 'note' : 'notes'} for ${name}`;
+      show.setAttribute('aria-label', showLabel);
+      show.title = showLabel;
+    }
+    function refresh() {
+      if (selected && label(selected) === undefined) selected = null;
+      unavailable.hidden = !missing().length;
+      unavailable.textContent = `Unavailable targets (${missing().length})`;
+      for (const group of document.querySelectorAll('[data-annotation-type]')) {
+        updateBadge(group, { type: group.dataset.annotationType, id: group.dataset.annotationTarget });
+      }
+      if (panel.open && !draft) render();
+    }
+    function discardDraft() {
+      if (draft && draft.input.value !== draft.original && !confirm('Discard the unsaved note?')) return false;
+      draft = undefined;
+      return true;
+    }
+    function focusPanel() {
+      panel.querySelector('.annotation-close').focus();
+    }
+    function open(target, control, compose = false) {
+      selected = target;
+      opener = control;
+      render();
+      panel.showModal();
+      if (compose) edit();
+      else focusPanel();
+    }
+    function close() {
+      if (!discardDraft()) return;
+      panel.close();
+      const replacement = selected && [...document.querySelectorAll('[data-annotation-type]')]
+        .find(group => group.dataset.annotationType === selected.type && group.dataset.annotationTarget === selected.id);
+      const control = opener?.isConnected && opener.getClientRects().length
+        ? opener : replacement?.querySelector('button:not([hidden])');
+      (control && control.getClientRects().length ? control : active ? exit : mode).focus({ preventScroll: true });
+    }
+    function changeMode(next) {
+      if (next && canEnter && !canEnter()) return;
+      active = next;
+      mode.hidden = active;
+      exit.hidden = !active;
+      setMode(active);
+      refresh();
+      if (panel.open) focusPanel();
+      else (active ? exit : mode).focus({ preventScroll: true });
+    }
+    function edit(note) {
+      const form = element('form');
+      const field = element('label', 'Annotation text');
+      const input = element('textarea');
+      input.rows = 3;
+      input.required = true;
+      input.value = note?.text || '';
+      field.append(input);
+      const save = element('button', 'Save note');
+      save.type = 'submit';
+      const actions = element('div');
+      actions.className = 'annotation-actions';
+      actions.append(save, button('Cancel', () => {
+        draft = undefined;
+        render();
+        focusPanel();
+      }));
+      form.append(field, actions);
+      draft = { input, original: input.value };
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!active) return;
+        const text = input.value.trim();
+        if (!text) {
+          input.setCustomValidity('Enter a note.');
+          input.reportValidity();
+          return;
+        }
+        Annotations.save(getState(), targetType, note ? { ...note, text } : {
+          id: 'note-' + crypto.randomUUID(), target: selected, target_label: label(selected), text
+        }, sections);
+        draft = undefined;
+        onEdit();
+        refresh();
+        focusPanel();
+      });
+      input.addEventListener('input', () => input.setCustomValidity(''));
+      panel.querySelector('.annotation-actions').hidden = true;
+      panel.querySelector('.annotation-list').hidden = true;
+      panel.querySelector('.annotation-empty')?.setAttribute('hidden', '');
+      panel.append(form);
+      input.focus();
+    }
+    function render() {
+      const heading = element('h2', selected ? label(selected) : 'Unavailable targets');
+      const actions = element('div');
+      actions.className = 'annotation-actions';
+      const eyebrow = element('p', 'Thoughts');
+      eyebrow.className = 'eyebrow';
+      const dismiss = iconButton('Close notes', 'M6 6l12 12M18 6L6 18', close);
+      dismiss.classList.add('annotation-close');
+      panel.replaceChildren(dismiss, eyebrow, heading, actions);
+      if (active) {
+        if (selected) actions.append(button('Add thought', () => edit()));
+      } else if (selected !== overview) {
+        actions.append(button(selected ? 'Annotate this target' : 'Manage unavailable notes', () => changeMode(true)));
+      }
+      const entries = selected === overview ? notes() : selected ? matches(selected) : missing();
+      if (!entries.length) {
+        const empty = element('p', 'No thoughts yet.');
+        empty.className = 'annotation-empty';
+        panel.append(empty);
+      }
+      const list = element('ul');
+      list.className = 'annotation-list';
+      for (const note of entries) {
+        const card = element('li');
+        if (!selected || selected === overview) card.append(element('strong', label(note.target) ?? note.target_label));
+        card.append(element('p', note.text));
+        if (active) {
+          const controls = element('div');
+          controls.className = 'annotation-note-actions';
+          controls.append(iconButton('Edit note', 'M4 20l4-.8L20 7l-3-3L5 16z M14.5 6.5l3 3', () => { if (!draft) edit(note); }),
+            iconButton('Delete note', 'M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 10v7 M14 10v7', () => {
+              if (draft || !confirm('Delete this note?')) return;
+              Annotations.remove(getState(), note.id);
+              onEdit();
+              refresh();
+              focusPanel();
+            }));
+          card.append(controls);
+        }
+        list.append(card);
+      }
+      panel.append(list);
+    }
+    function badge(id, type = targetType) {
+      const target = id === undefined ? { type } : { type, id };
+      const group = element('span');
+      group.className = 'annotation-controls';
+      group.dataset.annotationType = type;
+      if (id !== undefined) group.dataset.annotationTarget = id;
+      const add = button('', () => open(target, add, true));
+      const show = button('', () => open(type === 'canvas' && !active ? overview : target, show));
+      add.className = 'annotation-trigger annotation-add';
+      show.className = 'annotation-trigger annotation-show';
+      group.append(add, show);
+      updateBadge(group, target);
+      return group;
+    }
+    function reset() {
+      selected = canvas;
+      draft = undefined;
+      opener = undefined;
+    }
+    toolbar.append(mode, badge(undefined, 'canvas'), exit, unavailable);
+    return { badge, refresh, reset, isActive: () => active };
+  }
+  return { install };
+})();
+</script>
+<script data-implementation>
 /* Local tree UI. Strand, side doors, connector forms and overview preserve V2 geometry. */
 (() => {
   'use strict';
   const W = FiveWhys,
     $ = (selector) => document.querySelector(selector),
     source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction;
+  let state, requestedAction, annotations;
   function el(tag, cls, text) {
     const n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -1680,7 +2047,9 @@ const CanvasEditing = (() => {
     const nodes = [...document.querySelectorAll('[data-tree-node-id]')],
       card = nodes.find((n) => n.dataset.treeNodeId === id);
     if (card) {
-      card.querySelector('button')?.focus();
+      const first = 'button:not([hidden]):not(:disabled)';
+      const control = card.querySelector(first + ':not(.annotation-trigger)') || card.querySelector('.annotation-controls:not([hidden]) ' + first);
+      control?.focus();
       card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
   }
@@ -1691,6 +2060,7 @@ const CanvasEditing = (() => {
       ),
       heading = el('h3', '', row.text || 'No text yet.');
     wrap.append(heading);
+    if (annotations.isActive()) return wrap;
     if (!row.can_edit_text) {
       heading.title = 'Problem statement is locked once the investigation has begun.';
       return wrap;
@@ -1789,6 +2159,7 @@ const CanvasEditing = (() => {
         group = el('section', 'canvas-tree-stratum-title-group');
       group.append(el('p', 'canvas-tree-role-label', row.role_label), textEditor(card, row));
       header.append(el('span', 'canvas-tree-depth-badge', row.depth), group);
+      header.append(annotations.badge(row.id));
       card.append(header);
       if (row.is_terminal) {
         card.dataset.treeTerminalNode = '1';
@@ -1797,7 +2168,7 @@ const CanvasEditing = (() => {
         card.append(out);
       }
       const tools = el('div', 'canvas-tree-node-tools');
-      if (!state.proposals?.length)
+      if (!annotations.isActive() && !state.proposals?.length)
         tools.append(
           button(
             'Expand',
@@ -1811,7 +2182,7 @@ const CanvasEditing = (() => {
             'Expand',
           ),
         );
-      if (!row.is_root)
+      if (!annotations.isActive() && !row.is_root)
         tools.append(
           button(
             'Delete subtree',
@@ -1821,11 +2192,10 @@ const CanvasEditing = (() => {
                 const count = W.overview({ ...state, cursor: [...state.cursor] }).nodes.filter(
                   (n) => W.find(state, n.id).path.includes(row.id),
                 ).length;
-                if (
-                  !confirm(
-                    `Delete this cause and ${count - 1} descendant(s)? This cannot be undone.`,
-                  )
-                )
+                const noteCount = (state.annotations || []).filter(note =>
+                  note.target.type === 'node' && nodePath(note.target.id)?.includes(row.id)).length;
+                const impact = noteCount ? ` ${noteCount} attached note(s) will be kept under Unavailable targets.` : '';
+                if (!confirm(`Delete this cause and ${count - 1} descendant(s)? This cannot be undone.${impact}`))
                   return;
                 W.deleteNode(state, row.id);
                 renderTree();
@@ -1898,7 +2268,8 @@ const CanvasEditing = (() => {
         add.dataset.treeConnectorAddToggle = '1';
         add.dataset.connectorParentId = row.id;
         add.setAttribute('aria-expanded', 'false');
-        if (!state.content.tree.text.trim()) add.disabled = true;
+        if (!state.content.tree.text.trim() || annotations.isActive()) add.disabled = true;
+        add.hidden = annotations.isActive();
         zone.append(first, add, second);
         if (row.show_trifurcation_hint)
           zone.append(
@@ -1908,7 +2279,7 @@ const CanvasEditing = (() => {
               'More than three causes may mean the problem is broad. Consider narrowing it; alternatives remain allowed.',
             ),
           );
-        if (row.can_mark_terminal) {
+        if (!annotations.isActive() && row.can_mark_terminal) {
           const terminal = el('section', 'canvas-tree-terminal-action-link');
           terminal.append(
             button('Close branch', 'btn-utility', () => {
@@ -1946,7 +2317,7 @@ const CanvasEditing = (() => {
           zone.append(terminal);
         }
         spine.append(zone);
-      } else
+      } else if (!annotations.isActive())
         spine.append(
           button('Unmark', 'btn-utility', () =>
             run(() => {
@@ -1981,6 +2352,11 @@ const CanvasEditing = (() => {
       line.append(spine, lane);
       board.append(line);
     }
+    annotations.refresh();
+  }
+  function nodePath(id) {
+    try { return W.find(state, id).path; }
+    catch { return undefined; }
   }
   function renderOverview() {
     const v = W.overview(state),
@@ -2074,7 +2450,7 @@ const CanvasEditing = (() => {
     panel.replaceChildren();
     const p = state.proposals?.[0];
     panel.hidden = !p;
-    document.querySelector('[data-ai="evaluate"]').disabled = !!p;
+    document.querySelector('[data-ai="evaluate"]').disabled = annotations.isActive() || !!p;
     if (!p) return;
     panel.append(
       el('h2', '', 'Proposed causes'),
@@ -2095,6 +2471,7 @@ const CanvasEditing = (() => {
           }),
         ),
       );
+    if (annotations.isActive()) controls.querySelectorAll('button').forEach(control => { control.disabled = true; });
     panel.append(controls);
   }
   function updateScope() {
@@ -2130,8 +2507,11 @@ const CanvasEditing = (() => {
     }
   }
   function refresh() {
-    for (const field of W.framing)
-      $(`[data-framing="${field}"]`).value = state.content.framing[field];
+    for (const field of W.framing) {
+      const input = $(`[data-framing="${field}"]`);
+      input.readOnly = annotations.isActive();
+      input.value = state.content.framing[field];
+    }
     renderTree();
     renderThoughts();
     renderProposal();
@@ -2180,12 +2560,31 @@ const CanvasEditing = (() => {
       });
     });
     state = W.parseState($('#canvas-state').textContent);
+    annotations = AnnotationUI.install({
+      getState: () => state, targetType: 'node',
+      lookup: id => {
+        try {
+          const { node, parent } = W.find(state, id);
+          return node.text.trim() || (parent ? 'Blank cause' : 'Problem');
+        } catch { return undefined; }
+      },
+      setMode: active => {
+        $('#thinking-tools').disabled = $('#import').disabled = active;
+        refresh();
+      },
+      canEnter: () => {
+        if (!$('#tree-board form')) return true;
+        status('Save or cancel the open tree edit before entering Annotation Mode.', true);
+        return false;
+      },
+      onEdit: edited
+    });
     SixHatsUI.install(() => state, W, copyJson);
     refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of W.framing)
       $(`[data-framing="${field}"]`).addEventListener('input', (e) =>
-        run(() => W.editFraming(state, field, e.target.value)),
+        !annotations.isActive() && run(() => W.editFraming(state, field, e.target.value)),
       );
     document
       .querySelector('[data-ai="evaluate"]')
@@ -2253,9 +2652,10 @@ const CanvasEditing = (() => {
       e.preventDefault();
       try {
         const next = W.parseState($('#import-json').value);
-        if (!confirm('Replace the current canvas? Save or export first if you want to keep it.'))
+        if (!confirm('Replace the current canvas, including annotations? Save or export first if you want to keep it.'))
           return;
         state = next;
+        annotations.reset();
         $('#import-dialog').close();
         refresh();
         edited();

@@ -1,6 +1,7 @@
 /* PAGES state and action boundaries. Used by the standalone page and Node. */
 const Pages = (() => {
   'use strict';
+  const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const sections = Object.freeze(['parts', 'actions', 'goals', 'events', 'self_concepts']);
   const framing = Object.freeze(['what', 'why', 'intuition']);
@@ -61,9 +62,10 @@ const Pages = (() => {
     return before.length !== after.length || before.some(old => !after.some(item => item.id === old.id && item.text === old.text));
   }
   function validate(state) {
-    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['ripple_baseline', 'thoughts', 'proposals']);
+    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['ripple_baseline', 'thoughts', 'proposals', 'annotations']);
     if (state.framework !== 'pages' || state.schema_version !== '1.0') throw new Error('Unsupported framework/version; expected pages / 1.0.');
     const ids = validateContent(state.content);
+    Notes.validate(state.annotations, 'item', sections);
     if (state.ripple_baseline !== undefined) validateCollections(state.ripple_baseline);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');

@@ -10,7 +10,7 @@
   };
   const $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction;
+  let state, requestedAction, annotations;
   const ordering = CanvasEditing.collectionOrdering({ core: Pages, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -24,6 +24,7 @@
     $('#clipboard-fallback').hidden = true;
     status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
     renderChanges();
+    annotations.refresh();
   }
   function renderChanges() {
     const changes = Pages.changes(state);
@@ -51,26 +52,33 @@
     const container = $(`[data-section="${section}"]`), [label, symbol, description] = labels[section];
     const heading = element('div', 'band-heading');
     heading.append(element('span', 'cell-symbol', symbol), element('h2', '', label), element('p', 'band-description', description));
+    heading.append(annotations.badge(section, 'section'));
     const content = element('div', 'band-content'), list = element('ul', 'items');
     Pages.collection(state, section).forEach((item, index) => {
       const row = element('li', 'item'), input = element('textarea');
       CanvasEditing.finishOnEnter(input);
+      input.readOnly = annotations.isActive();
       input.rows = 1; input.value = item.text; input.dataset.id = item.id;
       input.setAttribute('aria-label', `${label} ${index + 1}`); input.placeholder = 'Write one idea…';
-      input.addEventListener('input', () => { Pages.editItem(state, section, item.id, input.value); resize(input); edited(); });
+      input.addEventListener('input', () => { if (annotations.isActive()) return; Pages.editItem(state, section, item.id, input.value); resize(input); edited(); });
       const remove = element('button', 'delete', '×'); remove.type = 'button'; remove.setAttribute('aria-label', `Delete ${label.toLowerCase()} ${index + 1}`);
       remove.addEventListener('click', () => { Pages.deleteItem(state, section, item.id); renderSection(section); container.querySelector('.add').focus(); edited(); });
-      row.append(ordering.createHandle(row, list, section, item, index, label), input, remove); list.append(row);
+      const handle = ordering.createHandle(row, list, section, item, index, label);
+      if (annotations.isActive()) handle.disabled = remove.disabled = true;
+      row.append(handle, input, annotations.badge(item.id), remove); list.append(row);
     });
     const removed = element('div', 'removed-items'); removed.hidden = true;
     const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
+    add.disabled = annotations.isActive();
     function beginItem() {
+      if (annotations.isActive()) return;
       const id = Pages.addItem(state, section); renderSection(section); edited();
       Array.from(container.querySelectorAll('textarea')).find(n => n.dataset.id === id).focus();
     }
     add.addEventListener('click', beginItem);
     // Match the collection canvases: blank space continues the list, reusing an unfinished draft.
     container.onclick = event => {
+      if (annotations.isActive()) return;
       if (event.target.closest('button, textarea, .item, .band-heading, .removed-items')) return;
       const last = Pages.collection(state, section).at(-1);
       if (last && !last.text.trim()) container.querySelector('li.item:last-child textarea').focus();
@@ -90,19 +98,21 @@
       card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', ripple: 'Ripple implications' }[th.kind]), element('p', '', th.text)); thoughts.append(card);
     }
     const proposal = state.proposals?.[0];
-    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
-    $('#reset-baseline').disabled = !!proposal;
+    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!proposal; });
+    $('#reset-baseline').disabled = annotations.isActive() || !!proposal;
     ProposalReviewUI.render({ state, core: Pages, panel: $('#proposal-panel'), labels,
       title: proposal?.action === 'ripple' ? 'Proposed Ripple implications' : 'Proposed improvements',
       onDecision: (selected, decision) => {
+        if (annotations.isActive()) return;
         Pages.resolveProposal(state, selected, decision); refresh(); edited();
         status('Review decision saved in this tab. Export or save to keep it.');
       }
     });
+    if (annotations.isActive()) $('#proposal-panel').querySelectorAll('button, input').forEach(control => { control.disabled = true; });
   }
   function refresh() {
-    for (const field of Pages.framing) { const input = $(`[data-framing="${field}"]`); input.value = state.content.framing[field]; resize(input); }
-    Pages.sections.forEach(renderSection); renderChanges(); renderAI();
+    for (const field of Pages.framing) { const input = $(`[data-framing="${field}"]`); input.readOnly = annotations.isActive(); input.value = state.content.framing[field]; resize(input); }
+    Pages.sections.forEach(renderSection); renderChanges(); renderAI(); annotations.refresh();
   }
   async function copyJson(json, message) {
     try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status(message); }
@@ -142,9 +152,24 @@
   }
   try {
     state = Pages.parseState($('#canvas-state').textContent);
+    annotations = AnnotationUI.install({
+      getState: () => state, targetType: 'item', sections: Pages.sections,
+      lookup: (id, type) => {
+        if (type === 'section') return labels[id]?.[0];
+        for (const section of Pages.sections) {
+          const item = Pages.collection(state, section).find(entry => entry.id === id);
+          if (item) return item.text.trim() || `Blank ${labels[section][0]} item`;
+        }
+      },
+      setMode: active => {
+        $('#thinking-tools').disabled = $('#import').disabled = active;
+        refresh();
+      },
+      onEdit: edited
+    });
     SixHatsUI.install(() => state, Pages, copyJson); refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
-    for (const field of Pages.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { state.content.framing[field] = e.target.value; resize(e.target); edited(); });
+    for (const field of Pages.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { if (annotations.isActive()) return; state.content.framing[field] = e.target.value; resize(e.target); edited(); });
     document.querySelectorAll('[data-ai]').forEach(b => b.addEventListener('click', () => openAction(b.dataset.ai)));
     $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());
     $('#ai-form').addEventListener('submit', async e => {
@@ -170,8 +195,8 @@
       e.preventDefault();
       try {
         const next = Pages.parseState($('#import-json').value);
-        if (!confirm('Replace the current canvas, including edits, thoughts, baseline and pending proposal? Save or export first if you want to keep it.')) return;
-        state = next; $('#import-dialog').close(); refresh(); edited(); status(next.ripple_baseline ? 'PAGES JSON imported. Save to keep this state.' : 'PAGES JSON imported without a baseline. Prior changes cannot be recovered; establish the current state explicitly.');
+        if (!confirm('Replace the current canvas, including edits, annotations, thoughts, baseline and pending proposal? Save or export first if you want to keep it.')) return;
+        state = next; annotations.reset(); $('#import-dialog').close(); refresh(); edited(); status(next.ripple_baseline ? 'PAGES JSON imported. Save to keep this state.' : 'PAGES JSON imported without a baseline. Prior changes cannot be recovered; establish the current state explicitly.');
       } catch (err) { $('#import-error').textContent = err.message; }
     });
     $('details').addEventListener('toggle', () => resize($('#intuition')));

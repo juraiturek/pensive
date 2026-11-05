@@ -1,0 +1,80 @@
+.annotation-toolbar, .annotation-controls, .annotation-actions, .annotation-note-actions {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+.annotation-controls { flex: 0 0 auto; }
+.band-heading > .annotation-controls { display: flex; margin-top: .55rem; }
+.annotation-toolbar button, .annotation-controls button { font-size: .75rem; }
+.annotation-controls .annotation-trigger {
+  min-height: 28px;
+  padding: .22rem .48rem;
+  border-radius: .4rem;
+}
+.annotation-trigger::before {
+  content: '';
+  display: inline-block;
+  width: .9em;
+  height: .9em;
+  margin-inline-end: .3em;
+  vertical-align: -.05em;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M2.5 2.5h11v7l-4 4h-7z M9.5 13.5v-4h4 M5 6h6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.annotation-controls .annotation-add, .annotation-add:not([hidden]) + .annotation-show {
+  background: #fff1ae;
+  border-color: #c6a94d;
+  color: #493907;
+}
+.annotation-add[hidden] + .annotation-show {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+.annotation-toolbar button, .annotation-toolbar .annotation-trigger {
+  min-height: 34px;
+  padding: .28rem .58rem;
+  border-radius: .4rem;
+}
+.annotation-panel .annotation-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+.annotation-panel .annotation-icon:hover { background: #eae6d8; color: var(--ink); }
+.annotation-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.annotation-panel .annotation-close { position: absolute; inset: .65rem .65rem auto auto; }
+.annotation-panel h2 { padding-inline-end: 1.5rem; }
+.annotation-panel h2 { margin: .25rem 0 1rem; overflow-wrap: anywhere; }
+.annotation-panel textarea { display: block; width: 100%; margin-block: .5rem; }
+.annotation-list { list-style: none; padding: 0; margin: .75rem 0 0; }
+.annotation-list li {
+  background: #fffae8;
+  border: 1px solid #e7dbaa;
+  border-radius: .45rem;
+  padding: .75rem;
+  margin-bottom: .45rem;
+}
+.annotation-list p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.annotation-note-actions { margin-top: .5rem; }
+@media (max-width: 600px) {
+  .item .annotation-controls, .canvas-tree-stratum-header .annotation-controls {
+    flex: 0 1 auto;
+    max-width: 38%;
+  }
+  .item .annotation-trigger, .canvas-tree-stratum-header .annotation-trigger { min-height: 32px; }
+}

@@ -13,6 +13,9 @@ export async function buildCanvas(state = Whys.initialState()) {
   ).join('\n');
   for (const [marker, source, tag] of [
     ['<!--pensive-style-->', styles, 'style'],
+    ['<!--pensive-annotations-style-->', await readFile(new URL('../../shared/annotations.css', framework), 'utf8'), 'style'],
+    ['<!--pensive-annotations-ui-->', await readFile(new URL('../../shared/annotations-ui.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-annotations-->', await readFile(new URL('../../shared/annotations.js', framework), 'utf8'), 'script'],
     ['<!--pensive-core-->', await readFile(new URL('state.js', framework), 'utf8'), 'script'],
     ['<!--pensive-six-hats-->', await readFile(new URL('../../shared/six-hats.js', framework), 'utf8'), 'script'],
     ['<!--pensive-six-hats-ui-->', await readFile(new URL('../../shared/six-hats-ui.js', framework), 'utf8'), 'script'],

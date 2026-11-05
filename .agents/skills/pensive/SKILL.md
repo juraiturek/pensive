@@ -17,6 +17,12 @@ Honor explicit Six Thinking Hats requests. When a deliberate lens could help wit
 
 Route `action.id: "six_hats"` here before framework-specific action routing. Read the [Six Thinking Hats handoff](references/six-hats-workflow.md) for supported targets, validation, prompt layers and packaging. Observations are primary, suggestions optional. Append a reflection without changing analytical content.
 
+## Manual annotations
+
+PAGES and 5 Whys support whole-canvas and stable item or causal-node notes. PAGES also supports dimension notes. Edit Mode indicators open a read-only thought overlay. Annotation Mode pauses analytical edits and offers local note creation, editing and deletion. JSON export and HTML Save to File include notes. Notes whose targets disappear are retained under Unavailable targets.
+
+Preserve the complete submitted `annotations` collection through existing-state actions and packaging. Manual notes are supplemental interpretive context, not automatically validated analytical content. Existing `use_thoughts` flags apply to their documented AI thoughts only. Discuss manual notes as user-authored context when the user explicitly selects them, and preserve the distinction between questions, tentative interpretations and evidence.
+
 ## Shared local editing
 
 Enter finishes analytical bullet/framing edits; Shift+Enter inserts a line break. 5 Whys node and countermeasure editors commit on Enter as well. Composition-confirming Enter is left to the input method; AI guidance and JSON text boxes remain multiline. Changes remain in the tab until saved/exported.

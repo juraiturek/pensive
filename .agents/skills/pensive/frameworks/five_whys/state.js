@@ -5,6 +5,7 @@
   else root.FiveWhys = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
+  const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const framing = [
     'observable_symptom',
@@ -74,12 +75,13 @@
     keys(
       s,
       ['framework', 'schema_version', 'content', 'cursor'],
-      ['thoughts', 'proposals'],
+      ['thoughts', 'proposals', 'annotations'],
       'Canvas',
     );
     if (s.framework !== 'five_whys' || s.schema_version !== '1.0')
       fail('Unsupported framework/version.');
     const ids = validateContent(s.content);
+    Notes.validate(s.annotations, 'node');
     if (s.thoughts !== undefined) {
       if (!Array.isArray(s.thoughts)) fail('Thoughts must be an array.');
       for (const t of s.thoughts) {

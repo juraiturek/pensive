@@ -276,3 +276,11 @@ The [methodology walkthrough](../tests/methodology/six-hats.md) covers the six s
 ### Cross-canvas handoff — user observation
 
 The user tested asking Pensive to create a VPC from an iterated canvas while explicitly considering its Black Hat reflection. They reported that the transition worked well and felt more natural than switching canvases in a web app. This is a user-reported workflow observation. It captures the value of carrying both the source analysis and a deliberately chosen reflection into a different framework through conversation.
+
+## Manual Annotation Mode pilot
+
+Executed on 2026-11-05. The new state tests initially failed because both runtimes rejected the annotations field. The new browser tests initially failed because the toolbar toggle was absent. The final full suite passed **177 tests, zero failures or skips** using bundled Node and offline Playwright Chromium. The skill validator and `git diff --check` passed. The README digest matched the recorded value.
+
+Coverage includes the shared annotation workflow in PAGES and 5 Whys, read-only analytical controls, note add/edit/delete, multiple notes, keyboard preview and focus restoration, narrow touch target selection, same-ID rename, orphan recovery, clipboard JSON import/export, HTML save/reopen, PAGES proposal acceptance/rejection, and 5 Whys Reflect/Six Hats result preservation. Browser coverage uses Chromium with simulated touch. Physical devices, Safari and Firefox were outside this run.
+
+After the overlay, dimension attachment, icon controls and combined counter refinements, the full offline Chromium and Node suite passed **178 tests, zero failures or skips**. The skill validator passed.
