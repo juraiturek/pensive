@@ -8,7 +8,11 @@ Review the current analysis for concrete meaning, duplication, internal/external
 
 Then review all existing strategies for their SO/ST/WO/WT pairing, practical mechanism, consistency with factors, feasibility, and conflicting resource demands. Improve a strategy when a factor edit affects its reasoning. Keep useful user-written choices; do not automatically regenerate every quadrant or populate empty strategy areas unrelated to the requested improvement. Missing knowledge is not itself an organizational weakness.
 
+Retain useful ordinary strengths without asserting unsupported distinctiveness; do not turn unknown comparison into a disadvantage or absence of a capability into a weakness without support. Keep factors and strategies concise. Make supporting factors recognizable in natural wording and explain material causal links, conditional assumptions and WO capability remedies in the existing thought when detail would overburden strategy text. Do not add factor IDs to displayed wording, rationale fields or node-linked notes. Use the thought for a consequential unanswered comparative question rather than fabricating an answer.
+
 Distinguish content drift from ambiguous framing and credible evidence questioning the objective or scope. Correct clear drift when supported; do not remove a credible discovery merely to make the canvas consistent. Where the right boundary is unresolved, retain useful evidence with its uncertainty and explain the framing choice or investigation needed.
+
+Allow indirect relevance and interactions among factors; an unclear individual objective link is not by itself a reason to remove emerging content. Surface widespread mismatch as a possible framing/objective problem as well as a content problem.
 
 Preserve framing exactly. If framing is the real problem, explain the issue in the thought and ask the user to edit it for a subsequent request. Do not silently change the entity or objective. Respect user constraints; do not treat “better” as permission to choose a new strategic direction.
 

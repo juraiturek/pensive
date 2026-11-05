@@ -57,3 +57,10 @@ The user explicitly extended VPC review to match SWOT/PAGES. This supersedes the
 ## 5 Whys — delivered approved scope
 
 Core/creation, Reflect (whole-canvas thought-only), Expand Deepen then Branch (explicit node target; append-batch local review) implement the approved Phase A gate. Preserve V2's strand/side doors/overview. Deferred: standalone Generate Problem Statement, broad Improve, applied reframing, per-suggestion acceptance, explicit collapse, drag/reparent/reorder and dedicated research UI/actions. Conversational research is user-controlled; no infrastructure is planned. History and numerical causal confidence remain excluded.
+
+## SWOT next improvements — user sequencing, 2026-11-04
+
+1. Delivered: [Markdown-only methodology refinement](plans/2026-11-04-swot-methodology-refinement.md), approved and implemented 2026-11-04; checks and limits in `docs/testing.md`.
+2. Next SWOT feature: design canvas-level and node-linked notes/thoughts/comments, including support for research questions, prompts and findings. Resolve attachment, edit/deletion behavior, provenance, freshness, review semantics, compact presentation, export compatibility and research authorization before implementation. This sequencing records priority, not approval of a particular schema, interface or research execution mechanism.
+
+The methodology refinement has no dependency on the second feature. It uses existing canvas-level thoughts for concise rationale, uncertainty and follow-up questions, existing request steering for explicit additional context, and existing content/proposal contracts. No node-linked storage, research action or new UI is needed to meet its acceptance criteria. Detailed persistent per-factor rationale and research workflow remain outside that slice.

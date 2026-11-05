@@ -35,12 +35,16 @@ If the first answer is still thin, reserve the second question turn for this cho
 
 - Strengths/weaknesses concern internal resources, capabilities, processes, and limitations. Opportunities/threats concern external conditions or developments. Classification depends on the entity boundary, not absolute control.
 - Relate factors to the objective/lens. Write concrete, distinct statements with enough explanation to show significance. Avoid generic praise, generic risks, repetition, and unsupported superlatives.
+- Distinguish useful ordinary capabilities from evidenced differentiators using supplied comparisons; do not require uniqueness or invent competitor benchmarks. A missing capability is a weakness only when a relevant limitation or disadvantage is supported. Unknown comparison is uncertainty, not inferiority. Use a comparative question only when consequential and within the existing elicitation budget.
 - “Enter Europe” is an action, not an opportunity; an evidenced external market opening may be. Do not generate strategies.
 - Missing evidence is not a weakness. Do not force item counts, equal quadrants, or arbitrary character limits. Unsupported quadrants stay empty; framing-only stubs may have all four empty. Do not create blank or “Unknown” placeholder factors.
 - Distinguish current facts from plausible developments. Put material uncertainty in factor text (“Assumption:”, “Potential … if …”) so it survives export. Retain useful supplied evidence attribution without inventing citations, statistics, or facts.
+- For an external condition, check what supplied evidence supports it and how it could benefit or harm this entity and objective. Preserve useful conditional hypotheses with their uncertainty; do not turn proposed actions into opportunities or speculation into established demand.
 - Disclose the general lens, material scope assumptions, and sparse-draft limitation in framing where relevant. Mention consequential limitations briefly in the delivery response. Do not add confidence/evidence fields.
 
 Review external fit explicitly: do factors concern this `focal_entity`, `objective` and `environment`, rather than another entity or goal? This is distinct from internal/external factor classification. Correct generated drift; if supplied evidence credibly challenges the objective or boundary, disclose that tension or a reframing question rather than silently broadening framing or discarding evidence. Respect the existing elicitation budget.
+
+Allow indirect relevance through factor interactions and credible emerging insights whose objective link is still unclear. Do not force a justification into every bullet. If substantial content does not fit, surface whether the framing or objective needs refinement rather than automatically excluding the content. Keep factors concise; initial creation still has no thought or new rationale fields.
 
 Before packaging, check factual support, coherent framing, internal/external placement, duplication, uncertainty, and absence of strategies. Correct generated mistakes without another elicitation round.
 

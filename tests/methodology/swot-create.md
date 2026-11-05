@@ -18,3 +18,11 @@ Run in a fresh skill-loaded conversation; assess behavior, not identical wording
 Rubric: correct routing; zero questions for sufficient context; at most two question turns; explicit agreement for limited-information fallback unless already requested; no fabricated factors; internal/external fidelity; uncertainty survives in text/framing; complete schema-valid state; globally unique IDs; empty strategy arrays; new artifact; established canvas preserved.
 
 Baseline and post-change observations are recorded in docs/testing.md. A structural validator or packaging pass does not establish analytical quality.
+
+## Methodological refinement cases — 2026-11-04
+
+- Rich regulated-integration context includes an ordinary delivery capability, a supplied certification benchmark, an action described as an opportunity and two reported customer inquiries. Generate directly, retain useful ordinary capabilities without superiority claims, use only the supplied comparison, distinguish actions from conditions and avoid extrapolating broad demand from two inquiries.
+- A useful emerging factor has an unclear or indirect objective link. Retain credible content with appropriate uncertainty rather than forcing an explicit justification into every bullet; disclose consequential framing tension without silently changing the objective.
+- No comparative data is supplied, or the elicitation budget is already exhausted. Do not invent benchmarks, require uniqueness, ask an extra question or classify unknown comparison as weakness. Preserve the existing sparse-draft and empty-quadrant rules.
+
+Creation remains SWOT-only with empty strategy arrays and no thought/rationale fields. Review factor concision as well as grounding. Actual synthetic excerpts and limitations are retained in [refinement observations](swot-refinement-observed.md).

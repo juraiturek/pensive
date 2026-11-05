@@ -1,5 +1,13 @@
 # Testing strategy
 
+## SWOT methodological prompt refinement — 2026-11-04
+
+Implemented the approved [Markdown-only plan](plans/2026-11-04-swot-methodology-refinement.md): comparative strengths/weaknesses, directional competitive assessment without scores, conditional external grounding, two-way framing fit, classification suggestions and concise TOWS causal reasoning with WO capability remedies. Existing canvas-level thoughts carry material explanation/questions; no new note, research or state contract was added.
+
+Actual baseline and forward synthetic application outputs are retained in [refinement observations](../tests/methodology/swot-refinement-observed.md), with updated creation/action rubrics. A child-agent application check covered compact/detailed Evaluate, eligible versus excluded thoughts, current steering answering comparison questions, widespread framing mismatch, WO evaluation/extend generation, restrained no-change Improve and sufficient-context Create. The baseline already handled the sampled cases sensibly; this is an explicit instruction-coverage improvement, not a measured model-quality gain or a claimed reproduced model failure. The actor inherited the discussion; the cases are narrow synthetic walkthroughs, not blind sampling, live-user evidence or statistical evaluation. Candidate structure/preservation was inspected, not run through packaging/runtime validation.
+
+Executed `PYTHONPATH=/tmp/pensive-validator-deps python3 /Users/juraj/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/pensive`: passed. A Python local-link check resolved all 102 skill-local Markdown links. README SHA-256 remains `372931125511c5fae95971c88a11fd725dffaa3724672c4bfb95291b23ea8c4e`. `git diff --check` passed; changed-file inventory is Markdown-only. No runtime/browser regressions were run because executable source, schemas, manifest, generated HTML and dependencies are unchanged. No legacy files, remote, push or publication were involved. Node-linked/free notes and research support remain the next separately designed SWOT feature, with no dependency from this refinement.
+
 ## Slice 0: structure
 
 Slice 0 used structural checks; Slice 1 now has executable tests below. Run the installed skill-creator validator for skill changes:
