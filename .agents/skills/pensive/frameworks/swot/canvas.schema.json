@@ -10,6 +10,7 @@
     "content"
   ],
   "properties": {
+    "takeaways": { "type": "string" },
     "annotations": {
       "type": "array",
       "items": {
@@ -124,99 +125,139 @@
       "type": "array",
       "maxItems": 1,
       "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "action",
-          "base_content",
-          "content",
-          "thought"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "maxLength": 128,
-            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
-          },
-          "action": {
-            "enum": [
-              "strategize",
-              "improve"
-            ]
-          },
-          "base_content": {
-            "$ref": "#/$defs/content"
-          },
-          "content": {
-            "$ref": "#/$defs/content"
-          },
-          "thought": {
-            "$ref": "#/$defs/thought"
-          },
-          "resolutions": {
+        "oneOf": [
+          {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "id",
+              "action",
+              "base_content",
+              "content",
+              "thought"
+            ],
             "properties": {
-              "strengths": {
+              "id": {
+                "type": "string",
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+              },
+              "action": {
                 "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
+                  "strategize",
+                  "improve"
                 ]
               },
-              "weaknesses": {
+              "base_content": {
+                "$ref": "#/$defs/content"
+              },
+              "content": {
+                "$ref": "#/$defs/content"
+              },
+              "thought": {
+                "$ref": "#/$defs/thought"
+              },
+              "resolutions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "strengths": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "weaknesses": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "opportunities": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "threats": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "so": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "st": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "wo": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "wt": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "action",
+              "base_content",
+              "base_takeaways",
+              "takeaways",
+              "rationale"
+            ],
+            "properties": {
+              "action": {
                 "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
+                  "formulate_takeaways",
+                  "review_takeaways"
                 ]
               },
-              "opportunities": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
-                ]
+              "base_content": {
+                "$ref": "#/$defs/content"
               },
-              "threats": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
-                ]
+              "base_takeaways": {
+                "type": "string"
               },
-              "so": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
-                ]
+              "base_annotations": {
+                "$ref": "#/properties/annotations"
               },
-              "st": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
-                ]
+              "takeaways": {
+                "type": "string",
+                "minLength": 1
               },
-              "wo": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
-                ]
-              },
-              "wt": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
-                ]
+              "rationale": {
+                "type": "string",
+                "minLength": 1
               }
             }
           }
-        }
+        ]
       }
     }
   },

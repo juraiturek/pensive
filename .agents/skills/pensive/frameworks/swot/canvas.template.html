@@ -21,7 +21,7 @@
       <label for="objective">Strategic objective<textarea id="objective" data-framing="objective" rows="1" placeholder="What are you working toward?"></textarea></label>
       <details><summary>Environment <span class="optional">/ optional</span></summary><label class="environment-label" for="environment">External environment<textarea id="environment" data-framing="environment" rows="2" placeholder="What is happening around you?"></textarea></label></details>
     </section>
-    <div class="toolbar">
+    <div id="analysis-toolbar" class="toolbar" tabindex="-1">
       <div class="view-tabs" role="group" aria-label="Canvas view">
         <button id="swot-toggle" type="button" aria-pressed="true" aria-controls="swot-view">SWOT</button>
         <button id="tows-toggle" type="button" aria-pressed="false" aria-controls="tows-view">TOWS <span id="tows-count" class="count" title="No strategies yet">0</span></button>
@@ -30,7 +30,7 @@
         <button type="button" data-ai="strategize" title="Derive SO/ST/WO/WT strategies from SWOT">Strategize</button>
         <button type="button" data-ai="evaluate" title="Evaluate SWOT, TOWS, or both">Evaluate</button>
         <button type="button" data-ai="improve" title="Improve the current SWOT/TOWS">Improve</button>
-      <button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button></div>
+      <button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button><a href="#takeaways">Takeaways</a></div>
       <div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary" title="Copy the complete canvas for discussion or reuse. Use an AI action button to request a transformation.">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
     <dialog id="thinking-tools-dialog" aria-labelledby="six-hats-title">
@@ -73,6 +73,45 @@
         <section class="cell wt" data-section="wt" aria-label="WT strategies"></section>
       </div>
     </section>
+    <section id="takeaways" class="takeaways" aria-labelledby="takeaways-title">
+      <div class="takeaways-heading">
+        <h2 id="takeaways-title"><label for="takeaways-text">Takeaways</label></h2>
+        <a href="#analysis-toolbar">Back to analysis</a>
+      </div>
+      <p id="takeaways-hint">Record what you want to carry forward from the analysis.</p>
+      <textarea id="takeaways-text" rows="4" aria-describedby="takeaways-hint"></textarea>
+      <div class="ai-actions" role="group" aria-label="Takeaways actions">
+        <button id="takeaways-formulate" type="button" aria-haspopup="dialog">Formulate Takeaways</button>
+        <button id="takeaways-improve" type="button" aria-haspopup="dialog">Review / Improve Takeaways</button>
+      </div>
+      <section id="takeaways-review" class="proposal-panel" aria-labelledby="takeaways-review-title" hidden>
+        <h3 id="takeaways-review-title">Proposed Takeaways</h3>
+        <p id="takeaways-rationale"></p>
+        <h4>Current</h4>
+        <p id="takeaways-current"></p>
+        <h4>Proposed</h4>
+        <p id="takeaways-proposed"></p>
+        <p id="takeaways-error" class="error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="takeaways-reject" type="button">Reject Takeaways</button>
+          <button id="takeaways-accept" type="button" class="primary">Accept Takeaways</button>
+        </div>
+      </section>
+    </section>
+    <dialog id="takeaways-dialog" aria-labelledby="takeaways-action-title">
+      <form>
+        <h2 id="takeaways-action-title">Takeaways</h2>
+        <p class="dialog-note">Copy this request into Codex with the Pensive skill to get a proposal for review.</p>
+        <label for="takeaways-guidance">Focus for this proposal</label>
+        <textarea id="takeaways-guidance" rows="3"></textarea>
+        <label class="checkbox-label"><input id="takeaways-include-annotations" type="checkbox"> Include user-authored Thoughts</label>
+        <p id="takeaways-request-error" class="error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="takeaways-cancel" type="button">Cancel Takeaways request</button>
+          <button type="submit" class="primary">Copy Takeaways request</button>
+        </div>
+      </form>
+    </dialog>
     <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden>
       <label for="clipboard-json">Canvas JSON</label><p>Copy this complete canvas for discussion or reuse.</p>
       <textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button>
@@ -102,6 +141,8 @@
 <!--pensive-review-ui-->
 <!--pensive-six-hats-->
 <!--pensive-annotations-->
+<!--pensive-takeaways-->
+<!--pensive-takeaways-ui-->
 <!--pensive-core-->
 <!--pensive-six-hats-ui-->
 <!--pensive-editing-->

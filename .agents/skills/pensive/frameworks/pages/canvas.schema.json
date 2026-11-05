@@ -10,6 +10,7 @@
     "content"
   ],
   "properties": {
+    "takeaways": { "type": "string" },
     "annotations": {
       "type": "array",
       "items": {
@@ -121,104 +122,144 @@
       "type": "array",
       "maxItems": 1,
       "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "action",
-          "sources",
-          "base_content",
-          "base_baseline",
-          "content",
-          "thought"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "maxLength": 128,
-            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
-          },
-          "action": {
-            "enum": [
-              "improve",
-              "ripple"
-            ]
-          },
-          "sources": {
-            "type": "array",
-            "uniqueItems": true,
-            "maxItems": 4,
-            "items": {
-              "enum": [
-                "parts",
-                "actions",
-                "goals",
-                "events",
-                "self_concepts"
-              ]
-            }
-          },
-          "base_content": {
-            "$ref": "#/$defs/content"
-          },
-          "base_baseline": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/collections"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "content": {
-            "$ref": "#/$defs/content"
-          },
-          "thought": {
-            "$ref": "#/$defs/thought"
-          },
-          "resolutions": {
+        "oneOf": [
+          {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "id",
+              "action",
+              "sources",
+              "base_content",
+              "base_baseline",
+              "content",
+              "thought"
+            ],
             "properties": {
-              "parts": {
+              "id": {
+                "type": "string",
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+              },
+              "action": {
                 "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
+                  "improve",
+                  "ripple"
                 ]
               },
-              "actions": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
+              "sources": {
+                "type": "array",
+                "uniqueItems": true,
+                "maxItems": 4,
+                "items": {
+                  "enum": [
+                    "parts",
+                    "actions",
+                    "goals",
+                    "events",
+                    "self_concepts"
+                  ]
+                }
+              },
+              "base_content": {
+                "$ref": "#/$defs/content"
+              },
+              "base_baseline": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/collections"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
-              "goals": {
+              "content": {
+                "$ref": "#/$defs/content"
+              },
+              "thought": {
+                "$ref": "#/$defs/thought"
+              },
+              "resolutions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "parts": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "actions": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "goals": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "events": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "self_concepts": {
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "action",
+              "base_content",
+              "base_takeaways",
+              "takeaways",
+              "rationale"
+            ],
+            "properties": {
+              "action": {
                 "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
+                  "formulate_takeaways",
+                  "review_takeaways"
                 ]
               },
-              "events": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
-                ]
+              "base_content": {
+                "$ref": "#/$defs/content"
               },
-              "self_concepts": {
-                "enum": [
-                  "pending",
-                  "accepted",
-                  "rejected"
-                ]
+              "base_takeaways": {
+                "type": "string"
+              },
+              "base_annotations": {
+                "$ref": "#/properties/annotations"
+              },
+              "takeaways": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
               }
             }
           }
-        }
+        ]
       }
     }
   },

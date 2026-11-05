@@ -2,6 +2,7 @@
 const Pages = (() => {
   'use strict';
   const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
+  const Results = typeof module !== 'undefined' && module.exports ? require('../../shared/takeaways.js') : Takeaways;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const sections = Object.freeze(['parts', 'actions', 'goals', 'events', 'self_concepts']);
   const framing = Object.freeze(['what', 'why', 'intuition']);
@@ -62,9 +63,10 @@ const Pages = (() => {
     return before.length !== after.length || before.some(old => !after.some(item => item.id === old.id && item.text === old.text));
   }
   function validate(state) {
-    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['ripple_baseline', 'thoughts', 'proposals', 'annotations']);
+    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['ripple_baseline', 'thoughts', 'proposals', 'annotations', 'takeaways']);
     if (state.framework !== 'pages' || state.schema_version !== '1.0') throw new Error('Unsupported framework/version; expected pages / 1.0.');
     const ids = validateContent(state.content);
+    if (state.takeaways !== undefined && typeof state.takeaways !== 'string') throw new Error('Takeaways must be text.');
     Notes.validate(state.annotations, 'item', sections);
     if (state.ripple_baseline !== undefined) validateCollections(state.ripple_baseline);
     if (state.thoughts !== undefined) {
@@ -77,6 +79,10 @@ const Pages = (() => {
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one pending proposal is supported.');
       for (const p of state.proposals) {
+        if (Results.handles(p?.action)) {
+          Results.validateProposal(p, validateContent, notes => Notes.validate(notes, 'item', sections));
+          continue;
+        }
         keys(p, ['id', 'action', 'sources', 'base_content', 'base_baseline', 'content', 'thought'], 'Proposal', ['resolutions']);
         if (typeof p.id !== 'string' || !idPattern.test(p.id) || ids.has(p.id)) throw new Error('Invalid or duplicate proposal ID.');
         ids.add(p.id);
@@ -154,6 +160,7 @@ const Pages = (() => {
   function buildRequest(state, action) {
     validate(state);
     if (state.proposals?.length) throw new Error('Resolve the pending proposal first.');
+    if (Results.handles(action?.id)) return Results.request(state, action);
     if (action?.id === 'six_hats') {
       Hats.validateAction(state, action);
       return structuredClone({ canvas: state, action });
@@ -175,6 +182,7 @@ const Pages = (() => {
   function validateRequest(request) { keys(request, ['canvas', 'action'], 'Request'); return buildRequest(request.canvas, request.action); }
   function composeResult(input, response) {
     const { canvas, action } = validateRequest(input);
+    if (Results.handles(action.id)) return validate(Results.compose(canvas, action, response));
     if (action.id === 'six_hats') return validate(Hats.append(canvas, action, response));
     keys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'Response');
     if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('A nonempty explanatory thought is required.');
@@ -186,9 +194,13 @@ const Pages = (() => {
     }
     return validate(canvas);
   }
-  function proposalSections(state) { validate(state); return state.proposals?.length ? review.entries(state.proposals[0]) : []; }
+  function proposalSections(state) { validate(state); return state.proposals?.length && !Results.handles(state.proposals[0].action) ? review.entries(state.proposals[0]) : []; }
   function resolveProposal(state, selected, decision) {
     validate(state); const p = state.proposals?.[0]; if (!p) throw new Error('No pending proposal.');
+    if (Results.handles(p.action)) {
+      if (selected !== undefined) throw new Error('Takeaways review applies to the whole text.');
+      return Results.resolve(state, decision);
+    }
     if (decision === 'accept') {
       if (!same(state.ripple_baseline ?? null, p.base_baseline)) throw new Error('Ripple baseline changed; reject and request again.');
       if (!same(state.content, review.expected(p))) throw new Error('Canvas content changed; reject remaining changes and request again.');

@@ -286,3 +286,9 @@ Coverage includes the shared annotation workflow in PAGES and 5 Whys, read-only 
 After the overlay, dimension attachment, icon controls and combined counter refinements, the full offline Chromium and Node suite passed **178 tests, zero failures or skips**. The skill validator passed.
 
 Annotation Mode rollout extended the focused browser checks to SWOT/TOWS and VPC, including shared factor notes in TOWS context, strategy and collection attachments, and JSON and HTML round-trips. State checks cover annotation preservation through SWOT and VPC proposal decisions. The full offline suite passed **184 tests**. After a final SWOT initialization adjustment, **51 focused tests** passed. Both runs had zero failures or skips. The skill validator and whitespace check passed.
+
+## Takeaways MVP
+
+The full Node and offline Chromium regression suite passed 196 tests with zero failures or skips. The 12 focused Takeaways cases cover all four frameworks. State checks cover optional legacy state, schema validation, action boundaries, whole-text acceptance and rejection, stale framing and opted-in annotation changes, JSON key order, and preservation through existing AI actions. Browser checks cover manual editing and clearing, unrelated framing edits, HTML save/reopen, JSON import, clipboard fallback, opt-in request context, and stale review with a local edit.
+
+Both actions also passed through each of the four result packagers with the prior text and proposal retained in embedded state. Skill validation, whitespace checks and the README diff check passed. The [synthetic walkthrough](../tests/methodology/takeaways.md) records the framework-specific reasoning examples and their limits. Browser coverage used Chromium. The walkthrough is qualitative and does not measure model consistency or live-user outcomes.

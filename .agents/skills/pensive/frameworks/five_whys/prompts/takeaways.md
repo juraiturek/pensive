@@ -1,0 +1,3 @@
+# 5 Whys Takeaways
+
+Start from the observed problem, expected condition and investigation scope. Compare consequential branches and test whether each cited child plausibly explains its parent in context. Identify whether causes are competing, interacting or unresolved, and distinguish reported evidence from hypotheses. A closed branch or recorded countermeasure does not establish causation. Relate interventions to the conditions they address and distinguish them from observations or tests that would discriminate among plausible causes. State the limits of what the tree supports and prefer an actionable next investigation when evidence is sparse.

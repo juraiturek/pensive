@@ -4,7 +4,7 @@
   const labels = { jobs: ['Customer Jobs', 'J'], pains: ['Pains', 'P'], gains: ['Gains', 'G'], products_services: ['Products & Services', 'PS'], pain_relievers: ['Pain Relievers', 'PR'], gain_creators: ['Gain Creators', 'GC'] };
   const $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction, annotations;
+  let state, requestedAction, annotations, renderTakeaways;
   const ordering = CanvasEditing.collectionOrdering({ core: Vpc, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; }
   function status(message, error = false) { $('#status').textContent = message; $('#status').classList.toggle('error', error); }
@@ -53,6 +53,7 @@
   }
   function renderProposal() {
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!state.proposals?.length; });
+    if (renderTakeaways()) { $('#proposal-panel').hidden = true; return; }
     ProposalReviewUI.render({ state, core: Vpc, panel: $('#proposal-panel'), labels,
       title: 'Proposed improvements',
       onDecision: (selected, decision) => {
@@ -88,6 +89,10 @@
         refresh();
       },
       onEdit: edited
+    });
+    renderTakeaways = TakeawaysUI.install({
+      getState: () => state, core: Vpc, isLocked: () => annotations.isActive(),
+      refresh: refresh, edited, copy: copyJson,
     });
     SixHatsUI.install(() => state, Vpc, copyJson); refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));

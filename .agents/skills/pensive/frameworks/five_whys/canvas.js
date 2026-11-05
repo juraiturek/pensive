@@ -4,7 +4,7 @@
   const W = FiveWhys,
     $ = (selector) => document.querySelector(selector),
     source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction, annotations;
+  let state, requestedAction, annotations, renderTakeaways;
   function el(tag, cls, text) {
     const n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -442,6 +442,7 @@
     const p = state.proposals?.[0];
     panel.hidden = !p;
     document.querySelector('[data-ai="evaluate"]').disabled = annotations.isActive() || !!p;
+    if (renderTakeaways()) { panel.hidden = true; return; }
     if (!p) return;
     panel.append(
       el('h2', '', 'Proposed causes'),
@@ -569,6 +570,10 @@
         return false;
       },
       onEdit: edited
+    });
+    renderTakeaways = TakeawaysUI.install({
+      getState: () => state, core: W, isLocked: () => annotations.isActive(),
+      refresh: refresh, edited, copy: copyJson,
     });
     SixHatsUI.install(() => state, W, copyJson);
     refresh();

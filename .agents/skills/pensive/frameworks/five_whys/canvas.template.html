@@ -12,7 +12,7 @@
 <label>System or Process<textarea data-framing="system_or_process" rows="2" placeholder="Which system, process and boundaries are involved?"></textarea></label>
 <label>Investigation Owner<textarea data-framing="investigation_owner" rows="2" placeholder="Who can investigate and act on the findings?"></textarea></label>
 </section>
-<div class="toolbar"><div class="ai-actions" role="group" aria-label="Investigation actions"><button type="button" data-ai="evaluate">Reflect</button><button type="button" id="overview-open">View full tree</button><button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button></div><div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File ↗</button></div></div>
+<div id="analysis-toolbar" class="toolbar" tabindex="-1"><div class="ai-actions" role="group" aria-label="Investigation actions"><button type="button" data-ai="evaluate">Reflect</button><button type="button" id="overview-open">View full tree</button><button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button><a href="#takeaways">Takeaways</a></div><div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File ↗</button></div></div>
 <dialog id="thinking-tools-dialog" aria-labelledby="six-hats-title">
   <form>
     <p class="eyebrow">Thinking tools</p>
@@ -29,6 +29,45 @@
 <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section><section id="proposal-panel" class="proposal-panel" aria-label="AI expansion proposal" hidden></section>
 <section id="investigation-view" aria-label="Causal investigation"><section class="canvas-tree-strand" data-recursive-tree="strand" data-tree-layout="connected"><section class="canvas-tree-board" id="tree-board"></section></section>
 <p class="tree-guide">Ask why while the next question is useful. Follow side doors to explore alternatives. Use Observed, Reported, Hypothesis or Inference in text to preserve evidence distinctions. Closing a branch records a decision and countermeasure; it does not prove causation.</p></section>
+    <section id="takeaways" class="takeaways" aria-labelledby="takeaways-title">
+      <div class="takeaways-heading">
+        <h2 id="takeaways-title"><label for="takeaways-text">Takeaways</label></h2>
+        <a href="#analysis-toolbar">Back to analysis</a>
+      </div>
+      <p id="takeaways-hint">Record what you want to carry forward from the analysis.</p>
+      <textarea id="takeaways-text" rows="4" aria-describedby="takeaways-hint"></textarea>
+      <div class="ai-actions" role="group" aria-label="Takeaways actions">
+        <button id="takeaways-formulate" type="button" aria-haspopup="dialog">Formulate Takeaways</button>
+        <button id="takeaways-improve" type="button" aria-haspopup="dialog">Review / Improve Takeaways</button>
+      </div>
+      <section id="takeaways-review" class="proposal-panel" aria-labelledby="takeaways-review-title" hidden>
+        <h3 id="takeaways-review-title">Proposed Takeaways</h3>
+        <p id="takeaways-rationale"></p>
+        <h4>Current</h4>
+        <p id="takeaways-current"></p>
+        <h4>Proposed</h4>
+        <p id="takeaways-proposed"></p>
+        <p id="takeaways-error" class="error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="takeaways-reject" type="button">Reject Takeaways</button>
+          <button id="takeaways-accept" type="button" class="primary">Accept Takeaways</button>
+        </div>
+      </section>
+    </section>
+    <dialog id="takeaways-dialog" aria-labelledby="takeaways-action-title">
+      <form>
+        <h2 id="takeaways-action-title">Takeaways</h2>
+        <p class="dialog-note">Copy this request into Codex with the Pensive skill to get a proposal for review.</p>
+        <label for="takeaways-guidance">Focus for this proposal</label>
+        <textarea id="takeaways-guidance" rows="3"></textarea>
+        <label class="checkbox-label"><input id="takeaways-include-annotations" type="checkbox"> Include user-authored Thoughts</label>
+        <p id="takeaways-request-error" class="error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="takeaways-cancel" type="button">Cancel Takeaways request</button>
+          <button type="submit" class="primary">Copy Takeaways request</button>
+        </div>
+      </form>
+    </dialog>
 <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden><label for="clipboard-json">Canvas JSON</label><p>Clipboard access was blocked. Copy the selected JSON manually.</p><textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button type="button" id="close-copy">Close</button></section>
 <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p></main>
 <footer><span>Less conversation. More thinking.</span><span>5 Whys · Pensive</span></footer></div>
@@ -41,6 +80,9 @@
 <!--pensive-state-end-->
 <!--pensive-six-hats-->
 <!--pensive-annotations-->
+<!--pensive-review-->
+<!--pensive-takeaways-->
+<!--pensive-takeaways-ui-->
 <!--pensive-core-->
 <!--pensive-six-hats-ui-->
 <!--pensive-editing-->

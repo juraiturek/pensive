@@ -141,3 +141,11 @@ dialog textarea { display: block; font-size: .9rem; }
 .checkbox-label { display: flex; align-items: center; gap: .5rem; font-weight: 400; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1.2rem; font-size: .8rem; }
 @media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
+
+.takeaways { margin-top: 2rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+.takeaways-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .5rem; }
+#takeaways-text { display: block; width: 100%; box-sizing: border-box; margin: .75rem 0; resize: vertical; }
+@supports (field-sizing: content) {
+  #takeaways-text { field-sizing: content; min-height: 8rem; resize: none; }
+}
+#takeaways-current, #takeaways-proposed, #takeaways-rationale { white-space: pre-wrap; overflow-wrap: anywhere; }

@@ -150,6 +150,14 @@ dialog textarea { display: block; font-size: .9rem; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1.2rem; font-size: .8rem; }
 @media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
 
+.takeaways { margin-top: 2rem; padding: 1rem 0; border-top: 1px solid var(--line); }
+.takeaways-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .5rem; }
+#takeaways-text { display: block; width: 100%; box-sizing: border-box; margin: .75rem 0; resize: vertical; }
+@supports (field-sizing: content) {
+  #takeaways-text { field-sizing: content; min-height: 8rem; resize: none; }
+}
+#takeaways-current, #takeaways-proposed, #takeaways-rationale { white-space: pre-wrap; overflow-wrap: anywhere; }
+
 /* PAGES layout over the established Pensive canvas styles, included at build time. */
 .pages-guide { font-size: .78rem; color: var(--muted); margin: .3rem 0 1rem; max-width: 68rem; }
 .pages-band { --category: var(--accent); display: grid; grid-template-columns: 12rem minmax(0, 1fr); border: 1px solid var(--line); background: var(--surface); border-radius: 5px; margin-bottom: .85rem; overflow: hidden; }
@@ -303,8 +311,8 @@ legend { font-size: .8rem; }
       <label for="why">Motivation<textarea id="why" data-framing="why" rows="1" placeholder="Why does this matter to you?"></textarea></label>
       <details><summary>Inkling <span class="optional">/ optional</span></summary><label for="intuition">Initial intuition<textarea id="intuition" data-framing="intuition" rows="2" placeholder="How do you currently see it?"></textarea></label></details>
     </section>
-    <div class="toolbar">
-      <div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button><button type="button" data-ai="ripple" title="Explore implications of changed dimensions">Ripple</button><button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button></div>
+    <div id="analysis-toolbar" class="toolbar" tabindex="-1">
+      <div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button><button type="button" data-ai="ripple" title="Explore implications of changed dimensions">Ripple</button><button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button><a href="#takeaways">Takeaways</a></div>
       <div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
     <div class="baseline-bar"><p id="baseline-status">Changes are marked against the initial canvas.</p><button type="button" id="reset-baseline">Set current state as Ripple baseline</button></div>
@@ -331,6 +339,45 @@ legend { font-size: .8rem; }
       <section class="pages-band" data-section="actions" aria-label="Actions"></section>
       <section class="pages-band" data-section="parts" aria-label="Parts"></section>
     </section>
+    <section id="takeaways" class="takeaways" aria-labelledby="takeaways-title">
+      <div class="takeaways-heading">
+        <h2 id="takeaways-title"><label for="takeaways-text">Takeaways</label></h2>
+        <a href="#analysis-toolbar">Back to analysis</a>
+      </div>
+      <p id="takeaways-hint">Record what you want to carry forward from the analysis.</p>
+      <textarea id="takeaways-text" rows="4" aria-describedby="takeaways-hint"></textarea>
+      <div class="ai-actions" role="group" aria-label="Takeaways actions">
+        <button id="takeaways-formulate" type="button" aria-haspopup="dialog">Formulate Takeaways</button>
+        <button id="takeaways-improve" type="button" aria-haspopup="dialog">Review / Improve Takeaways</button>
+      </div>
+      <section id="takeaways-review" class="proposal-panel" aria-labelledby="takeaways-review-title" hidden>
+        <h3 id="takeaways-review-title">Proposed Takeaways</h3>
+        <p id="takeaways-rationale"></p>
+        <h4>Current</h4>
+        <p id="takeaways-current"></p>
+        <h4>Proposed</h4>
+        <p id="takeaways-proposed"></p>
+        <p id="takeaways-error" class="error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="takeaways-reject" type="button">Reject Takeaways</button>
+          <button id="takeaways-accept" type="button" class="primary">Accept Takeaways</button>
+        </div>
+      </section>
+    </section>
+    <dialog id="takeaways-dialog" aria-labelledby="takeaways-action-title">
+      <form>
+        <h2 id="takeaways-action-title">Takeaways</h2>
+        <p class="dialog-note">Copy this request into Codex with the Pensive skill to get a proposal for review.</p>
+        <label for="takeaways-guidance">Focus for this proposal</label>
+        <textarea id="takeaways-guidance" rows="3"></textarea>
+        <label class="checkbox-label"><input id="takeaways-include-annotations" type="checkbox"> Include user-authored Thoughts</label>
+        <p id="takeaways-request-error" class="error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="takeaways-cancel" type="button">Cancel Takeaways request</button>
+          <button type="submit" class="primary">Copy Takeaways request</button>
+        </div>
+      </form>
+    </dialog>
     <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden><label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p><textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button></section>
     <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
   </main>
@@ -677,10 +724,172 @@ const Annotations = (() => {
 if (typeof module !== 'undefined' && module.exports) module.exports = Annotations;
 </script>
 <script data-implementation>
+/* Plain-text proposals share the canvas's single pending review slot. */
+const Takeaways = (() => {
+  'use strict';
+  const actions = ['formulate_takeaways', 'review_takeaways'];
+  const handles = id => actions.includes(id);
+  const value = state => state.takeaways ?? '';
+  const text = input => typeof input === 'string';
+  const nonblank = input => text(input) && !!input.trim();
+  const object = input => input && typeof input === 'object' && !Array.isArray(input);
+  const only = (input, keys) => object(input) && Object.keys(input).every(key => keys.includes(key));
+  const review = typeof module !== 'undefined' && module.exports ? require('./proposal-review.js') : ProposalReview;
+
+  function request(canvas, action) {
+    if (!only(action, ['id', 'comment', 'include_annotations']) ||
+        (action.comment !== undefined && !text(action.comment)) ||
+        (action.include_annotations !== undefined && typeof action.include_annotations !== 'boolean')) {
+      throw new Error('Invalid Takeaways action guidance.');
+    }
+    if (action.id === 'review_takeaways' && !value(canvas).trim()) {
+      throw new Error('Review requires existing Takeaways.');
+    }
+    return structuredClone({ canvas, action });
+  }
+
+  function validateProposal(proposal, validateContent, validateAnnotations) {
+    if (!only(proposal, ['action', 'base_content', 'base_takeaways', 'base_annotations', 'takeaways', 'rationale']) ||
+        !text(proposal.base_takeaways) || !nonblank(proposal.takeaways) || !nonblank(proposal.rationale)) {
+      throw new Error('Invalid Takeaways proposal.');
+    }
+    validateContent(proposal.base_content);
+    if (Object.hasOwn(proposal, 'base_annotations')) {
+      if (!Array.isArray(proposal.base_annotations)) throw new Error('Invalid Takeaways annotation snapshot.');
+      validateAnnotations(proposal.base_annotations);
+    }
+  }
+
+  function compose(canvas, action, response) {
+    if (!only(response, ['takeaways', 'rationale']) || !nonblank(response.takeaways) || !nonblank(response.rationale)) {
+      throw new Error('Takeaways response requires proposed text and a rationale.');
+    }
+    const result = structuredClone(canvas);
+    result.proposals = [{
+      action: action.id,
+      base_content: structuredClone(canvas.content),
+      base_takeaways: value(canvas),
+      ...(action.include_annotations === true ? { base_annotations: structuredClone(canvas.annotations ?? []) } : {}),
+      takeaways: response.takeaways,
+      rationale: response.rationale,
+    }];
+    return result;
+  }
+
+  function resolve(state, decision) {
+    const proposal = state.proposals[0];
+    if (decision === 'accept') {
+      if (!review.same(state.content, proposal.base_content) || value(state) !== proposal.base_takeaways ||
+          (proposal.base_annotations && !review.same(state.annotations ?? [], proposal.base_annotations))) {
+        throw new Error('Takeaways proposal is stale. Reject it and request a fresh proposal.');
+      }
+      state.takeaways = proposal.takeaways;
+    } else if (decision !== 'reject') {
+      throw new Error('Unknown review decision.');
+    }
+    delete state.proposals;
+  }
+
+  return Object.freeze({ handles, value, request, validateProposal, compose, resolve });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = Takeaways;
+</script>
+<script data-implementation>
+/* Shared local editor and whole-text review controls. */
+const TakeawaysUI = (() => {
+  'use strict';
+
+  function install({ getState, core, isLocked, refresh, edited, copy }) {
+    const find = id => document.getElementById(id);
+    const input = find('takeaways-text');
+    const formulate = find('takeaways-formulate');
+    const improve = find('takeaways-improve');
+    const panel = find('takeaways-review');
+    const dialog = find('takeaways-dialog');
+    const form = dialog.querySelector('form');
+    const error = find('takeaways-error');
+    let actionId;
+
+    function render() {
+      const state = getState();
+      const proposal = state.proposals?.[0];
+      const locked = isLocked();
+      const reviewing = Takeaways.handles(proposal?.action);
+      input.value = Takeaways.value(state);
+      input.readOnly = locked;
+      formulate.disabled = locked || !!proposal;
+      improve.disabled = formulate.disabled || !input.value.trim();
+      panel.hidden = !reviewing;
+      error.textContent = '';
+      if (reviewing) {
+        find('takeaways-current').textContent = input.value || '(Empty)';
+        find('takeaways-proposed').textContent = proposal.takeaways;
+        find('takeaways-rationale').textContent = proposal.rationale;
+        panel.querySelectorAll('button').forEach(button => { button.disabled = locked; });
+      }
+      return reviewing;
+    }
+
+    input.addEventListener('input', () => {
+      if (isLocked()) return;
+      getState().takeaways = input.value;
+      improve.disabled = formulate.disabled || !input.value.trim();
+      if (!panel.hidden) find('takeaways-current').textContent = input.value || '(Empty)';
+      edited();
+    });
+
+    function open(id, label) {
+      actionId = id;
+      form.reset();
+      find('takeaways-action-title').textContent = label;
+      find('takeaways-request-error').textContent = '';
+      dialog.showModal();
+    }
+    formulate.addEventListener('click', () => open('formulate_takeaways', formulate.textContent));
+    improve.addEventListener('click', () => open('review_takeaways', improve.textContent));
+    find('takeaways-cancel').addEventListener('click', () => dialog.close());
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      try {
+        const request = core.buildRequest(getState(), {
+          id: actionId,
+          comment: find('takeaways-guidance').value,
+          include_annotations: find('takeaways-include-annotations').checked,
+        });
+        dialog.close();
+        await copy(JSON.stringify(request, null, 2), 'Copied AI request. Paste it into Codex with the Pensive skill.', true);
+      } catch (failure) {
+        find('takeaways-request-error').textContent = failure.message;
+      }
+    });
+
+    function decide(decision) {
+      if (isLocked()) return;
+      try {
+        const state = getState();
+        if (state.framework === 'five_whys') core.resolveProposal(state, decision);
+        else core.resolveProposal(state, undefined, decision);
+        refresh();
+        edited();
+        input.focus();
+      } catch (failure) {
+        error.textContent = failure.message;
+      }
+    }
+    find('takeaways-accept').addEventListener('click', () => decide('accept'));
+    find('takeaways-reject').addEventListener('click', () => decide('reject'));
+    return render;
+  }
+
+  return Object.freeze({ install });
+})();
+</script>
+<script data-implementation>
 /* PAGES state and action boundaries. Used by the standalone page and Node. */
 const Pages = (() => {
   'use strict';
   const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
+  const Results = typeof module !== 'undefined' && module.exports ? require('../../shared/takeaways.js') : Takeaways;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const sections = Object.freeze(['parts', 'actions', 'goals', 'events', 'self_concepts']);
   const framing = Object.freeze(['what', 'why', 'intuition']);
@@ -741,9 +950,10 @@ const Pages = (() => {
     return before.length !== after.length || before.some(old => !after.some(item => item.id === old.id && item.text === old.text));
   }
   function validate(state) {
-    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['ripple_baseline', 'thoughts', 'proposals', 'annotations']);
+    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['ripple_baseline', 'thoughts', 'proposals', 'annotations', 'takeaways']);
     if (state.framework !== 'pages' || state.schema_version !== '1.0') throw new Error('Unsupported framework/version; expected pages / 1.0.');
     const ids = validateContent(state.content);
+    if (state.takeaways !== undefined && typeof state.takeaways !== 'string') throw new Error('Takeaways must be text.');
     Notes.validate(state.annotations, 'item', sections);
     if (state.ripple_baseline !== undefined) validateCollections(state.ripple_baseline);
     if (state.thoughts !== undefined) {
@@ -756,6 +966,10 @@ const Pages = (() => {
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one pending proposal is supported.');
       for (const p of state.proposals) {
+        if (Results.handles(p?.action)) {
+          Results.validateProposal(p, validateContent, notes => Notes.validate(notes, 'item', sections));
+          continue;
+        }
         keys(p, ['id', 'action', 'sources', 'base_content', 'base_baseline', 'content', 'thought'], 'Proposal', ['resolutions']);
         if (typeof p.id !== 'string' || !idPattern.test(p.id) || ids.has(p.id)) throw new Error('Invalid or duplicate proposal ID.');
         ids.add(p.id);
@@ -833,6 +1047,7 @@ const Pages = (() => {
   function buildRequest(state, action) {
     validate(state);
     if (state.proposals?.length) throw new Error('Resolve the pending proposal first.');
+    if (Results.handles(action?.id)) return Results.request(state, action);
     if (action?.id === 'six_hats') {
       Hats.validateAction(state, action);
       return structuredClone({ canvas: state, action });
@@ -854,6 +1069,7 @@ const Pages = (() => {
   function validateRequest(request) { keys(request, ['canvas', 'action'], 'Request'); return buildRequest(request.canvas, request.action); }
   function composeResult(input, response) {
     const { canvas, action } = validateRequest(input);
+    if (Results.handles(action.id)) return validate(Results.compose(canvas, action, response));
     if (action.id === 'six_hats') return validate(Hats.append(canvas, action, response));
     keys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'Response');
     if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('A nonempty explanatory thought is required.');
@@ -865,9 +1081,13 @@ const Pages = (() => {
     }
     return validate(canvas);
   }
-  function proposalSections(state) { validate(state); return state.proposals?.length ? review.entries(state.proposals[0]) : []; }
+  function proposalSections(state) { validate(state); return state.proposals?.length && !Results.handles(state.proposals[0].action) ? review.entries(state.proposals[0]) : []; }
   function resolveProposal(state, selected, decision) {
     validate(state); const p = state.proposals?.[0]; if (!p) throw new Error('No pending proposal.');
+    if (Results.handles(p.action)) {
+      if (selected !== undefined) throw new Error('Takeaways review applies to the whole text.');
+      return Results.resolve(state, decision);
+    }
     if (decision === 'accept') {
       if (!same(state.ripple_baseline ?? null, p.base_baseline)) throw new Error('Ripple baseline changed; reject and request again.');
       if (!same(state.content, review.expected(p))) throw new Error('Canvas content changed; reject remaining changes and request again.');
@@ -1336,7 +1556,7 @@ const AnnotationUI = (() => {
   };
   const $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction, annotations;
+  let state, requestedAction, annotations, renderTakeaways;
   const ordering = CanvasEditing.collectionOrdering({ core: Pages, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -1426,6 +1646,7 @@ const AnnotationUI = (() => {
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!proposal; });
     $('#reset-baseline').disabled = annotations.isActive() || !!proposal;
+    if (renderTakeaways()) { $('#proposal-panel').hidden = true; return; }
     ProposalReviewUI.render({ state, core: Pages, panel: $('#proposal-panel'), labels,
       title: proposal?.action === 'ripple' ? 'Proposed Ripple implications' : 'Proposed improvements',
       onDecision: (selected, decision) => {
@@ -1492,6 +1713,10 @@ const AnnotationUI = (() => {
         refresh();
       },
       onEdit: edited
+    });
+    renderTakeaways = TakeawaysUI.install({
+      getState: () => state, core: Pages, isLocked: () => annotations.isActive(),
+      refresh: refresh, edited, copy: copyJson,
     });
     SixHatsUI.install(() => state, Pages, copyJson); refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));

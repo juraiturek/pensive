@@ -6,6 +6,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
   const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
+  const Results = typeof module !== 'undefined' && module.exports ? require('../../shared/takeaways.js') : Takeaways;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const framing = [
     'observable_symptom',
@@ -75,12 +76,13 @@
     keys(
       s,
       ['framework', 'schema_version', 'content', 'cursor'],
-      ['thoughts', 'proposals', 'annotations'],
+      ['thoughts', 'proposals', 'annotations', 'takeaways'],
       'Canvas',
     );
     if (s.framework !== 'five_whys' || s.schema_version !== '1.0')
       fail('Unsupported framework/version.');
     const ids = validateContent(s.content);
+    if (s.takeaways !== undefined && typeof s.takeaways !== 'string') throw new Error('Takeaways must be text.');
     Notes.validate(s.annotations, 'node');
     if (s.thoughts !== undefined) {
       if (!Array.isArray(s.thoughts)) fail('Thoughts must be an array.');
@@ -98,7 +100,10 @@
     if (s.proposals !== undefined) {
       if (!Array.isArray(s.proposals) || s.proposals.length > 1)
         fail('At most one pending proposal.');
-      for (const p of s.proposals) validateProposal(p, ids);
+      for (const p of s.proposals) {
+        if (Results.handles(p?.action)) Results.validateProposal(p, validateContent, notes => Notes.validate(notes, 'node'));
+        else validateProposal(p, ids);
+      }
     }
     if (!Array.isArray(s.cursor) || !s.cursor.length || s.cursor[0] !== s.content.tree.id)
       fail('Invalid cursor.');
@@ -125,6 +130,7 @@
     const ids = validateContent(s.content);
     for (const t of s.thoughts || []) ids.add(t.id);
     for (const p of s.proposals || []) {
+      if (Results.handles(p.action)) continue;
       ids.add(p.id);
       ids.add(p.thought.id);
       for (const c of p.children) ids.add(c.id);
@@ -378,6 +384,7 @@
     keys(request, ['canvas', 'action'], [], 'Request');
     validate(request.canvas);
     if (request.canvas.proposals?.length) fail('Resolve pending proposal first.');
+    if (Results.handles(request.action?.id)) return Results.request(request.canvas, request.action);
     if (request.action?.id === 'six_hats') {
       Hats.validateAction(request.canvas, request.action);
       return request;
@@ -405,6 +412,7 @@
   }
   function composeResult(request, response) {
     validateRequest(request);
+    if (Results.handles(request.action.id)) return validate(Results.compose(request.canvas, request.action, response));
     if (request.action.id === 'six_hats') return validate(Hats.append(request.canvas, request.action, response));
     const expanding = request.action.id === 'expand';
     keys(response, ['thought', ...(expanding ? ['children'] : [])], [], 'Response');
@@ -464,6 +472,7 @@
     if (!['accept', 'reject'].includes(decision)) fail('Unknown review decision.');
     const p = s.proposals?.[0];
     if (!p) fail('No pending proposal.');
+    if (Results.handles(p.action)) return Results.resolve(s, decision);
     if (decision === 'reject') {
       delete s.proposals;
       return;

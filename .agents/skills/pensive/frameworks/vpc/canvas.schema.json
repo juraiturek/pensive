@@ -10,6 +10,7 @@
     "content"
   ],
   "properties": {
+    "takeaways": { "type": "string" },
     "annotations": {
       "type": "array",
       "items": {
@@ -119,7 +120,47 @@
       "type": "array",
       "maxItems": 1,
       "items": {
-        "$ref": "#/$defs/proposal"
+        "oneOf": [
+          {
+            "$ref": "#/$defs/proposal"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "action",
+              "base_content",
+              "base_takeaways",
+              "takeaways",
+              "rationale"
+            ],
+            "properties": {
+              "action": {
+                "enum": [
+                  "formulate_takeaways",
+                  "review_takeaways"
+                ]
+              },
+              "base_content": {
+                "$ref": "#/$defs/content"
+              },
+              "base_takeaways": {
+                "type": "string"
+              },
+              "base_annotations": {
+                "$ref": "#/properties/annotations"
+              },
+              "takeaways": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        ]
       }
     }
   },

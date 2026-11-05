@@ -2,6 +2,7 @@
 const Swot = (() => {
   'use strict';
   const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
+  const Results = typeof module !== 'undefined' && module.exports ? require('../../shared/takeaways.js') : Takeaways;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
@@ -58,9 +59,10 @@ const Swot = (() => {
     ids.add(thought.id);
   }
   function validate(state) {
-    objectWithKeys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals', 'annotations']);
+    objectWithKeys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals', 'annotations', 'takeaways']);
     if (state.framework !== 'swot' || state.schema_version !== '1.0') throw new Error('Unsupported framework or schema version. Expected swot / 1.0.');
     const ids = validateContent(state.content);
+    if (state.takeaways !== undefined && typeof state.takeaways !== 'string') throw new Error('Takeaways must be text.');
     Notes.validate(state.annotations, ['factor', 'strategy'], [...factors, ...strategies]);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
@@ -72,6 +74,10 @@ const Swot = (() => {
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one whole-canvas proposal is supported.');
       for (const proposal of state.proposals) {
+        if (Results.handles(proposal?.action)) {
+          Results.validateProposal(proposal, validateContent, notes => Notes.validate(notes, ['factor', 'strategy'], [...factors, ...strategies]));
+          continue;
+        }
         objectWithKeys(proposal, ['id', 'action', 'base_content', 'content', 'thought'], 'Proposal', ['resolutions']);
         if (typeof proposal.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(proposal.id) || ids.has(proposal.id)) throw new Error('Invalid or duplicate proposal ID.');
         ids.add(proposal.id);
@@ -147,6 +153,7 @@ const Swot = (() => {
   function buildRequest(state, action) {
     validate(state);
     if (state.proposals?.length) throw new Error('Accept or reject the pending proposal before requesting another AI action.');
+    if (Results.handles(action?.id)) return Results.request(state, action);
     if (action?.id === 'six_hats') {
       Hats.validateAction(state, action);
       return structuredClone({ canvas: state, action });
@@ -174,6 +181,7 @@ const Swot = (() => {
   function composeResult(input, response) {
     const request = validateRequest(input);
     const { canvas, action } = request;
+    if (Results.handles(action.id)) return validate(Results.compose(canvas, action, response));
     if (action.id === 'six_hats') return validate(Hats.append(canvas, action, response));
     objectWithKeys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'AI response');
     if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('A nonempty explanatory thought is required.');
@@ -196,12 +204,16 @@ const Swot = (() => {
   }
   function proposalSections(state) {
     validate(state);
-    return state.proposals?.length ? review.entries(state.proposals[0]) : [];
+    return state.proposals?.length && !Results.handles(state.proposals[0].action) ? review.entries(state.proposals[0]) : [];
   }
   function resolveProposal(state, selected, decision) {
     validate(state);
     const proposal = state.proposals?.[0];
     if (!proposal) throw new Error('No pending proposal.');
+    if (Results.handles(proposal.action)) {
+      if (selected !== undefined) throw new Error('Takeaways review applies to the whole text.');
+      return Results.resolve(state, decision);
+    }
     if (decision === 'accept' && !same(state.content, review.expected(proposal))) throw new Error('Canvas content changed after this proposal; reject remaining changes and request a fresh transformation.');
     const next = review.apply(state, selected, decision);
     validate(next);

@@ -11,6 +11,10 @@ SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve r
 
 For context-based creation and existing-state analytical actions, read the shared [internal and external fit guidance](references/framing-content.md) with the selected framework method. Framework methodology and action boundaries remain authoritative; blank copying and JSON-only packaging need no analytical review.
 
+## Takeaways
+
+All four canvases have a manually editable Takeaways body below the analysis. Preserve it during unrelated edits and AI actions. Route `formulate_takeaways` and `review_takeaways` before framework-specific action routing. Read the [Takeaways handoff](references/takeaways-workflow.md) for context selection, framework methodology, response validation and explicit whole-text review. Include relevant manual Thoughts only when the user opts in. A pending proposal never replaces the user's body until acceptance.
+
 ## Shared thinking tools
 
 Honor explicit Six Thinking Hats requests. When a deliberate lens could help with an impasse, challenge an analysis or generate alternatives, offer it selectively as a choice. Wait for the user's choice when only implicitly relevant. Apply one selected hat at a time.

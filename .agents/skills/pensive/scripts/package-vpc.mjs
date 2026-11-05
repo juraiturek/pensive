@@ -15,6 +15,8 @@ export async function buildCanvas(state = Vpc.initialState()) {
     ['<!--pensive-annotations-style-->', await readFile(new URL('../../shared/annotations.css', framework), 'utf8'), 'style'],
     ['<!--pensive-annotations-->', await readFile(new URL('../../shared/annotations.js', framework), 'utf8'), 'script'],
     ['<!--pensive-annotations-ui-->', await readFile(new URL('../../shared/annotations-ui.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-takeaways-ui-->', await readFile(new URL('../../shared/takeaways-ui.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-takeaways-->', await readFile(new URL('../../shared/takeaways.js', framework), 'utf8'), 'script'],
     ['<!--pensive-core-->', await readFile(new URL('state.js', framework), 'utf8'), 'script'],
     ['<!--pensive-six-hats-->', await readFile(new URL('../../shared/six-hats.js', framework), 'utf8'), 'script'],
     ['<!--pensive-six-hats-ui-->', await readFile(new URL('../../shared/six-hats-ui.js', framework), 'utf8'), 'script'],

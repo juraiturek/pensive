@@ -18,6 +18,8 @@ export async function buildCanvas(state = Swot.initialState()) {
     ['<!--pensive-annotations-style-->', '../../shared/annotations.css', 'style'],
     ['<!--pensive-annotations-->', '../../shared/annotations.js', 'script'],
     ['<!--pensive-annotations-ui-->', '../../shared/annotations-ui.js', 'script'],
+    ['<!--pensive-takeaways-ui-->', '../../shared/takeaways-ui.js', 'script'],
+    ['<!--pensive-takeaways-->', '../../shared/takeaways.js', 'script'],
     ['<!--pensive-core-->', 'state.js', 'script'],
     ['<!--pensive-six-hats-->', '../../shared/six-hats.js', 'script'],
     ['<!--pensive-six-hats-ui-->', '../../shared/six-hats-ui.js', 'script'],

@@ -10,7 +10,7 @@
   };
   const $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction, annotations;
+  let state, requestedAction, annotations, renderTakeaways;
   const ordering = CanvasEditing.collectionOrdering({ core: Pages, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -100,6 +100,7 @@
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!proposal; });
     $('#reset-baseline').disabled = annotations.isActive() || !!proposal;
+    if (renderTakeaways()) { $('#proposal-panel').hidden = true; return; }
     ProposalReviewUI.render({ state, core: Pages, panel: $('#proposal-panel'), labels,
       title: proposal?.action === 'ripple' ? 'Proposed Ripple implications' : 'Proposed improvements',
       onDecision: (selected, decision) => {
@@ -166,6 +167,10 @@
         refresh();
       },
       onEdit: edited
+    });
+    renderTakeaways = TakeawaysUI.install({
+      getState: () => state, core: Pages, isLocked: () => annotations.isActive(),
+      refresh: refresh, edited, copy: copyJson,
     });
     SixHatsUI.install(() => state, Pages, copyJson); refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));

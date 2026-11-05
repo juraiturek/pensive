@@ -1,0 +1,3 @@
+# SWOT/TOWS Takeaways
+
+Start with the focal entity, objective and environment. Trace promising directions to the specific internal capability or constraint and external condition that make the move relevant. For an existing TOWS option, check that its SO, ST, WO or WT pairing supports the proposed mechanism. Weigh material feasibility, priority, tradeoffs and differentiation relative to known alternatives. Qualify unsupported competitive or external assumptions. TOWS entries are candidate strategies even when accepted into the matrix. Attribute selection only when the user has expressed it. Where the choice turns on missing information, identify what comparison or assumption would distinguish the options.

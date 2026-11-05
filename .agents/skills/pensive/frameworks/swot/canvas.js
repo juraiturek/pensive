@@ -16,7 +16,7 @@
   const $ = selector => document.querySelector(selector);
   // Capture before rendering. Exports reuse this pristine implementation, never the edited DOM.
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, annotations;
+  let state, annotations, renderTakeaways;
   let mode = 'swot';
   let requestedAction = null;
   const ordering = CanvasEditing.collectionOrdering({ core: Swot, getState: () => state, renderSection, edited, status });
@@ -203,6 +203,7 @@
     }
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!proposal; });
+    if (renderTakeaways()) { $('#proposal-panel').hidden = true; return; }
     ProposalReviewUI.render({ state, core: Swot, panel: $('#proposal-panel'), labels,
       title: proposal?.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements',
       onDecision: (selected, decision) => {
@@ -245,6 +246,10 @@
         refreshCanvas();
       },
       onEdit: edited
+    });
+    renderTakeaways = TakeawaysUI.install({
+      getState: () => state, core: Swot, isLocked: () => annotations.isActive(),
+      refresh: refreshCanvas, edited, copy: copyJson,
     });
     SixHatsUI.install(() => state, Swot, copyJson);
     for (const field of Swot.framing) {

@@ -1,5 +1,11 @@
 # Destination architecture
 
+## Takeaways
+
+An optional top-level `takeaways` string extends schema 1.0 across SWOT/TOWS, PAGES, VPC and 5 Whys. Framing and framework analysis keep their existing `content` representation. Manual annotations and AI thoughts remain supplementary. Takeaways edit and travel with the complete artifact through the existing JSON and standalone HTML paths.
+
+A Takeaways proposal uses the single pending review slot. Its acceptance guard compares the submitted content and text, plus manual annotations when explicitly included. Both actions use the existing clipboard and deterministic packaging handoff. The [Takeaways workflow](../.agents/skills/pensive/references/takeaways-workflow.md) owns the operational contract and the [implementation plan](plans/2026-11-05-takeaways.md) records the slice.
+
 ## Uniform local editing — 2026-11-04
 
 The [approved follow-up](plans/2026-11-04-uniform-canvas-editing.md) extends the previously SWOT-only collection interaction to PAGES and VPC. Shared `canvas-editing.js` owns DOM Enter handling and pointer gestures; shared `collection-ordering.css` owns handle/insertion presentation. Framework-owned state operations still enforce collection validity, stable identities and pending-review locks. The three collection canvases embed both assets; 5 Whys embeds the Enter helper but installs no collection-ordering controller or styles.
