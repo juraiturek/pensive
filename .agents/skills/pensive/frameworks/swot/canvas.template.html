@@ -6,6 +6,8 @@
 <meta name="color-scheme" content="light">
 <title>Pensive — SWOT / TOWS</title>
 <!--pensive-style-->
+<!--pensive-ordering-style-->
+<!--pensive-interactions-->
 </head>
 <body>
 <div class="shell">
@@ -28,7 +30,7 @@
         <button type="button" data-ai="evaluate" title="Evaluate SWOT, TOWS, or both">Evaluate</button>
         <button type="button" data-ai="improve" title="Improve the current SWOT/TOWS">Improve</button>
       </div>
-      <div class="export-actions"><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
+      <div class="export-actions"><button id="copy" type="button" class="primary" title="Copy the complete canvas for discussion or reuse. Use an AI action button to request a transformation.">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
     <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
     <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
@@ -58,7 +60,7 @@
       </div>
     </section>
     <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden>
-      <label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p>
+      <label for="clipboard-json">Canvas JSON</label><p>Copy this complete canvas for discussion or reuse.</p>
       <textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button>
     </section>
     <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
@@ -68,7 +70,7 @@
 <dialog id="ai-dialog" aria-labelledby="ai-title">
   <form id="ai-form">
     <h2 id="ai-title">Request AI action</h2>
-    <p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill. No AI runs in this page.</p>
+    <p class="dialog-note">Copy the complete canvas and selected action, then paste the request into Codex or ChatGPT with the Pensive skill. Export to clipboard copies the canvas alone for discussion or reuse. No AI runs in this page.</p>
     <div id="strategy-options"><label for="strategy-mode">Strategy mode</label><select id="strategy-mode"><option value="extend">Add to existing strategies</option><option value="replace">Regenerate all strategies</option></select></div>
     <div id="evaluation-options"><label for="evaluation-scope">Evaluate</label><select id="evaluation-scope"><option value="both">SWOT and TOWS</option><option value="swot">SWOT only</option><option value="tows">TOWS only</option></select></div>
     <label for="ai-guidance">Steering guidance</label>
@@ -84,6 +86,7 @@
 <!--pensive-review-->
 <!--pensive-review-ui-->
 <!--pensive-core-->
+<!--pensive-editing-->
 <!--pensive-runtime-->
 </body>
 </html>

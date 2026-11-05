@@ -15,6 +15,7 @@ Privately summarize entity and analytical boundary, objective/lens, relevant env
 - Without a specific objective, use and disclose “General strategic position assessment” unless different plausible objectives materially change the result.
 - Geography, timeframe, market, stakeholders, and constraints are conditional needs, not a mandatory checklist. Environment can be empty when unknown.
 - Generate directly when context supports useful specific factors and no consequential ambiguity remains. Do not ask simply to populate every quadrant.
+- Once SWOT is chosen, take initiative at the transition from discussion to a draft. If useful creation is already authorized and evidence is sufficient, generate; if only a sparse draft is supported, offer that option promptly within the existing question budget. A user finding an elicitation question difficult is a reason to reassess available evidence, not to wait for them to repeat “create a SWOT.” Do not treat uncertainty or silence as sparse-draft agreement.
 
 ## Elicit: zero to two question turns
 

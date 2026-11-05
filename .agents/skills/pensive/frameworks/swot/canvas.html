@@ -150,6 +150,31 @@ dialog textarea { display: block; font-size: .9rem; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: 1.2rem; font-size: .8rem; }
 @media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
 </style>
+<style>
+/* Shared pointer-ordering presentation for flat collections. */
+.item { display: flex; position: relative; align-items: start; gap: .6rem; border-top: 1px solid #00000014; padding: .55rem 0 .55rem 1.15rem; }
+.item::before { content: "·"; color: var(--category); position: absolute; left: .15rem; top: .7rem; padding-top: 0; }
+.drag-handle { position: absolute; left: -.25rem; top: .55rem; width: 1.25rem; height: 2rem; padding: 0; border: 0; background: transparent; color: var(--category); font-size: 1.15rem; line-height: 1; opacity: 0; pointer-events: none; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.drag-handle:hover { background: transparent; }
+.drag-handle:disabled { cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .item:hover .drag-handle { opacity: 1; pointer-events: auto; transition: opacity 0s .18s; }
+  .item:hover::before { opacity: 0; transition: opacity 0s .18s; }
+}
+.item.touch-selected .drag-handle { opacity: 1; pointer-events: auto; transition: none; }
+.item.touch-selected::before { opacity: 0; }
+.item.is-dragging { opacity: .45; }
+.item.is-dragging .drag-handle { cursor: grabbing; }
+.item.drop-before::after, .item.drop-after::after { content: ""; position: absolute; left: 0; right: 0; height: 2px; background: var(--accent); pointer-events: none; }
+.item.drop-before::after { top: -1px; }
+.item.drop-after::after { bottom: -1px; }
+</style>
+<style>
+/* SWOT thought disclosure; collection interactions are shared. */
+.earlier-thoughts { margin-top: .6rem; }
+.earlier-thoughts > summary { font-size: .8rem; color: var(--muted); padding: .35rem 0; cursor: pointer; }
+.earlier-thoughts .thought { margin-top: .5rem; }
+</style>
 </head>
 <body>
 <div class="shell">
@@ -172,7 +197,7 @@ dialog textarea { display: block; font-size: .9rem; }
         <button type="button" data-ai="evaluate" title="Evaluate SWOT, TOWS, or both">Evaluate</button>
         <button type="button" data-ai="improve" title="Improve the current SWOT/TOWS">Improve</button>
       </div>
-      <div class="export-actions"><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
+      <div class="export-actions"><button id="copy" type="button" class="primary" title="Copy the complete canvas for discussion or reuse. Use an AI action button to request a transformation.">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
     <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
     <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
@@ -202,7 +227,7 @@ dialog textarea { display: block; font-size: .9rem; }
       </div>
     </section>
     <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden>
-      <label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p>
+      <label for="clipboard-json">Canvas JSON</label><p>Copy this complete canvas for discussion or reuse.</p>
       <textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button>
     </section>
     <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
@@ -212,7 +237,7 @@ dialog textarea { display: block; font-size: .9rem; }
 <dialog id="ai-dialog" aria-labelledby="ai-title">
   <form id="ai-form">
     <h2 id="ai-title">Request AI action</h2>
-    <p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill. No AI runs in this page.</p>
+    <p class="dialog-note">Copy the complete canvas and selected action, then paste the request into Codex or ChatGPT with the Pensive skill. Export to clipboard copies the canvas alone for discussion or reuse. No AI runs in this page.</p>
     <div id="strategy-options"><label for="strategy-mode">Strategy mode</label><select id="strategy-mode"><option value="extend">Add to existing strategies</option><option value="replace">Regenerate all strategies</option></select></div>
     <div id="evaluation-options"><label for="evaluation-scope">Evaluate</label><select id="evaluation-scope"><option value="both">SWOT and TOWS</option><option value="swot">SWOT only</option><option value="tows">TOWS only</option></select></div>
     <label for="ai-guidance">Steering guidance</label>
@@ -500,6 +525,14 @@ const Swot = (() => {
     const { items, index } = locate(state, section, id);
     items.splice(index, 1);
   }
+  function reorderItem(state, section, id, finalIndex) {
+    const { items, index } = locate(state, section, id);
+    if (!Number.isInteger(finalIndex) || finalIndex < 0 || finalIndex >= items.length) throw new Error('Reorder position must be within this collection.');
+    if (proposalSections(state).some(entry => entry.section === section && entry.status === 'pending')) throw new Error('Resolve this collection’s pending review before reordering.');
+    if (index === finalIndex) return;
+    const [item] = items.splice(index, 1);
+    items.splice(finalIndex, 0, item);
+  }
   function same(a, b) {
     if (a === b) return true;
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
@@ -592,9 +625,138 @@ const Swot = (() => {
     const slot = `${start}\n<script id="canvas-state" type="application/json">${json}<${'/script>'}\n${end}`;
     return html.slice(0, first) + slot + html.slice(last + end.length);
   }
-  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
+  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
+</script>
+<script data-implementation>
+/* Shared local text editing and flat-collection pointer ordering. No state or network service. */
+const CanvasEditing = (() => {
+  'use strict';
+  function finishOnEnter(input, finish = () => input.blur()) {
+    input.title ||= 'Enter to finish editing; Shift+Enter for a new line.';
+    input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' || event.shiftKey || event.isComposing || event.keyCode === 229) return;
+      event.preventDefault();
+      finish();
+    });
+  }
+  function collectionOrdering({ core, getState, renderSection, edited, status }) {
+    let drag = null;
+    let suppressDragClick = false;
+    // Keep ordering local until a valid drop. Pointer capture supports both mouse and touch.
+    function updateDrop(x, y) {
+      if (!drag || drag.cancelled) return;
+      drag.x = x; drag.y = y;
+      drag.list.querySelectorAll('.drop-before, .drop-after').forEach(row => row.classList.remove('drop-before', 'drop-after'));
+      drag.finalIndex = null;
+      if (!drag.active && Math.hypot(x - drag.startX, y - drag.startY) < 5) return;
+      drag.active = true;
+      drag.row.classList.add('is-dragging');
+      const bounds = drag.list.getBoundingClientRect();
+      if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) return;
+      const others = [...drag.list.children].filter(row => row !== drag.row);
+      const before = others.find(row => { const box = row.getBoundingClientRect(); return y < box.top + box.height / 2; });
+      drag.finalIndex = before ? others.indexOf(before) : others.length;
+      const marker = before || others.at(-1);
+      marker?.classList.add(before ? 'drop-before' : 'drop-after');
+    }
+    function scrollDrag() {
+      if (!drag) return;
+      if (drag.active) {
+        const bounds = drag.list.getBoundingClientRect();
+        const direction = drag.y < 48 ? -1 : drag.y > innerHeight - 48 ? 1 : 0;
+        const remaining = direction < 0 ? Math.max(0, -bounds.top) : Math.max(0, bounds.bottom - innerHeight);
+        if (direction && remaining && drag.x >= bounds.left && drag.x <= bounds.right) {
+          window.scrollBy(0, direction * Math.min(10, remaining));
+          updateDrop(drag.x, drag.y);
+        }
+      }
+      drag.frame = requestAnimationFrame(scrollDrag);
+    }
+    function finishDrag(commit) {
+      if (!drag) return;
+      const current = drag;
+      drag = null;
+      if (current.active) {
+        // A drop can replace its source DOM; never let the resulting click add a draft.
+        suppressDragClick = true;
+        setTimeout(() => { suppressDragClick = false; }, 0);
+      }
+      cancelAnimationFrame(current.frame);
+      current.list.querySelectorAll('.drop-before, .drop-after, .is-dragging').forEach(row => row.classList.remove('drop-before', 'drop-after', 'is-dragging'));
+      if (current.handle.hasPointerCapture(current.pointerId)) current.handle.releasePointerCapture(current.pointerId);
+      if (!commit || !current.active || current.finalIndex === null) return;
+      const previous = core.collection(getState(), current.section).findIndex(item => item.id === current.id);
+      if (previous === current.finalIndex) return;
+      try {
+        core.reorderItem(getState(), current.section, current.id, current.finalIndex);
+        renderSection(current.section);
+        edited();
+        if (getState().proposals?.length) status('Order changed. This manual edit makes remaining proposal acceptance stale; reject remaining changes and request a fresh proposal.');
+      } catch (error) { status(error.message, true); }
+    }
+    function wireHandle(handle, row, list, section, id) {
+      handle.addEventListener('pointerdown', event => {
+        if (handle.disabled || !event.isPrimary || event.button !== 0) return;
+        event.preventDefault();
+        finishDrag(false);
+        drag = { handle, row, list, section, id, pointerId: event.pointerId,
+          startX: event.clientX, startY: event.clientY, x: event.clientX, y: event.clientY, active: false, finalIndex: null };
+        handle.setPointerCapture(event.pointerId);
+        drag.frame = requestAnimationFrame(scrollDrag);
+      });
+      handle.addEventListener('pointermove', event => {
+        if (drag?.handle === handle && drag.pointerId === event.pointerId) updateDrop(event.clientX, event.clientY);
+      });
+      handle.addEventListener('pointerup', event => {
+        if (drag?.handle !== handle || drag.pointerId !== event.pointerId) return;
+        updateDrop(event.clientX, event.clientY);
+        finishDrag(!drag.cancelled);
+      });
+      for (const type of ['pointercancel', 'lostpointercapture']) handle.addEventListener(type, () => { if (drag?.handle === handle) finishDrag(false); });
+      handle.addEventListener('click', event => event.preventDefault());
+    }
+
+    function createHandle(row, list, section, item, index, label) {
+      const pendingReview = core.proposalSections(getState()).some(entry => entry.section === section && entry.status === 'pending');
+      const handle = document.createElement('button');
+      handle.className = 'drag-handle'; handle.textContent = '⠿'; handle.type = 'button';
+      handle.tabIndex = -1; // Keyboard ordering is deferred; text editing retains its tab order.
+      handle.disabled = pendingReview || core.collection(getState(), section).length < 2;
+      handle.title = pendingReview ? 'Resolve this collection’s pending review before reordering.' : handle.disabled ? 'Add another bullet to reorder.' : 'Drag to reorder within this collection';
+      handle.setAttribute('aria-label', `Reorder ${label.toLowerCase()} ${index + 1}`);
+      wireHandle(handle, row, list, section, item.id);
+      return handle;
+    }
+    document.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch') return;
+      const selected = event.target.closest('[data-section] .item');
+      document.querySelectorAll('.touch-selected').forEach(row => { if (row !== selected) row.classList.remove('touch-selected'); });
+      selected?.classList.add('touch-selected');
+      if (selected) {
+        const section = selected.closest('[data-section]').dataset.section;
+        if (core.proposalSections(getState()).some(entry => entry.section === section && entry.status === 'pending')) status('Resolve this collection’s pending review before reordering. You can still edit its text.');
+      }
+    });
+    document.addEventListener('click', event => {
+      if (!suppressDragClick) return;
+      event.preventDefault(); event.stopPropagation();
+    }, true);
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !drag) return;
+      event.preventDefault();
+      drag.cancelled = true;
+      cancelAnimationFrame(drag.frame);
+      drag.list.querySelectorAll('.drop-before, .drop-after, .is-dragging').forEach(row => row.classList.remove('drop-before', 'drop-after', 'is-dragging'));
+      // Retain capture until pointerup so release cannot turn into a background Add click.
+    });
+    window.addEventListener('blur', () => finishDrag(false));
+
+    return Object.freeze({ createHandle });
+  }
+  return Object.freeze({ finishOnEnter, collectionOrdering });
+})();
 </script>
 <script data-implementation>
 /* UI for this SWOT/TOWS canvas only. No storage or network operations. */
@@ -616,6 +778,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
   let state;
   let mode = 'swot';
   let requestedAction = null;
+  const ordering = CanvasEditing.collectionOrdering({ core: Swot, getState: () => state, renderSection, edited, status });
   function status(message, error = false) {
     $('#status').textContent = message;
     $('#status').classList.toggle('error', error);
@@ -655,7 +818,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     const list = element('ul', 'items');
     items.forEach((item, index) => {
       const row = element('li', 'item');
+      const handle = ordering.createHandle(row, list, section, item, index, label);
       const input = element('textarea');
+      CanvasEditing.finishOnEnter(input);
       input.rows = 1;
       input.value = item.text;
       input.dataset.id = item.id;
@@ -675,7 +840,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
         container.querySelector('.add').focus();
         edited();
       });
-      row.append(input, remove);
+      row.append(handle, input, remove);
       list.append(row);
     });
     container.append(list);
@@ -725,13 +890,17 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     $('#tows-toggle').setAttribute('aria-pressed', String(mode === 'tows'));
     document.querySelectorAll(`#${mode}-view textarea`).forEach(resize);
   }
-  async function copyJson(json, message) {
+  async function copyJson(json, message, actionRequest = false) {
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
       status(message);
     } catch {
       $('#clipboard-fallback').hidden = false;
+      $('#clipboard-fallback label').textContent = actionRequest ? 'AI request JSON' : 'Canvas JSON';
+      $('#clipboard-fallback p').textContent = actionRequest
+        ? 'Copy this complete canvas and selected action into Codex or ChatGPT with the Pensive skill.'
+        : 'Copy this complete canvas for discussion or reuse. To request a transformation, use Strategize, Evaluate or Improve.';
       $('#clipboard-json').value = json;
       $('#clipboard-json').focus();
       $('#clipboard-json').select();
@@ -739,7 +908,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     }
   }
   function copyState() {
-    return copyJson(JSON.stringify(Swot.validate(state), null, 2), 'Copied complete canvas JSON to clipboard.');
+    return copyJson(JSON.stringify(Swot.validate(state), null, 2), 'Copied complete canvas JSON for discussion or reuse. Use an AI action button to request a transformation.');
   }
   function openAction(id) {
     if (state.proposals?.length) { status('Accept or reject the pending proposal first.', true); return; }
@@ -762,10 +931,18 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     const thoughts = $('#thoughts');
     thoughts.replaceChildren();
     thoughts.hidden = !state.thoughts?.length;
-    for (const thought of state.thoughts || []) {
+    function thoughtCard(thought) {
       const card = element('article', 'thought');
       card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', strategize: 'Strategy rationale' }[thought.kind]), element('p', '', thought.text));
-      thoughts.append(card);
+      return card;
+    }
+    const accepted = state.thoughts || [];
+    if (accepted.length) thoughts.append(thoughtCard(accepted.at(-1)));
+    if (accepted.length > 1) {
+      const earlier = element('details', 'earlier-thoughts');
+      earlier.append(element('summary', '', `Earlier thoughts (${accepted.length - 1})`));
+      for (const thought of accepted.slice(0, -1)) earlier.append(thoughtCard(thought));
+      thoughts.append(earlier);
     }
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
@@ -813,7 +990,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
         if (requestedAction === 'evaluate') action.scope = $('#evaluation-scope').value;
         const request = Swot.buildRequest(state, action);
         $('#ai-dialog').close();
-        await copyJson(JSON.stringify(request, null, 2), 'Copied AI request. Paste it into Codex or ChatGPT with the Pensive skill.');
+        await copyJson(JSON.stringify(request, null, 2), 'Copied AI request with complete canvas and selected action. Paste it into Codex or ChatGPT with the Pensive skill.', true);
       } catch (error) { status(error.message, true); }
     });
     $('#swot-toggle').addEventListener('click', () => setMode('swot'));
@@ -822,7 +999,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
     $('#save').addEventListener('click', saveFile);
     $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });
     $('details').addEventListener('toggle', () => $('#environment').hidden || resize($('#environment')));
-    document.querySelectorAll('[data-framing]').forEach(resize);
+    document.querySelectorAll('[data-framing]').forEach(input => { CanvasEditing.finishOnEnter(input); resize(input); });
   } catch (error) {
     document.querySelectorAll('button, textarea').forEach(node => { node.disabled = true; });
     status(`Invalid canvas: ${error.message} The embedded state has not been changed.`, true);

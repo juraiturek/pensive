@@ -5,6 +5,7 @@
   const $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
   let state, requestedAction;
+  const ordering = CanvasEditing.collectionOrdering({ core: Vpc, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; }
   function status(message, error = false) { $('#status').textContent = message; $('#status').classList.toggle('error', error); }
   function resize(input) { input.style.height = 'auto'; input.style.height = `${Math.max(input.scrollHeight + input.offsetHeight - input.clientHeight, 30)}px`; }
@@ -14,12 +15,12 @@
     const heading = element('div', 'vpc-heading'); heading.append(element('span', 'cell-symbol', symbol), element('h3', '', label));
     const list = element('ul', 'items');
     Vpc.collection(state, section).forEach((item, index) => {
-      const row = element('li', 'item'), input = element('textarea'); input.rows = 1; input.value = item.text; input.dataset.id = item.id;
+      const row = element('li', 'item'), input = element('textarea'); CanvasEditing.finishOnEnter(input); input.rows = 1; input.value = item.text; input.dataset.id = item.id;
       input.setAttribute('aria-label', `${label} ${index + 1}`); input.placeholder = 'Write one idea…';
       input.addEventListener('input', () => { Vpc.editItem(state, section, item.id, input.value); resize(input); edited(); });
       const remove = element('button', 'delete', '×'); remove.type = 'button'; remove.setAttribute('aria-label', `Delete ${label.toLowerCase()} ${index + 1}`);
       remove.addEventListener('click', () => { Vpc.deleteItem(state, section, item.id); renderSection(section); container.querySelector('.add').focus(); edited(); });
-      row.append(input, remove); list.append(row);
+      row.append(ordering.createHandle(row, list, section, item, index, label), input, remove); list.append(row);
     });
     const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
     function beginItem() {
@@ -61,6 +62,7 @@
   }
   try {
     state = Vpc.parseState($('#canvas-state').textContent); refresh();
+    document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of Vpc.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { state.content.framing[field] = e.target.value; resize(e.target); edited(); });
     document.querySelectorAll('[data-ai]').forEach(button => button.addEventListener('click', () => {
       try {

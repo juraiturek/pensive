@@ -1,0 +1,4 @@
+/* SWOT thought disclosure; collection interactions are shared. */
+.earlier-thoughts { margin-top: .6rem; }
+.earlier-thoughts > summary { font-size: .8rem; color: var(--muted); padding: .35rem 0; cursor: pointer; }
+.earlier-thoughts .thought { margin-top: .5rem; }

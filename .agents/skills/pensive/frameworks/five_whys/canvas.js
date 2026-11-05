@@ -102,13 +102,11 @@
         e.preventDefault();
         save();
       });
+      CanvasEditing.finishOnEnter(input, save);
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           e.preventDefault();
           cancel();
-        } else if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          save();
         }
       });
       input.addEventListener('blur', (e) => {
@@ -279,6 +277,7 @@
               input.required = true;
               input.rows = 3;
               input.setAttribute('aria-label', 'Countermeasure');
+              CanvasEditing.finishOnEnter(input, () => form.requestSubmit());
               label.append(input);
               form.append(
                 label,
@@ -535,6 +534,7 @@
     });
     state = W.parseState($('#canvas-state').textContent);
     refresh();
+    document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of W.framing)
       $(`[data-framing="${field}"]`).addEventListener('input', (e) =>
         run(() => W.editFraming(state, field, e.target.value)),

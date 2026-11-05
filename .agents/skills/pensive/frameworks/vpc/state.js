@@ -91,6 +91,16 @@ const Vpc = (() => {
     validate(state); const list = collection(state, section), index = list.findIndex(i => i.id === id);
     if (index < 0) throw new Error('Unknown item.'); list.splice(index, 1);
   }
+  function reorderItem(state, section, id, finalIndex) {
+    validate(state);
+    const items = collection(state, section), index = items.findIndex(item => item.id === id);
+    if (index < 0) throw new Error('Unknown item.');
+    if (!Number.isInteger(finalIndex) || finalIndex < 0 || finalIndex >= items.length) throw new Error('Reorder position must be within this collection.');
+    if (proposalSections(state).some(entry => entry.section === section && entry.status === 'pending')) throw new Error('Resolve this collection’s pending review before reordering.');
+    if (index === finalIndex) return;
+    const [item] = items.splice(index, 1);
+    items.splice(finalIndex, 0, item);
+  }
   function validateRequest(request) {
     keys(request, ['canvas', 'action'], 'Request'); validate(request.canvas);
     if (request.canvas.proposals?.length) throw new Error('Resolve the pending proposal first.');
@@ -141,6 +151,6 @@ const Vpc = (() => {
     if (first < 0 || last < first || html.indexOf(start, first + start.length) !== -1 || html.indexOf(end, last + end.length) !== -1) throw new Error('Expected one complete state slot.');
     return html.slice(0, first) + `${start}\n<script id="canvas-state" type="application/json">${safeJson(state)}<${'/script>'}\n${end}` + html.slice(last + end.length);
   }
-  return Object.freeze({ sections, framing, initialState, validate, validateContent, collection, addItem, editItem, deleteItem, validateRequest, buildRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, parseState, safeJson, packageHtml });
+  return Object.freeze({ sections, framing, initialState, validate, validateContent, collection, addItem, editItem, deleteItem, reorderItem, validateRequest, buildRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, parseState, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Vpc;

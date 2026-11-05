@@ -6,6 +6,8 @@ Use this method for `action.id: strategize`, never for initial creation. First r
 
 Use `action.comment` to steer how to reason: ambition, horizon, resource limits, conservative versus exploratory choices, stakeholders, exclusions, trade-offs, and preferred level of specificity. Do not infer consequential preferences from silence. Use framing as the analytical boundary. If `action.use_thoughts` is true, use current thoughts as fallible context, distinguishing evaluation from evidence; otherwise preserve but do not use them as guidance.
 
+When many plausible combinations would materially change output breadth and the user has expressed no preference, a brief choice can help: “Start with a few promising strategies and add more, or generate a broader set for you to prune?” Wait for the answer when asking; do not make this a mandatory wizard or ask again after a preference or instruction to proceed. For a small clear option set, generate directly. “Broader” still means distinct supported choices, never every factor pairing or a fixed count. Preserve extend/replace semantics whichever breadth is chosen.
+
 In `extend` mode, preserve every existing strategy object unchanged in its existing collection and add only complementary choices. In `replace` mode, regenerate the strategy collections; this explicitly authorizes a proposed replacement, not automatic acceptance. Preserve the ID for a retained strategy with the same identity; assign new IDs only for new strategies. In both modes leave framing and all four SWOT factor arrays exactly unchanged.
 
 ## Derive choices, not four generic lists
@@ -28,5 +30,7 @@ Check feasibility, resource trade-offs, dependency, contradictory moves, and exp
 ## Output
 
 Return a response JSON object for deterministic packaging with exactly `content` and `thought`. `content` is the complete candidate content, not legacy `nodes` or four untyped lists. Existing items use `{id, text}`; preserve identities as above. The thought is a plain nonempty string explaining the key cross-matches, priorities, material assumptions, and why these choices help. When the available SWOT cannot support meaningful choices, say why instead of fabricating strategies.
+
+Default to a compact paragraph explaining the most consequential mechanisms and trade-offs; expand for requested detail or genuinely complex choices. Do not repeat every strategy or narrate packaging/review mechanics in the thought. Distinguish suggested priorities from user decisions and avoid turning older rationale into new instructions.
 
 The result composer enforces the action boundary and extend-mode preservation. The artifact contains a pending whole-canvas proposal; the user reviews and accepts or rejects it locally. Do not claim strategies have been accepted merely because the HTML was generated.

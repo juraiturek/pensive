@@ -9,9 +9,11 @@ export async function buildCanvas(state = Pages.initialState()) {
   const styles = await Promise.all(['../swot/canvas.css', 'canvas.css'].map(p => readFile(new URL(p, framework), 'utf8')));
   const resources = [
     ['<!--pensive-style-->', styles.join('\n'), 'style'],
+    ['<!--pensive-ordering-style-->', await readFile(new URL('../../shared/collection-ordering.css', framework), 'utf8'), 'style'],
     ['<!--pensive-review-->', await readFile(new URL('../../shared/proposal-review.js', framework), 'utf8'), 'script'],
     ['<!--pensive-review-ui-->', await readFile(new URL('../../shared/proposal-review-ui.js', framework), 'utf8'), 'script'],
     ['<!--pensive-core-->', await readFile(new URL('state.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-editing-->', await readFile(new URL('../../shared/canvas-editing.js', framework), 'utf8'), 'script'],
     ['<!--pensive-runtime-->', await readFile(new URL('canvas.js', framework), 'utf8'), 'script']
   ];
   for (const [marker, source, tag] of resources) {

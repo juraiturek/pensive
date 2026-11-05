@@ -1,5 +1,15 @@
 # Implementation roadmap
 
+## Uniform editing follow-up — 2026-11-04
+
+The user requested consistent editing across frameworks. Enter-to-finish/Shift+Enter-to-newline now applies to analytical text fields in all four canvases, with AI/JSON text boxes excluded. Within-collection pointer ordering is shared by SWOT, PAGES and VPC. Framework state/baseline/proposal semantics remain separate; 5 Whys tree movement is deferred. See [implementation plan](plans/2026-11-04-uniform-canvas-editing.md) and verification in `docs/testing.md`. This extends the previously SWOT-only E8 interaction without approving the larger L1–L6 backlog.
+
+## Consumer-test follow-up — 2026-11-04
+
+Approved E1–E8 from the [consumer report](2026-11-04-swot-consumer-test-report.md) are implemented in the [bounded follow-up slice](plans/2026-11-04-swot-consumer-improvements.md): proactive creation/reconciliation guidance, concise proofreading/rationales, optional strategy breadth, compact SWOT thoughts, clearer handoff wording and within-collection pointer reordering. E8 uses hover/touch-revealed bullet-marker handles; keyboard reordering was explicitly deferred. No new state schema or action was introduced.
+
+The report's L1–L6 remain proposed developments requiring design: Outcomes, strategy decisions, attached annotations, cross-collection movement, controlled framing changes and richer reconciliation. The existing notes/thoughts priority below is not an approval of those designs. Checks and limitations are recorded in `docs/testing.md`.
+
 This approved sequence refines the README's broad phases without editing the authoritative vision. Each slice requires separately scoped implementation work. Slice 0 does not authorize extraction or future slices.
 
 | Slice | Deliverable | Exit evidence |

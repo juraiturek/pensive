@@ -23,6 +23,7 @@ semantics:
 manual_capabilities:
   - edit_framing
   - add_edit_delete_items
+  - reorder_within_collection
   - import_validated_json
   - export_complete_json
   - save_standalone_html

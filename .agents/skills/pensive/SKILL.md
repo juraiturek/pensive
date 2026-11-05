@@ -11,9 +11,16 @@ SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve r
 
 For context-based creation and existing-state analytical actions, read the shared [internal and external fit guidance](references/framing-content.md) with the selected framework method. Framework methodology and action boundaries remain authoritative; blank copying and JSON-only packaging need no analytical review.
 
+## Shared local editing
+
+Enter finishes analytical bullet/framing edits; Shift+Enter inserts a line break. 5 Whys node and countermeasure editors commit on Enter as well. Composition-confirming Enter is left to the input method; AI guidance and JSON text boxes remain multiline. Changes remain in the tab until saved/exported.
+
+SWOT, PAGES and VPC share hover/touch-revealed handles for within-collection ordering; keyboard ordering and cross-collection moves are deferred. PAGES ordering alone does not change the Ripple baseline or count as a semantic source change. 5 Whys causal-tree movement is not supported.
+
 ## Select a framework without imposing one
 
-- Honor explicit framework choice. An explicit 5 Whys, PAGES or VPC request needs no recommendation or permission step; distinguish blank, context-driven creation and actions on existing state.
+- Honor explicit framework choice. An explicit SWOT, 5 Whys, PAGES or VPC request needs no recommendation or framework-choice permission step; distinguish blank, context-driven creation and actions on existing state. Framework-specific sparse-draft agreement still applies.
+- SWOT can help when the user is weighing an entity's internal capabilities against external conditions to choose a strategic direction. When implicitly useful, offer it selectively with a concrete reason and wait for the user's choice; respect a decline. Once chosen, move toward a useful draft as soon as framing and evidence permit, rather than waiting for another generation command. Read [Create](frameworks/swot/prompts/create.md) for sparse-draft agreement and the question budget.
 - PAGES can help discover how a current perspective is composed, or shift a limiting lens: assumptions, interpretations, repeated conclusions, an impasse or an established viewpoint the user wants to question. Read its [semantics](frameworks/pages/framework.yaml). These are contextual opportunities, not automatic triggers.
 - When only implicitly relevant, normally offer it once as an option with a brief concrete reason: “We could map the parts, actions, goals, events and self-concepts behind this view, then test what changes when one premise shifts.” Wait for the user's choice before creating a canvas. Respect a decline; do not suggest it again unless the user reopens it or the situation materially changes.
 - VPC examines one customer segment’s jobs, pains and gains against an offering’s products/services, pain relievers and gain creators. Use it for customer needs, offering design or uncertain customer–offering fit; read its [semantics](frameworks/vpc/framework.yaml). When only implicitly useful, offer it selectively with a concrete reason and wait for the user’s choice. Respect a decline; ordinary product questions do not automatically require a canvas.
@@ -67,9 +74,13 @@ Read [frameworks/swot/framework.yaml](frameworks/swot/framework.yaml) for SWOT s
 - Return a link to the resulting standalone HTML. It opens locally without a server. The page starts in SWOT; TOWS has read-only factor context and editable strategies. Its count indicator includes blank draft strategies.
 - Explain the two export controls when helpful: Export to clipboard copies complete state JSON (with selectable JSON if clipboard access is blocked); Save to File downloads editable standalone HTML. Edits exist only in the current tab until exported. File loading and local storage are intentionally absent.
 
-The package source is separated into `canvas.template.html`, `canvas.css`, `state.js`, and `canvas.js`. `node scripts/package-swot.mjs` rebuilds the committed blank `canvas.html` deterministically during development; it is not needed to open a canvas.
+The package source is separated into `canvas.template.html`, base `canvas.css`, SWOT thought-disclosure `interactions.css`, `state.js`, and `canvas.js`, with shared local editing/collection-ordering assets embedded at build time. `node scripts/package-swot.mjs` rebuilds the committed blank `canvas.html` deterministically during development; it is not needed to open a canvas.
+
+SWOT/TOWS bullets can be reordered within a collection using a handle revealed at the bullet marker on brief hover, or after tapping a row on touch. Drag only from the handle; drop within the same list. Escape or a cancelled/outside drop preserves order. Collections awaiting proposal review cannot be reordered. Other manual edits during review can still make acceptance stale. Keyboard reordering and cross-collection moves are deferred. The latest accepted thought is shown above the matrix; earlier thoughts are collapsed but preserved in export/save, with pending rationale displayed separately.
 
 ## Transform an existing SWOT canvas
+
+Work as a collaborator over the shared analysis: connect replies to the current canvas, notice useful implications and offer concrete next moves. Relevant discoveries in chat may warrant a proposed update; use the [AI handoff's reconciliation guidance](references/ai-workflow.md#collaborate-without-silent-overwrites), not silent synchronization. Do not imply that a suggestion, action shortlist or feature request has been persisted when it exists only in conversation.
 
 When the user supplies `{canvas, action}` with `canvas.framework: "swot"` or requests Strategize, Evaluate, or Improve on existing SWOT state, read [AI handoff](references/ai-workflow.md) and only the selected method:
 

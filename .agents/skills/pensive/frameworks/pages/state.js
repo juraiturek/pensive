@@ -117,6 +117,14 @@ const Pages = (() => {
     const { items, index } = locate(state, section, id); items[index].text = text;
   }
   function deleteItem(state, section, id) { const { items, index } = locate(state, section, id); items.splice(index, 1); }
+  function reorderItem(state, section, id, finalIndex) {
+    const { items, index } = locate(state, section, id);
+    if (!Number.isInteger(finalIndex) || finalIndex < 0 || finalIndex >= items.length) throw new Error('Reorder position must be within this collection.');
+    if (proposalSections(state).some(entry => entry.section === section && entry.status === 'pending')) throw new Error('Resolve this collection’s pending review before reordering.');
+    if (index === finalIndex) return;
+    const [item] = items.splice(index, 1);
+    items.splice(finalIndex, 0, item);
+  }
   function resetBaseline(state) {
     validate(state);
     if (state.proposals?.length) throw new Error('Resolve the pending proposal before resetting the baseline.');
@@ -187,6 +195,6 @@ const Pages = (() => {
     if (first < 0 || last < first || html.indexOf(start, first + start.length) !== -1 || html.indexOf(end, last + end.length) !== -1) throw new Error('Expected one complete state slot.');
     return html.slice(0, first) + `${start}\n<script id="canvas-state" type="application/json">${safeJson(state)}<${'/script>'}\n${end}` + html.slice(last + end.length);
   }
-  return Object.freeze({ sections, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, resetBaseline, changes, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
+  return Object.freeze({ sections, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, resetBaseline, changes, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Pages;

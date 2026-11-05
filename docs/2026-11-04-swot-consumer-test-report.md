@@ -1,7 +1,9 @@
 # SWOT consumer-mode experiment: findings and proposed backlog
 
 Date: 2026-11-04  
-Status: Final report of one exploratory session; backlog proposed, not approved for implementation.
+Status: Final report of one exploratory session; E1–E8 subsequently approved and implemented. Larger developments remain proposed.
+
+Implementation follow-up: the user subsequently approved E1–E8, with hover/touch-revealed bullet-marker drag handles for E8 and keyboard reordering deferred. See the [implementation record](plans/2026-11-04-swot-consumer-improvements.md) and [verification](testing.md). The findings and proposed backlog below retain the experiment's original context; L1–L6 still require design and approval.
 
 ## Purpose and evidence
 
@@ -114,7 +116,7 @@ The typo correction itself was ordinary content maintenance. The later question 
 | E5 | Medium | Shorter, clearer AI rationale | Lead with material changes and reasoning; avoid protocol narration and repeated caveats. Clearly label prior rationale so obsolete instructions are not presented as current tasks. Automatic stale-instruction detection is outside this small item. |
 | E6 | Medium | Conditional strategy-breadth choice | When many plausible options exist and preference is absent, offer “few first, then expand” versus “broader set to prune.” Avoid a compulsory wizard and avoid Cartesian-product generation. |
 | E7 | Medium | Distinguish state export from action requests | Make each export's purpose clear. A bare canvas remains valid for discussion; an action request carries explicit intent. Preserve existing JSON contracts. |
-| E8 | Medium | Reorder within a collection | Provide accessible up/down controls; assess drag-and-drop as an enhancement. Preserve item IDs, text and order through export/save/reopen. Define behavior with pending proposals; do not include cross-collection moves in this slice. |
+| E8 | Medium | Reorder within a collection | Approved refinement: reveal a drag handle at the bullet marker on brief hover or deliberate touch selection, with no persistent arrows. Preserve item IDs, text and order through export/save/reopen. Disable ordering in collections awaiting review. Cross-collection moves and keyboard reordering are deferred. |
 
 E1–E3, E5 and E6 are primarily skill/methodology refinements. E4, E7 and E8 require bounded interface work. E8 is the largest item in this group and may need a separate slice after code inspection.
 

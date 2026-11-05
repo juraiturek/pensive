@@ -14,6 +14,7 @@ export async function buildCanvas(state = Whys.initialState()) {
   for (const [marker, source, tag] of [
     ['<!--pensive-style-->', styles, 'style'],
     ['<!--pensive-core-->', await readFile(new URL('state.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-editing-->', await readFile(new URL('../../shared/canvas-editing.js', framework), 'utf8'), 'script'],
     ['<!--pensive-runtime-->', await readFile(new URL('canvas.js', framework), 'utf8'), 'script'],
   ]) {
     if (source.toLowerCase().includes(`<${'/' + tag}`))

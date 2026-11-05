@@ -1,5 +1,45 @@
 # Testing strategy
 
+## Uniform canvas editing — 2026-11-04
+
+Implemented [Enter-to-finish and shared ordering](plans/2026-11-04-uniform-canvas-editing.md). Shared browser code in `shared/canvas-editing.js` binds Enter only to analytical text fields, preserving Shift+Enter and composition-confirming Enter (`isComposing` and legacy keycode 229). SWOT/PAGES/VPC bullet and framing editors blur on Enter after their existing live state update. 5 Whys framing blurs; node text and countermeasures use their existing save/submit callbacks. AI steering and JSON/import text boxes remain multiline. No schema or file-persistence semantics changed.
+
+SWOT's pointer-ordering implementation was extracted into the same shared browser helper, with shared `collection-ordering.css`, and extended to PAGES/VPC. Framework-owned reorder operations preserve IDs/text and block unresolved proposed collections. PAGES baseline stays unchanged and pure ordering does not trigger Ripple. Tree movement and keyboard reordering remain deferred.
+
+Test-first evidence: new Enter tests observed an unwanted final newline; new PAGES/VPC browser tests found no drag handles; five new state scenarios first failed with missing reorder operations. During integration the PAGES test exposed over-scrolling of a fully visible list near the viewport edge. The shared controller now scrolls only the active list's remaining offscreen extent, with both visible-list and 30-item mixed-height long-list regressions. The 5 Whys countermeasure fixture was corrected to close a child leaf and assert its existing `output` field. The previous saved-HTML test's fixed two-script assumption was updated to compare every embedded implementation script against the original, including the new helper, across consecutive saves.
+
+Executed final full regression:
+
+`PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright /Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test tests/*.test.mjs`
+
+**160 passed, zero failures/skips.** Full output retained during execution at `/tmp/pensive-uniform-regression.log`. This includes nine new cross-framework browser tests and seven PAGES/VPC ordering state tests. Focused shared-editing/order/SWOT regression passed 36 tests before the final full run. Direct bundled-Node packagers rebuilt all four standalone canvases; shell npm was unavailable. Builds and Chromium required the already-approved filesystem/macOS process access.
+
+New browser coverage checks every flat collection and framing field, native Enter/Shift+Enter, simulated composition-key preservation, no unintended Add, complete save/reopen, AI/JSON text-area exclusion, 5 Whys node/countermeasure commit, all three collection drag interfaces, pending locks and PAGES/VPC touch cancellation/drop. Existing SWOT cancellation/autoscroll/offline/implementation preservation regressions remain green. Independent review found no blocking issues; its earlier geometry diagnosis was refined when the visible-list test confirmed the actual autoscroll edge. PAGES desktop active-drag and VPC narrow touch screenshots were visually inspected.
+
+Skill validator passed; 104 local skill Markdown references resolve and all four manifests parse. README checksum remains unchanged; `git diff --check` passed.
+
+Limits: offline Chromium desktop/narrow and CDP touch only; composition guards are event simulations, not a physical IME test. No new Safari, Firefox or physical-device run. Previously exported HTML retains its runtime; repackage complete JSON, or import into a newly generated PAGES/VPC/5 Whys canvas, to use the new behavior. No new dependencies, commit, push or publication.
+
+## SWOT consumer improvements E1–E8 — 2026-11-04
+
+Implemented the approved [consumer follow-up](plans/2026-11-04-swot-consumer-improvements.md). Methodology refinements cover proactive framework/draft transitions, explicitly authorized chat clarification through Improve, concise proofreading/rationales and optional strategy breadth. The actual narrow baseline/forward agent walkthroughs are retained in [collaboration observations](../tests/methodology/swot-collaboration.md) and `swot-collaboration-observed.json`. Baseline proofreading already worked; these checks are instruction/application evidence, not a statistical quality gain. Three complete Improve fixtures are checked by `tests/swot-collaboration-methodology.test.mjs` for request preservation, stable IDs/framing, explicit acceptance and safe standalone embedding.
+
+Runtime changes are SWOT-only: latest accepted thought expanded, earlier thoughts collapsed and preserved; state-versus-action handoff explanations including clipboard denial; hover/touch-revealed bullet-marker handles; same-collection pointer reorder with insertion feedback, autoscroll and commit-on-valid-drop. Keyboard reordering is deferred by explicit user instruction. Pending changed collections are locked, with desktop title and touch status explanation; other manual changes retain the existing stale-acceptance behavior.
+
+Observed test-first stages: two new state tests failed because `reorderItem` was missing; browser tests failed for absent handles, all-visible thoughts and absent export explanations. Browser testing then reproduced an Escape-cancelled drag producing a background Add click; pointer capture/click suppression fixed it and the regression now checks no state mutation. A touch restriction test failed before the transient explanation was added. The 30-item mixed-height drag case checks page scrolling and cancellation preservation.
+
+The first full run identified shared-style coupling: PAGES, VPC and 5 Whys embed the base SWOT stylesheet, so three deterministic rebuild assertions failed. Isolated new styles in SWOT-only `interactions.css` through an additional safe packager marker and restored the shared `canvas.css` exactly. Other framework sources and generated HTML are unchanged.
+
+Executed final runtime check:
+
+`PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright /Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test tests/*.test.mjs`
+
+**144 passed, zero failures/skips.** The full output was retained during execution at `/tmp/pensive-consumer-regression.log`. Chromium required elevated macOS process access; the initial sandbox launch failed at `bootstrap_check_in` before product assertions. Rebuilding the protected standalone skill HTML also required approved filesystem access. No dependency was added.
+
+Independent code review found no blocking issue; its touch discoverability and long-list coverage suggestions were implemented. Desktop compact-thought, hover-handle and active insertion-marker screenshots plus narrow touch layout were visually inspected in `test-results/`. Skill validator passed using the existing temporary PyYAML path; all 104 local skill Markdown references resolved. README SHA-256 remains `372931125511c5fae95971c88a11fd725dffaa3724672c4bfb95291b23ea8c4e`; whitespace verification passed.
+
+Limits: browser automation is offline Chromium with desktop/narrow viewports and CDP-generated touch/pointer cancellation, not physical-device or new Safari/Firefox testing. Prior consumer Safari use remains separate evidence. The actor walkthroughs are synthetic and narrow. Outcomes, attached annotations, strategy decisions, cross-collection moves, framing proposals and automatic history remain deferred. Previously exported HTML keeps its embedded runtime; complete JSON repackaging is required to obtain the updated interface. No commit, push, remote or publication was performed.
+
 ## SWOT methodological prompt refinement — 2026-11-04
 
 Implemented the approved [Markdown-only plan](plans/2026-11-04-swot-methodology-refinement.md): comparative strengths/weaknesses, directional competitive assessment without scores, conditional external grounding, two-way framing fit, classification suggestions and concise TOWS causal reasoning with WO capability remedies. Existing canvas-level thoughts carry material explanation/questions; no new note, research or state contract was added.

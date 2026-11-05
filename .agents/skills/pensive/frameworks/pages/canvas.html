@@ -189,6 +189,25 @@ legend { font-size: .8rem; }
   .band-content { padding: .65rem 1rem; }
 }
 </style>
+<style>
+/* Shared pointer-ordering presentation for flat collections. */
+.item { display: flex; position: relative; align-items: start; gap: .6rem; border-top: 1px solid #00000014; padding: .55rem 0 .55rem 1.15rem; }
+.item::before { content: "·"; color: var(--category); position: absolute; left: .15rem; top: .7rem; padding-top: 0; }
+.drag-handle { position: absolute; left: -.25rem; top: .55rem; width: 1.25rem; height: 2rem; padding: 0; border: 0; background: transparent; color: var(--category); font-size: 1.15rem; line-height: 1; opacity: 0; pointer-events: none; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.drag-handle:hover { background: transparent; }
+.drag-handle:disabled { cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .item:hover .drag-handle { opacity: 1; pointer-events: auto; transition: opacity 0s .18s; }
+  .item:hover::before { opacity: 0; transition: opacity 0s .18s; }
+}
+.item.touch-selected .drag-handle { opacity: 1; pointer-events: auto; transition: none; }
+.item.touch-selected::before { opacity: 0; }
+.item.is-dragging { opacity: .45; }
+.item.is-dragging .drag-handle { cursor: grabbing; }
+.item.drop-before::after, .item.drop-after::after { content: ""; position: absolute; left: 0; right: 0; height: 2px; background: var(--accent); pointer-events: none; }
+.item.drop-before::after { top: -1px; }
+.item.drop-after::after { bottom: -1px; }
+</style>
 </head>
 <body>
 <div class="shell">
@@ -512,6 +531,14 @@ const Pages = (() => {
     const { items, index } = locate(state, section, id); items[index].text = text;
   }
   function deleteItem(state, section, id) { const { items, index } = locate(state, section, id); items.splice(index, 1); }
+  function reorderItem(state, section, id, finalIndex) {
+    const { items, index } = locate(state, section, id);
+    if (!Number.isInteger(finalIndex) || finalIndex < 0 || finalIndex >= items.length) throw new Error('Reorder position must be within this collection.');
+    if (proposalSections(state).some(entry => entry.section === section && entry.status === 'pending')) throw new Error('Resolve this collection’s pending review before reordering.');
+    if (index === finalIndex) return;
+    const [item] = items.splice(index, 1);
+    items.splice(finalIndex, 0, item);
+  }
   function resetBaseline(state) {
     validate(state);
     if (state.proposals?.length) throw new Error('Resolve the pending proposal before resetting the baseline.');
@@ -582,9 +609,138 @@ const Pages = (() => {
     if (first < 0 || last < first || html.indexOf(start, first + start.length) !== -1 || html.indexOf(end, last + end.length) !== -1) throw new Error('Expected one complete state slot.');
     return html.slice(0, first) + `${start}\n<script id="canvas-state" type="application/json">${safeJson(state)}<${'/script>'}\n${end}` + html.slice(last + end.length);
   }
-  return Object.freeze({ sections, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, resetBaseline, changes, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
+  return Object.freeze({ sections, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, resetBaseline, changes, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Pages;
+</script>
+<script data-implementation>
+/* Shared local text editing and flat-collection pointer ordering. No state or network service. */
+const CanvasEditing = (() => {
+  'use strict';
+  function finishOnEnter(input, finish = () => input.blur()) {
+    input.title ||= 'Enter to finish editing; Shift+Enter for a new line.';
+    input.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' || event.shiftKey || event.isComposing || event.keyCode === 229) return;
+      event.preventDefault();
+      finish();
+    });
+  }
+  function collectionOrdering({ core, getState, renderSection, edited, status }) {
+    let drag = null;
+    let suppressDragClick = false;
+    // Keep ordering local until a valid drop. Pointer capture supports both mouse and touch.
+    function updateDrop(x, y) {
+      if (!drag || drag.cancelled) return;
+      drag.x = x; drag.y = y;
+      drag.list.querySelectorAll('.drop-before, .drop-after').forEach(row => row.classList.remove('drop-before', 'drop-after'));
+      drag.finalIndex = null;
+      if (!drag.active && Math.hypot(x - drag.startX, y - drag.startY) < 5) return;
+      drag.active = true;
+      drag.row.classList.add('is-dragging');
+      const bounds = drag.list.getBoundingClientRect();
+      if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) return;
+      const others = [...drag.list.children].filter(row => row !== drag.row);
+      const before = others.find(row => { const box = row.getBoundingClientRect(); return y < box.top + box.height / 2; });
+      drag.finalIndex = before ? others.indexOf(before) : others.length;
+      const marker = before || others.at(-1);
+      marker?.classList.add(before ? 'drop-before' : 'drop-after');
+    }
+    function scrollDrag() {
+      if (!drag) return;
+      if (drag.active) {
+        const bounds = drag.list.getBoundingClientRect();
+        const direction = drag.y < 48 ? -1 : drag.y > innerHeight - 48 ? 1 : 0;
+        const remaining = direction < 0 ? Math.max(0, -bounds.top) : Math.max(0, bounds.bottom - innerHeight);
+        if (direction && remaining && drag.x >= bounds.left && drag.x <= bounds.right) {
+          window.scrollBy(0, direction * Math.min(10, remaining));
+          updateDrop(drag.x, drag.y);
+        }
+      }
+      drag.frame = requestAnimationFrame(scrollDrag);
+    }
+    function finishDrag(commit) {
+      if (!drag) return;
+      const current = drag;
+      drag = null;
+      if (current.active) {
+        // A drop can replace its source DOM; never let the resulting click add a draft.
+        suppressDragClick = true;
+        setTimeout(() => { suppressDragClick = false; }, 0);
+      }
+      cancelAnimationFrame(current.frame);
+      current.list.querySelectorAll('.drop-before, .drop-after, .is-dragging').forEach(row => row.classList.remove('drop-before', 'drop-after', 'is-dragging'));
+      if (current.handle.hasPointerCapture(current.pointerId)) current.handle.releasePointerCapture(current.pointerId);
+      if (!commit || !current.active || current.finalIndex === null) return;
+      const previous = core.collection(getState(), current.section).findIndex(item => item.id === current.id);
+      if (previous === current.finalIndex) return;
+      try {
+        core.reorderItem(getState(), current.section, current.id, current.finalIndex);
+        renderSection(current.section);
+        edited();
+        if (getState().proposals?.length) status('Order changed. This manual edit makes remaining proposal acceptance stale; reject remaining changes and request a fresh proposal.');
+      } catch (error) { status(error.message, true); }
+    }
+    function wireHandle(handle, row, list, section, id) {
+      handle.addEventListener('pointerdown', event => {
+        if (handle.disabled || !event.isPrimary || event.button !== 0) return;
+        event.preventDefault();
+        finishDrag(false);
+        drag = { handle, row, list, section, id, pointerId: event.pointerId,
+          startX: event.clientX, startY: event.clientY, x: event.clientX, y: event.clientY, active: false, finalIndex: null };
+        handle.setPointerCapture(event.pointerId);
+        drag.frame = requestAnimationFrame(scrollDrag);
+      });
+      handle.addEventListener('pointermove', event => {
+        if (drag?.handle === handle && drag.pointerId === event.pointerId) updateDrop(event.clientX, event.clientY);
+      });
+      handle.addEventListener('pointerup', event => {
+        if (drag?.handle !== handle || drag.pointerId !== event.pointerId) return;
+        updateDrop(event.clientX, event.clientY);
+        finishDrag(!drag.cancelled);
+      });
+      for (const type of ['pointercancel', 'lostpointercapture']) handle.addEventListener(type, () => { if (drag?.handle === handle) finishDrag(false); });
+      handle.addEventListener('click', event => event.preventDefault());
+    }
+
+    function createHandle(row, list, section, item, index, label) {
+      const pendingReview = core.proposalSections(getState()).some(entry => entry.section === section && entry.status === 'pending');
+      const handle = document.createElement('button');
+      handle.className = 'drag-handle'; handle.textContent = '⠿'; handle.type = 'button';
+      handle.tabIndex = -1; // Keyboard ordering is deferred; text editing retains its tab order.
+      handle.disabled = pendingReview || core.collection(getState(), section).length < 2;
+      handle.title = pendingReview ? 'Resolve this collection’s pending review before reordering.' : handle.disabled ? 'Add another bullet to reorder.' : 'Drag to reorder within this collection';
+      handle.setAttribute('aria-label', `Reorder ${label.toLowerCase()} ${index + 1}`);
+      wireHandle(handle, row, list, section, item.id);
+      return handle;
+    }
+    document.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch') return;
+      const selected = event.target.closest('[data-section] .item');
+      document.querySelectorAll('.touch-selected').forEach(row => { if (row !== selected) row.classList.remove('touch-selected'); });
+      selected?.classList.add('touch-selected');
+      if (selected) {
+        const section = selected.closest('[data-section]').dataset.section;
+        if (core.proposalSections(getState()).some(entry => entry.section === section && entry.status === 'pending')) status('Resolve this collection’s pending review before reordering. You can still edit its text.');
+      }
+    });
+    document.addEventListener('click', event => {
+      if (!suppressDragClick) return;
+      event.preventDefault(); event.stopPropagation();
+    }, true);
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !drag) return;
+      event.preventDefault();
+      drag.cancelled = true;
+      cancelAnimationFrame(drag.frame);
+      drag.list.querySelectorAll('.drop-before, .drop-after, .is-dragging').forEach(row => row.classList.remove('drop-before', 'drop-after', 'is-dragging'));
+      // Retain capture until pointerup so release cannot turn into a background Add click.
+    });
+    window.addEventListener('blur', () => finishDrag(false));
+
+    return Object.freeze({ createHandle });
+  }
+  return Object.freeze({ finishOnEnter, collectionOrdering });
+})();
 </script>
 <script data-implementation>
 /* Local PAGES editing and explicit AI handoff. No network or storage service. */
@@ -600,6 +756,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Pages;
   const $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
   let state, requestedAction;
+  const ordering = CanvasEditing.collectionOrdering({ core: Pages, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -642,12 +799,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Pages;
     const content = element('div', 'band-content'), list = element('ul', 'items');
     Pages.collection(state, section).forEach((item, index) => {
       const row = element('li', 'item'), input = element('textarea');
+      CanvasEditing.finishOnEnter(input);
       input.rows = 1; input.value = item.text; input.dataset.id = item.id;
       input.setAttribute('aria-label', `${label} ${index + 1}`); input.placeholder = 'Write one idea…';
       input.addEventListener('input', () => { Pages.editItem(state, section, item.id, input.value); resize(input); edited(); });
       const remove = element('button', 'delete', '×'); remove.type = 'button'; remove.setAttribute('aria-label', `Delete ${label.toLowerCase()} ${index + 1}`);
       remove.addEventListener('click', () => { Pages.deleteItem(state, section, item.id); renderSection(section); container.querySelector('.add').focus(); edited(); });
-      row.append(input, remove); list.append(row);
+      row.append(ordering.createHandle(row, list, section, item, index, label), input, remove); list.append(row);
     });
     const removed = element('div', 'removed-items'); removed.hidden = true;
     const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
@@ -716,6 +874,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = Pages;
   }
   try {
     state = Pages.parseState($('#canvas-state').textContent); refresh();
+    document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of Pages.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { state.content.framing[field] = e.target.value; resize(e.target); edited(); });
     document.querySelectorAll('[data-ai]').forEach(b => b.addEventListener('click', () => openAction(b.dataset.ai)));
     $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());

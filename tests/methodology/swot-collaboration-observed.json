@@ -1,0 +1,267 @@
+{
+  "date": "2026-11-04",
+  "actor": "Fresh child agent, baseline then revised guidance, inherited task but not full consumer conversation",
+  "limits": "Narrow synthetic actual walkthroughs, not blind sampling or statistical evaluation. Complete Improve candidates below additionally receive deterministic composition checks; prose-only cases do not claim runtime artifact execution.",
+  "baseline": {
+    "A": "We can start with a useful, limited SWOT: the staffed pickup desk and clear instructions are concrete strengths, while local demand and reasons for abandoned loans remain unknown. Your preference for making pickup easier can guide later strategy choices; it doesn’t establish an external opportunity. I’ll draft from those facts and leave unsupported quadrants empty.",
+    "B": "The checkout delay now has concrete support: the scanner sometimes needs a restart. That supports treating checkout delay as a real logistical issue, while its effect on abandoned loans remains unproven. I’d revise the hypothetical wording to reflect that distinction. I haven’t changed the canvas; that revision would belong in an Improve proposal or a manual edit.",
+    "C": {
+      "request": {
+        "canvas": {
+          "framework": "swot",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "focal_entity": "Tool library",
+              "objective": "Make borrowing tools easier",
+              "environment": "Staffed pickup desk"
+            },
+            "strengths": [
+              {
+                "id": "s-practice",
+                "text": "Insturctions for borrowers"
+              },
+              {
+                "id": "s-teacher",
+                "text": "Partner: Alder Workshop"
+              }
+            ],
+            "weaknesses": [],
+            "opportunities": [
+              {
+                "id": "o-demand",
+                "text": "Potential opportunity: local interest in tool loans, if demand exists"
+              }
+            ],
+            "threats": [],
+            "strategies": {
+              "so": [],
+              "st": [],
+              "wo": [],
+              "wt": []
+            }
+          }
+        },
+        "action": {
+          "id": "improve",
+          "comment": "Shorten and polish"
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "focal_entity": "Tool library",
+            "objective": "Make borrowing tools easier",
+            "environment": "Staffed pickup desk"
+          },
+          "strengths": [
+            {
+              "id": "s-practice",
+              "text": "Instructions for borrowers"
+            },
+            {
+              "id": "s-teacher",
+              "text": "Partner: Alder Workshop"
+            }
+          ],
+          "weaknesses": [],
+          "opportunities": [
+            {
+              "id": "o-demand",
+              "text": "Potential local interest in tool loans, if demand exists."
+            }
+          ],
+          "threats": [],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        },
+        "thought": "Corrected “Insturctions” to “Instructions” and shortened the opportunity without removing its demand uncertainty. Preserved Alder Workshop’s name, the framing and all item IDs. No strategies were added."
+      }
+    },
+    "D": "I’ll derive a small set of distinct TOWS options from the strongest supported combinations, explain the main trade-offs, and preserve the factors and framing. The strategies will be proposals for review.",
+    "E": "Evaluate can assess the checkout issue and recommend a revision, but it cannot add or change a factor. I can complete the evaluation with the submitted content unchanged. To incorporate the checkout observation into the canvas, edit it locally and submit the updated export, or use an Improve request with the fact stated in its steering."
+  },
+  "revised": {
+    "A": "We have enough for a sparse starting SWOT, using the staffed pickup desk and clear instructions while leaving local demand and reasons for abandoned loans unresolved. Your preference for making pickup easier can guide later strategies. Shall I create that limited draft, leaving unsupported quadrants empty?",
+    "A2": "A SWOT could help connect your volunteer capacity and practical constraints with outside conditions affecting sustainable growth. Would you like to use that approach?",
+    "B": "That makes checkout delay a concrete issue, rather than just a possibility. It still doesn’t establish why people abandon loans. Shall I propose changing the checkout factor to say that the scanner sometimes needs a restart, while keeping its effect on abandoned loans unknown?",
+    "B2": {
+      "request": {
+        "canvas": {
+          "framework": "swot",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "focal_entity": "Tool library",
+              "objective": "Make borrowing tools easier",
+              "environment": "Staffed pickup desk"
+            },
+            "strengths": [
+              {
+                "id": "s-practice",
+                "text": "Insturctions for borrowers"
+              },
+              {
+                "id": "s-teacher",
+                "text": "Partner: Alder Workshop"
+              }
+            ],
+            "weaknesses": [
+              {
+                "id": "w-arrival",
+                "text": "Possible delays at checkout; impact unknown"
+              }
+            ],
+            "opportunities": [
+              {
+                "id": "o-demand",
+                "text": "Potential opportunity: local interest in tool loans, if demand exists"
+              }
+            ],
+            "threats": [],
+            "strategies": {
+              "so": [],
+              "st": [],
+              "wo": [],
+              "wt": []
+            }
+          }
+        },
+        "action": {
+          "id": "improve",
+          "comment": "Shorten and polish"
+        }
+      },
+      "explicitSteering": "Include our clarification that the scanner sometimes needs a restart; don't infer a cause of abandoned loans.",
+      "response": {
+        "content": {
+          "framing": {
+            "focal_entity": "Tool library",
+            "objective": "Make borrowing tools easier",
+            "environment": "Staffed pickup desk"
+          },
+          "strengths": [
+            {
+              "id": "s-practice",
+              "text": "Instructions for borrowers"
+            },
+            {
+              "id": "s-teacher",
+              "text": "Partner: Alder Workshop"
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w-arrival",
+              "text": "The scanner sometimes needs a restart, delaying checkout. Effect on abandoned loans unknown."
+            }
+          ],
+          "opportunities": [
+            {
+              "id": "o-demand",
+              "text": "Potential local interest in tool loans, if demand exists."
+            }
+          ],
+          "threats": [],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        },
+        "thought": "Checkout delay is now grounded in your observation that the scanner sometimes needs a restart; its relationship to abandoned loans remains unknown. The wording is shorter, with the demand uncertainty retained."
+      }
+    },
+    "B3": "I’ll keep the submitted factors unchanged and derive strategies within that boundary. Your clarification establishes a checkout problem, but gives no basis for calling it a cause of abandoned loans. Updating the factor itself would require a separate Improve proposal or local edit.",
+    "C": {
+      "request": {
+        "canvas": {
+          "framework": "swot",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "focal_entity": "Tool library",
+              "objective": "Make borrowing tools easier",
+              "environment": "Staffed pickup desk"
+            },
+            "strengths": [
+              {
+                "id": "s-practice",
+                "text": "Insturctions for borrowers"
+              },
+              {
+                "id": "s-teacher",
+                "text": "Partner: Alder Workshop"
+              }
+            ],
+            "weaknesses": [],
+            "opportunities": [
+              {
+                "id": "o-demand",
+                "text": "Potential opportunity: local interest in tool loans, if demand exists"
+              }
+            ],
+            "threats": [],
+            "strategies": {
+              "so": [],
+              "st": [],
+              "wo": [],
+              "wt": []
+            }
+          }
+        },
+        "action": {
+          "id": "improve",
+          "comment": "Shorten and polish"
+        }
+      },
+      "response": {
+        "content": {
+          "framing": {
+            "focal_entity": "Tool library",
+            "objective": "Make borrowing tools easier",
+            "environment": "Staffed pickup desk"
+          },
+          "strengths": [
+            {
+              "id": "s-practice",
+              "text": "Instructions for borrowers"
+            },
+            {
+              "id": "s-teacher",
+              "text": "Partner: Alder Workshop"
+            }
+          ],
+          "weaknesses": [],
+          "opportunities": [
+            {
+              "id": "o-demand",
+              "text": "Potential local interest in tool loans, if demand exists."
+            }
+          ],
+          "threats": [],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        },
+        "thought": "Polished the wording and shortened the opportunity while retaining its demand uncertainty. The existing factors do not establish local demand or a distinctive advantage."
+      }
+    },
+    "D": "Would you prefer a few promising strategies to start with, or a broader set of distinct options to prune?",
+    "D2": "I’ll generate a broader set of distinct, supported options, keeping the main assumptions and trade-offs clear.",
+    "E": "I can discuss your checkout clarification in the evaluation, but Evaluate leaves factors unchanged. I’ll assess its significance without claiming it explains abandoned loans. Adding it to the factor would require a separate Improve proposal or a local edit."
+  },
+  "observations": {
+    "baseline": "A proceeded toward sparse creation without agreement, an actual failure in this walkthrough. B suggested a revision but did not offer to carry it out. C already corrected spelling and preserved names/uncertainty. D used the existing small-set default, not an observed product defect. E respected the action boundary.",
+    "revised": "A/A2/B/D explicitly offer and wait. B2 incorporates authorized current clarification in a reviewable candidate without another permission question, while preserving identities and uncertainty about abandoned loans. B3/E respect immutable action boundaries. C is concise and preserves meaning. D2 respects breadth preference without re-asking.",
+    "limitations": "The A2 input is newly tested post-change, not a matched pre-change recognition benchmark. No complete Strategize/Evaluate candidate or artifact was authored in this probe; those responses test routing/boundaries through prose."
+  }
+}

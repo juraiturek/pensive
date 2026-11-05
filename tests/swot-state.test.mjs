@@ -84,6 +84,37 @@ test('invalid operations leave state unchanged and never replace identities', ()
   }
 });
 
+test('reordering changes only collection order and survives JSON packaging', () => {
+  const core = getCore();
+  for (const section of [...core.factors, ...core.strategies]) {
+    const state = core.initialState();
+    core.collection(state, section).push(item('a', 'First'), item('b', 'Second'), item('c', 'Third'));
+    core.reorderItem(state, section, 'a', 2);
+    assert.deepEqual(core.collection(state, section), [item('b', 'Second'), item('c', 'Third'), item('a', 'First')]);
+    core.reorderItem(state, section, 'a', 0);
+    core.reorderItem(state, section, 'b', 1);
+    assert.deepEqual(core.collection(core.parseState(JSON.stringify(state)), section), [item('a', 'First'), item('b', 'Second'), item('c', 'Third')]);
+  }
+});
+
+test('invalid reorder targets and pending collection moves fail without mutation', () => {
+  const core = getCore();
+  const state = core.initialState(); state.content.strengths.push(item('a', 'First'), item('b', 'Second'));
+  const before = structuredClone(state);
+  for (const [section, id, index] of [['strengths', 'a', -1], ['strengths', 'a', 2], ['strengths', 'a', 0.5], ['strengths', 'a', '1'], ['strengths', 'absent', 0], ['weaknesses', 'a', 0], ['invalid', 'a', 0]]) {
+    assert.throws(() => core.reorderItem(state, section, id, index));
+    assert.deepEqual(state, before);
+  }
+  const content = structuredClone(state.content); content.strengths[0].text = 'Proposed';
+  const proposed = core.composeResult(core.buildRequest(state, { id: 'improve' }), { content, thought: 'Clarified.' });
+  const pending = structuredClone(proposed);
+  assert.throws(() => core.reorderItem(proposed, 'strengths', 'a', 1), /review|pending|resolve/i);
+  assert.deepEqual(proposed, pending);
+  core.rejectProposal(proposed);
+  core.reorderItem(proposed, 'strengths', 'a', 1);
+  assert.equal(proposed.content.strengths[0].id, 'b');
+});
+
 test('safe state embedding round-trips adversarial strings and preserves implementation bytes', () => {
   const core = getCore();
   const html = readFileSync(new URL('canvas.html', root), 'utf8');

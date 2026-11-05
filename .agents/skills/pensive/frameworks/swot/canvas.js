@@ -17,6 +17,7 @@
   let state;
   let mode = 'swot';
   let requestedAction = null;
+  const ordering = CanvasEditing.collectionOrdering({ core: Swot, getState: () => state, renderSection, edited, status });
   function status(message, error = false) {
     $('#status').textContent = message;
     $('#status').classList.toggle('error', error);
@@ -56,7 +57,9 @@
     const list = element('ul', 'items');
     items.forEach((item, index) => {
       const row = element('li', 'item');
+      const handle = ordering.createHandle(row, list, section, item, index, label);
       const input = element('textarea');
+      CanvasEditing.finishOnEnter(input);
       input.rows = 1;
       input.value = item.text;
       input.dataset.id = item.id;
@@ -76,7 +79,7 @@
         container.querySelector('.add').focus();
         edited();
       });
-      row.append(input, remove);
+      row.append(handle, input, remove);
       list.append(row);
     });
     container.append(list);
@@ -126,13 +129,17 @@
     $('#tows-toggle').setAttribute('aria-pressed', String(mode === 'tows'));
     document.querySelectorAll(`#${mode}-view textarea`).forEach(resize);
   }
-  async function copyJson(json, message) {
+  async function copyJson(json, message, actionRequest = false) {
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
       status(message);
     } catch {
       $('#clipboard-fallback').hidden = false;
+      $('#clipboard-fallback label').textContent = actionRequest ? 'AI request JSON' : 'Canvas JSON';
+      $('#clipboard-fallback p').textContent = actionRequest
+        ? 'Copy this complete canvas and selected action into Codex or ChatGPT with the Pensive skill.'
+        : 'Copy this complete canvas for discussion or reuse. To request a transformation, use Strategize, Evaluate or Improve.';
       $('#clipboard-json').value = json;
       $('#clipboard-json').focus();
       $('#clipboard-json').select();
@@ -140,7 +147,7 @@
     }
   }
   function copyState() {
-    return copyJson(JSON.stringify(Swot.validate(state), null, 2), 'Copied complete canvas JSON to clipboard.');
+    return copyJson(JSON.stringify(Swot.validate(state), null, 2), 'Copied complete canvas JSON for discussion or reuse. Use an AI action button to request a transformation.');
   }
   function openAction(id) {
     if (state.proposals?.length) { status('Accept or reject the pending proposal first.', true); return; }
@@ -163,10 +170,18 @@
     const thoughts = $('#thoughts');
     thoughts.replaceChildren();
     thoughts.hidden = !state.thoughts?.length;
-    for (const thought of state.thoughts || []) {
+    function thoughtCard(thought) {
       const card = element('article', 'thought');
       card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', strategize: 'Strategy rationale' }[thought.kind]), element('p', '', thought.text));
-      thoughts.append(card);
+      return card;
+    }
+    const accepted = state.thoughts || [];
+    if (accepted.length) thoughts.append(thoughtCard(accepted.at(-1)));
+    if (accepted.length > 1) {
+      const earlier = element('details', 'earlier-thoughts');
+      earlier.append(element('summary', '', `Earlier thoughts (${accepted.length - 1})`));
+      for (const thought of accepted.slice(0, -1)) earlier.append(thoughtCard(thought));
+      thoughts.append(earlier);
     }
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
@@ -214,7 +229,7 @@
         if (requestedAction === 'evaluate') action.scope = $('#evaluation-scope').value;
         const request = Swot.buildRequest(state, action);
         $('#ai-dialog').close();
-        await copyJson(JSON.stringify(request, null, 2), 'Copied AI request. Paste it into Codex or ChatGPT with the Pensive skill.');
+        await copyJson(JSON.stringify(request, null, 2), 'Copied AI request with complete canvas and selected action. Paste it into Codex or ChatGPT with the Pensive skill.', true);
       } catch (error) { status(error.message, true); }
     });
     $('#swot-toggle').addEventListener('click', () => setMode('swot'));
@@ -223,7 +238,7 @@
     $('#save').addEventListener('click', saveFile);
     $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });
     $('details').addEventListener('toggle', () => $('#environment').hidden || resize($('#environment')));
-    document.querySelectorAll('[data-framing]').forEach(resize);
+    document.querySelectorAll('[data-framing]').forEach(input => { CanvasEditing.finishOnEnter(input); resize(input); });
   } catch (error) {
     document.querySelectorAll('button, textarea').forEach(node => { node.disabled = true; });
     status(`Invalid canvas: ${error.message} The embedded state has not been changed.`, true);

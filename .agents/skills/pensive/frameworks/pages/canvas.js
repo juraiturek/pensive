@@ -11,6 +11,7 @@
   const $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
   let state, requestedAction;
+  const ordering = CanvasEditing.collectionOrdering({ core: Pages, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -53,12 +54,13 @@
     const content = element('div', 'band-content'), list = element('ul', 'items');
     Pages.collection(state, section).forEach((item, index) => {
       const row = element('li', 'item'), input = element('textarea');
+      CanvasEditing.finishOnEnter(input);
       input.rows = 1; input.value = item.text; input.dataset.id = item.id;
       input.setAttribute('aria-label', `${label} ${index + 1}`); input.placeholder = 'Write one idea…';
       input.addEventListener('input', () => { Pages.editItem(state, section, item.id, input.value); resize(input); edited(); });
       const remove = element('button', 'delete', '×'); remove.type = 'button'; remove.setAttribute('aria-label', `Delete ${label.toLowerCase()} ${index + 1}`);
       remove.addEventListener('click', () => { Pages.deleteItem(state, section, item.id); renderSection(section); container.querySelector('.add').focus(); edited(); });
-      row.append(input, remove); list.append(row);
+      row.append(ordering.createHandle(row, list, section, item, index, label), input, remove); list.append(row);
     });
     const removed = element('div', 'removed-items'); removed.hidden = true;
     const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
@@ -127,6 +129,7 @@
   }
   try {
     state = Pages.parseState($('#canvas-state').textContent); refresh();
+    document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of Pages.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { state.content.framing[field] = e.target.value; resize(e.target); edited(); });
     document.querySelectorAll('[data-ai]').forEach(b => b.addEventListener('click', () => openAction(b.dataset.ai)));
     $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());

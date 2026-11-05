@@ -1,5 +1,21 @@
 # Destination architecture
 
+## Uniform local editing — 2026-11-04
+
+The [approved follow-up](plans/2026-11-04-uniform-canvas-editing.md) extends the previously SWOT-only collection interaction to PAGES and VPC. Shared `canvas-editing.js` owns DOM Enter handling and pointer gestures; shared `collection-ordering.css` owns handle/insertion presentation. Framework-owned state operations still enforce collection validity, stable identities and pending-review locks. The three collection canvases embed both assets; 5 Whys embeds the Enter helper but installs no collection-ordering controller or styles.
+
+Enter finishes bullet/framing editing without a line break; Shift+Enter retains multiline editing. 5 Whys uses the same composition-aware Enter helper with its existing node-save and countermeasure-submit callbacks. AI steering and JSON fields remain multiline. Finishing an edit does not download a file or introduce new persistence.
+
+PAGES reorder preserves its Ripple baseline and produces no semantic change solely from ordering. Existing stale-acceptance rules remain in force for manual order changes outside unresolved collections. Autoscroll is bounded to offscreen content of the active list. Tree movement, keyboard ordering, cross-collection moves and schema changes remain deferred. Earlier SWOT-only source/style notes below describe the preceding slice; the shared editing extraction supersedes those placement details.
+
+## SWOT consumer improvements — 2026-11-04
+
+The approved [E1–E8 slice](plans/2026-11-04-swot-consumer-improvements.md) refines collaborative guidance without changing JSON or action shapes. Explicitly authorized conversational clarifications can steer a narrow Improve proposal against the complete submitted state; they do not override local edits silently or expand Evaluate/Strategize permissions. Framing remains immutable to these actions.
+
+SWOT alone adds pointer-based within-collection reordering. The state operation validates the final index and protects unresolved proposed collections; cancellation does not mutate state. The bullet-marker handle appears on brief hover or after touch selection, with insertion feedback and long-list page scrolling. Keyboard ordering and cross-collection movement remain deferred. Reordering another collection during review is a manual edit subject to the existing stale-acceptance guard.
+
+Accepted thoughts keep their JSON order/text; the latest renders expanded with earlier thoughts collapsed. Pending rationale stays separate. Disclosure/selection/drag state is transient. The base SWOT stylesheet is embedded by other frameworks, so new interaction styles live in SWOT-only `interactions.css`, embedded by the SWOT packager; other framework presentation is unchanged. Existing exported HTML retains its embedded runtime and needs complete-state repackaging to obtain the new interface.
+
 ## Authority and scope
 
 README.md remains the unchanged authoritative product vision and design reference. This document records the approved slice-0 architecture and refines its illustrative layout and sequencing. The user reports V1/V2 audits complete; source folders and audit artifacts are unavailable here. No extraction findings are invented.

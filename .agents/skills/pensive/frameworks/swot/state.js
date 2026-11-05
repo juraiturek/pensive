@@ -114,6 +114,14 @@ const Swot = (() => {
     const { items, index } = locate(state, section, id);
     items.splice(index, 1);
   }
+  function reorderItem(state, section, id, finalIndex) {
+    const { items, index } = locate(state, section, id);
+    if (!Number.isInteger(finalIndex) || finalIndex < 0 || finalIndex >= items.length) throw new Error('Reorder position must be within this collection.');
+    if (proposalSections(state).some(entry => entry.section === section && entry.status === 'pending')) throw new Error('Resolve this collection’s pending review before reordering.');
+    if (index === finalIndex) return;
+    const [item] = items.splice(index, 1);
+    items.splice(finalIndex, 0, item);
+  }
   function same(a, b) {
     if (a === b) return true;
     if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
@@ -206,6 +214,6 @@ const Swot = (() => {
     const slot = `${start}\n<script id="canvas-state" type="application/json">${json}<${'/script>'}\n${end}`;
     return html.slice(0, first) + slot + html.slice(last + end.length);
   }
-  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
+  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Swot;

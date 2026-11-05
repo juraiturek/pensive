@@ -141,7 +141,8 @@ test('validated import cancellation, clipboard fallback and consecutive saved HT
   await p.getByRole('button', { name: 'Cancel import' }).click();
   assert.deepEqual(await exported(p), s);
   const original = await readFile(new URL('canvas.html', root), 'utf8');
-  let implementation;
+  const implementation = [...original.matchAll(/<script data-implementation(?:="")?>([\s\S]*?)<\/script>/g)].map(x => x[1]);
+  assert.ok(implementation.length > 0);
   for (let i = 0; i < 2; i++) {
     const download = p.waitForEvent('download');
     await p.getByRole('button', { name: /^Save to File/ }).click();
@@ -151,9 +152,7 @@ test('validated import cancellation, clipboard fallback and consecutive saved HT
       scripts = [...html.matchAll(/<script data-implementation(?:="")?>([\s\S]*?)<\/script>/g)].map(
         (x) => x[1],
       );
-    assert.equal(scripts.length, 2);
-    if (implementation) assert.deepEqual(scripts, implementation);
-    else implementation = scripts;
+    assert.deepEqual(scripts, implementation);
     await p.goto(pathToFileURL(path).href);
     assert.deepEqual(await exported(p), s);
   }

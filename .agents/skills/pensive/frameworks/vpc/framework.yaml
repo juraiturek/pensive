@@ -15,7 +15,7 @@ semantics:
     pain_relievers: How the offering addresses a specific customer pain.
     gain_creators: How the offering supports a specific desired gain.
   fit: A plausible mapping is a hypothesis, not evidence of customer demand or product-market fit.
-manual_capabilities: [edit_framing, add_edit_delete_items, import_validated_json, export_complete_json, save_standalone_html]
+manual_capabilities: [edit_framing, add_edit_delete_items, reorder_within_collection, import_validated_json, export_complete_json, save_standalone_html]
 ai_actions:
   create:
     method: prompts/create.md
