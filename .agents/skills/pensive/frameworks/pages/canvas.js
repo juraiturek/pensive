@@ -64,10 +64,18 @@
     });
     const removed = element('div', 'removed-items'); removed.hidden = true;
     const add = element('button', 'add', 'Add'); add.type = 'button'; add.setAttribute('aria-label', 'Add');
-    add.addEventListener('click', () => {
+    function beginItem() {
       const id = Pages.addItem(state, section); renderSection(section); edited();
       Array.from(container.querySelectorAll('textarea')).find(n => n.dataset.id === id).focus();
-    });
+    }
+    add.addEventListener('click', beginItem);
+    // Match the collection canvases: blank space continues the list, reusing an unfinished draft.
+    container.onclick = event => {
+      if (event.target.closest('button, textarea, .item, .band-heading, .removed-items')) return;
+      const last = Pages.collection(state, section).at(-1);
+      if (last && !last.text.trim()) container.querySelector('li.item:last-child textarea').focus();
+      else beginItem();
+    };
     content.append(list, removed, add); container.replaceChildren(heading, content); container.querySelectorAll('textarea').forEach(resize);
   }
   function renderAI() {

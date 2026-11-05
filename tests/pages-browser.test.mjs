@@ -94,6 +94,43 @@ test('empty PAGES has five bands and editable framing/items with persistent chan
   assert.ok((await group.locator('.change-mark').textContent()).includes('Edited'));
   await group.getByRole('button',{name:/Delete/}).click(); assert.ok((await group.locator('.removed-items').textContent()).includes('parts entry'));
 });
+test('PAGES blank space adds or focuses one draft in every band without treating headings or items as Add', async t => {
+  const page = await openCanvas(t);
+  for (const section of ['parts', 'actions', 'goals', 'events', 'self_concepts']) {
+    const group = page.locator(`[data-section="${section}"]`);
+    const content = group.locator('.band-content');
+    async function blank(double = false) {
+      await content.scrollIntoViewIfNeeded();
+      const box = await content.boundingBox();
+      const position = { x: box.width - 6, y: box.height - 6 };
+      if (double) await content.dblclick({ position });
+      else await content.click({ position });
+    }
+    await group.locator('.band-heading').click();
+    assert.equal(await group.locator('textarea').count(), 0);
+    await blank();
+    assert.equal(await group.locator('textarea').count(), 1);
+    const first = group.locator('textarea').first();
+    assert.equal(await first.evaluate(el => el === document.activeElement), true);
+    const id = await first.getAttribute('data-id');
+    await blank(true);
+    assert.equal(await group.locator('textarea').count(), 1);
+    await first.fill(`${section} first`);
+    await first.press('Enter');
+    await blank(true);
+    assert.equal(await group.locator('textarea').count(), 2);
+    assert.equal(await group.locator('textarea').last().evaluate(el => el === document.activeElement), true);
+    await group.locator('textarea').last().fill(`${section} second`);
+    await first.click();
+    await group.locator('.change-mark').first().click();
+    await group.locator('.band-heading').click();
+    assert.equal(await group.locator('textarea').count(), 2);
+    assert.equal((await copiedState(page)).content[section][0].id, id);
+  }
+  const state = await copiedState(page);
+  await page.goto(pathToFileURL(await save(page, 'pages-background-add.html')).href);
+  assert.deepEqual(await copiedState(page), state);
+});
 test('JSON import is validated and atomic, cancellation preserves work; missing baseline requires explicit establishment',async t=>{
   const page=await openCanvas(t); await add(page,'parts','Keep me'); const before=await copiedState(page);
   await importJson(page,'{"framework":"pages"}',null); assert.ok((await page.locator('#import-error').textContent()).length>0);

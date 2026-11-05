@@ -8,7 +8,22 @@ The user requested consistent editing across frameworks. Enter-to-finish/Shift+E
 
 Approved E1–E8 from the [consumer report](2026-11-04-swot-consumer-test-report.md) are implemented in the [bounded follow-up slice](plans/2026-11-04-swot-consumer-improvements.md): proactive creation/reconciliation guidance, concise proofreading/rationales, optional strategy breadth, compact SWOT thoughts, clearer handoff wording and within-collection pointer reordering. E8 uses hover/touch-revealed bullet-marker handles; keyboard reordering was explicitly deferred. No new state schema or action was introduced.
 
-The report's L1–L6 remain proposed developments requiring design: Outcomes, strategy decisions, attached annotations, cross-collection movement, controlled framing changes and richer reconciliation. The existing notes/thoughts priority below is not an approval of those designs. Checks and limitations are recorded in `docs/testing.md`.
+The user requested inclusion of L1–L6 in the future feature plan below. They require detailed design and separately scoped implementation approval. Checks and limitations for delivered work are recorded in `docs/testing.md`.
+
+## Future features — L1–L6
+
+Included by user request on 2026-11-04, based on the [consumer-test findings](2026-11-04-swot-consumer-test-report.md). Priorities below are proposed; no delivery dates or implementation designs are committed. Prefer consistent shared interactions where useful, while preserving framework-specific semantics and action boundaries.
+
+| ID | Priority | Feature | Design scope and completion conditions |
+| --- | --- | --- | --- |
+| L1 | High | Persisted Outcomes section | Capture takeaways, decisions, next steps, open questions and parked ideas with the analysis. Start by comparing a lightweight editable section with structured fields. Specify JSON/save/export, manual edit preservation and reviewed AI updates; outcomes need not be tasks. |
+| L2 | High | Individual strategy selection and follow-through | Distinguish accepting analytical content from choosing pursue/test/park/decline. Support appropriate first actions or validation steps, with optional owner and review point. Define behavior when strategies change or are deleted; keep scope below a project-management system. |
+| L3 | High | Bullet- and collection-level annotations | Attach comments, observations, research questions and thoughts to stable targets. Define authorship/provenance, compact display, editing, export, freshness and target move/deletion behavior. Distinguish local comments, AI thoughts and prior rationale without implying full revision history. This incorporates the existing notes/thoughts priority below. |
+| L4 | Medium | Cross-collection moves | Extend current within-collection ordering through explicit, atomic moves that preserve identity and attached annotations. Define pending-review interactions and framework compatibility. Moving a TOWS strategy must not imply that its new pairing is analytically valid; causal-tree moves require separate scope. |
+| L5 | Medium | Controlled framing proposals | Allow requested or explicitly approved framing changes with visible rationale and review. Distinguish factual cleanup from changes to entity, objective or environment; specify stale-state guards and implications for existing analysis. Coordinate with deferred Restate framing across applicable frameworks. Existing actions retain their current boundaries until a new contract is approved. |
+| L6 | Medium | Broader collaborative state reconciliation | Extend the implemented conversational update offer into reviewable reconciliation of explicit chat discoveries and local canvas edits. Establish the current state, resolve conflicts and preserve unrelated edits. Do not introduce silent synchronization, hidden reconstruction or automatic history by implication. |
+
+Suggested design sequence: L1 as a small persistence slice; L2 and L3 as separately scoped follow-ups; then L4–L6 with their identity, review and state implications. This is a planning recommendation, not a replacement for the previously expressed notes/thoughts priority: agree the next slice when work starts. L1 can ship without structured L2 decisions; L4 should account for L3 annotation behavior before enabling target moves. No new framework receives a generic feature automatically where its semantics differ.
 
 This approved sequence refines the README's broad phases without editing the authoritative vision. Each slice requires separately scoped implementation work. Slice 0 does not authorize extraction or future slices.
 

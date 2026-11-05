@@ -1,5 +1,15 @@
 # Testing strategy
 
+## PAGES blank-space editing and indicator investigation — 2026-11-04
+
+Reproduced the missing empty-band click behavior with a failing offline browser test (zero editors after click). PAGES now follows SWOT/VPC: blank collection space adds and focuses a bullet, or reuses an unfinished trailing draft, including double-clicks. Headings, existing rows, controls and removed-item notices are excluded. The handler is replaced on re-render, so Add does not accumulate listeners. Rebuilt only PAGES standalone HTML.
+
+Executed `PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright /Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test tests/pages-browser.test.mjs tests/pages-state.test.mjs tests/canvas-editing-browser.test.mjs tests/collection-ordering-state.test.mjs`: **37 passed, zero failures/skips**, using approved Chromium process access. New coverage spans all five bands, empty/populated background clicks, repeated/double-click draft reuse, editor focus, heading/item/change-marker exclusion, stable IDs and HTML save/reopen. Existing PAGES baseline, proposal, import/export and shared Enter/drag regressions passed. Independent narrow review found no blocking issue.
+
+Investigation only for indicators: PAGES compares stable item IDs and text against persisted `ripple_baseline`. Added means absent from that baseline; Edited means an existing item's text differs (tooltip shows its prior text); removed baseline entries appear as Removed notices. Reordering alone is non-semantic. Explicit baseline reset clears/rebases the markers; imported state without a baseline has no recoverable prior comparison. These are distinct from AI proposal New/Updated tags shared by collection canvases. No indicator, baseline, identifier or other-framework behavior was harmonized or changed.
+
+Skill validator and whitespace checks passed. Limits: offline Chromium, not new Safari/physical-device testing; full cross-framework suite was not repeated for this local PAGES event-handler change. Existing exported HTML needs complete-state repackaging/import into the updated canvas for this behavior. No commit/push/publication.
+
 ## Uniform canvas editing — 2026-11-04
 
 Implemented [Enter-to-finish and shared ordering](plans/2026-11-04-uniform-canvas-editing.md). Shared browser code in `shared/canvas-editing.js` binds Enter only to analytical text fields, preserving Shift+Enter and composition-confirming Enter (`isComposing` and legacy keycode 229). SWOT/PAGES/VPC bullet and framing editors blur on Enter after their existing live state update. 5 Whys framing blurs; node text and countermeasures use their existing save/submit callbacks. AI steering and JSON/import text boxes remain multiline. No schema or file-persistence semantics changed.
