@@ -1,5 +1,9 @@
 # Implementation roadmap
 
+## SWOT JSON import — 2026-11-05
+
+SWOT now follows the other canvases with validated pasted JSON and confirmation before replacing the current state. This supersedes the original Slice 1 import UI deferral. Complete exported state, including thoughts and pending review decisions, can be restored directly in the browser.
+
 ## Uniform editing follow-up — 2026-11-04
 
 The user requested consistent editing across frameworks. Enter-to-finish/Shift+Enter-to-newline now applies to analytical text fields in all four canvases, with AI/JSON text boxes excluded. Within-collection pointer ordering is shared by SWOT, PAGES and VPC. Framework state/baseline/proposal semantics remain separate; 5 Whys tree movement is deferred. See [implementation plan](plans/2026-11-04-uniform-canvas-editing.md) and verification in `docs/testing.md`. This extends the previously SWOT-only E8 interaction without approving the larger L1–L6 backlog.

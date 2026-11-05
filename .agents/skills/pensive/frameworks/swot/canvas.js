@@ -160,7 +160,11 @@
     $('#ai-guidance').focus();
   }
   function refreshCanvas() {
-    for (const field of Swot.framing) $(`[data-framing="${field}"]`).value = state.content.framing[field];
+    for (const field of Swot.framing) {
+      const input = $(`[data-framing="${field}"]`);
+      input.value = state.content.framing[field];
+      resize(input);
+    }
     for (const section of [...Swot.factors, ...Swot.strategies]) renderSection(section);
     countStrategies();
     setMode(mode);
@@ -234,6 +238,30 @@
     });
     $('#swot-toggle').addEventListener('click', () => setMode('swot'));
     $('#tows-toggle').addEventListener('click', () => setMode('tows'));
+    $('#import').addEventListener('click', () => {
+      $('#import-form').reset();
+      $('#import-error').textContent = '';
+      $('#import-dialog').showModal();
+      $('#import-json').focus();
+    });
+    $('#cancel-import').addEventListener('click', () => $('#import-dialog').close());
+    $('#import-form').addEventListener('submit', event => {
+      event.preventDefault();
+      $('#import-error').textContent = '';
+      let next;
+      try {
+        next = Swot.parseState($('#import-json').value);
+      } catch (error) {
+        $('#import-error').textContent = error.message;
+        return;
+      }
+      if (!confirm('Replace the current canvas, including edits, thoughts and pending proposal? Save or export first if you want to keep it.')) return;
+      state = next;
+      $('#import-dialog').close();
+      refreshCanvas();
+      edited();
+      status('SWOT JSON imported. Save to keep this state.');
+    });
     $('#copy').addEventListener('click', copyState);
     $('#save').addEventListener('click', saveFile);
     $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });

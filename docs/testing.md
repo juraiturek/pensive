@@ -1,5 +1,9 @@
 # Testing strategy
 
+## SWOT JSON import — 2026-11-05
+
+A new offline Chromium test reproduced the missing Import JSON control before implementation. It now covers invalid framework state, declined replacement, and confirmed import with rendering and complete JSON export. Existing clipboard and action-dialog tests use precise selectors to distinguish the new import dialog. The full `node --test tests/*.test.mjs` suite passed 162 tests with zero failures or skips using bundled Node and offline Chromium. The skill validator and `git diff --check` passed. Browser coverage was Chromium only.
+
 ## PAGES blank-space editing and indicator investigation — 2026-11-04
 
 Reproduced the missing empty-band click behavior with a failing offline browser test (zero editors after click). PAGES now follows SWOT/VPC: blank collection space adds and focuses a bullet, or reuses an unfinished trailing draft, including double-clicks. Headings, existing rows, controls and removed-item notices are excluded. The handler is replaced on re-render, so Add does not accumulate listeners. Rebuilt only PAGES standalone HTML.

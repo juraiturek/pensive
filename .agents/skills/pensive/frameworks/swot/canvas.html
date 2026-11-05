@@ -197,7 +197,7 @@ dialog textarea { display: block; font-size: .9rem; }
         <button type="button" data-ai="evaluate" title="Evaluate SWOT, TOWS, or both">Evaluate</button>
         <button type="button" data-ai="improve" title="Improve the current SWOT/TOWS">Improve</button>
       </div>
-      <div class="export-actions"><button id="copy" type="button" class="primary" title="Copy the complete canvas for discussion or reuse. Use an AI action button to request a transformation.">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
+      <div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary" title="Copy the complete canvas for discussion or reuse. Use an AI action button to request a transformation.">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
     <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
     <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
@@ -234,6 +234,7 @@ dialog textarea { display: block; font-size: .9rem; }
   </main>
   <footer><span>Less conversation. More thinking.</span><span>SWOT / TOWS <span aria-hidden="true">·</span> Pensive</span></footer>
 </div>
+<dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><h2 id="import-title">Import SWOT JSON</h2><p class="dialog-note">Paste complete exported SWOT state. Validation happens before replacement.</p><label for="import-json">Import canvas JSON</label><textarea id="import-json" rows="10" spellcheck="false"></textarea><p id="import-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-import" type="button">Cancel import</button><button type="submit" class="primary">Replace canvas</button></div></form></dialog>
 <dialog id="ai-dialog" aria-labelledby="ai-title">
   <form id="ai-form">
     <h2 id="ai-title">Request AI action</h2>
@@ -921,7 +922,11 @@ const CanvasEditing = (() => {
     $('#ai-guidance').focus();
   }
   function refreshCanvas() {
-    for (const field of Swot.framing) $(`[data-framing="${field}"]`).value = state.content.framing[field];
+    for (const field of Swot.framing) {
+      const input = $(`[data-framing="${field}"]`);
+      input.value = state.content.framing[field];
+      resize(input);
+    }
     for (const section of [...Swot.factors, ...Swot.strategies]) renderSection(section);
     countStrategies();
     setMode(mode);
@@ -995,6 +1000,30 @@ const CanvasEditing = (() => {
     });
     $('#swot-toggle').addEventListener('click', () => setMode('swot'));
     $('#tows-toggle').addEventListener('click', () => setMode('tows'));
+    $('#import').addEventListener('click', () => {
+      $('#import-form').reset();
+      $('#import-error').textContent = '';
+      $('#import-dialog').showModal();
+      $('#import-json').focus();
+    });
+    $('#cancel-import').addEventListener('click', () => $('#import-dialog').close());
+    $('#import-form').addEventListener('submit', event => {
+      event.preventDefault();
+      $('#import-error').textContent = '';
+      let next;
+      try {
+        next = Swot.parseState($('#import-json').value);
+      } catch (error) {
+        $('#import-error').textContent = error.message;
+        return;
+      }
+      if (!confirm('Replace the current canvas, including edits, thoughts and pending proposal? Save or export first if you want to keep it.')) return;
+      state = next;
+      $('#import-dialog').close();
+      refreshCanvas();
+      edited();
+      status('SWOT JSON imported. Save to keep this state.');
+    });
     $('#copy').addEventListener('click', copyState);
     $('#save').addEventListener('click', saveFile);
     $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });

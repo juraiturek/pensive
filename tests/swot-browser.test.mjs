@@ -176,7 +176,7 @@ test('clipboard denial offers selectable JSON without claiming successful copy',
   await add(page, 'strengths', 'Still exportable');
   await page.getByRole('button', { name: 'Export to clipboard', exact: true }).click();
   await page.waitForSelector('#clipboard-fallback:not([hidden])');
-  const exported = JSON.parse(await page.getByLabel('Canvas JSON').inputValue());
+  const exported = JSON.parse(await page.getByLabel('Canvas JSON', { exact: true }).inputValue());
   assert.equal(exported.content.strengths[0].text, 'Still exportable');
   assert.ok(!(await page.locator('#status').textContent()).includes('Copied'));
 });
@@ -362,14 +362,14 @@ test('state export and action request explain distinct handoffs including clipbo
   const page = await openCanvas(t);
   assert.match(await page.locator('#copy').getAttribute('title'), /discussion/i);
   await page.getByRole('button', { name: 'Strategize', exact: true }).click();
-  assert.match(await page.locator('.dialog-note').textContent(), /complete canvas.*action/i);
+  assert.match(await page.locator('#ai-dialog .dialog-note').textContent(), /complete canvas.*action/i);
   await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { value: { writeText: async () => { throw Error('Denied'); } } }));
   await page.getByRole('button', { name: 'Copy AI request', exact: true }).click();
   assert.equal(await page.getByLabel('AI request JSON').isVisible(), true);
   assert.match(await page.locator('#clipboard-fallback p').textContent(), /action/i);
   await page.getByRole('button', { name: 'Close', exact: true }).click();
   await page.locator('#copy').click();
-  assert.equal(await page.getByLabel('Canvas JSON').isVisible(), true);
+  assert.equal(await page.getByLabel('Canvas JSON', { exact: true }).isVisible(), true);
   assert.match(await page.locator('#clipboard-fallback p').textContent(), /discussion/i);
 });
 
@@ -510,4 +510,30 @@ test('proposal review distinguishes new and updated SWOT bullets without tagging
   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.screenshot({path:'test-results/swot-proposal-tags-mobile.png',fullPage:true});
   await page.getByRole('button',{name:'Reject All',exact:true}).click();assert.deepEqual((await copiedState(page)).content,s.content);
+});
+
+test('SWOT JSON import validates and confirms before replacing complete state', async t => {
+  const page = await openCanvas(t);
+  await add(page, 'strengths', 'Keep until confirmed');
+  const original = await copiedState(page);
+  const next = structuredClone(original);
+  next.content.framing.objective = 'Imported objective';
+  next.content.strengths[0].text = 'Imported strength';
+  await page.getByRole('button', { name: 'Import JSON', exact: true }).click();
+  const input = page.getByLabel('Import canvas JSON');
+  const replace = page.getByRole('button', { name: 'Replace canvas' });
+  await input.fill('{"framework":"pages"}');
+  await replace.click();
+  assert.ok((await page.locator('#import-error').textContent()).trim());
+  await input.fill(JSON.stringify(next));
+  page.once('dialog', dialog => dialog.dismiss());
+  await replace.click();
+  await page.getByRole('button', { name: 'Cancel import' }).click();
+  assert.deepEqual(await copiedState(page), original);
+  await page.getByRole('button', { name: 'Import JSON', exact: true }).click();
+  await input.fill(JSON.stringify(next));
+  page.once('dialog', dialog => dialog.accept());
+  await replace.click();
+  assert.equal(await page.locator('[data-framing="objective"]').inputValue(), 'Imported objective');
+  assert.deepEqual(await copiedState(page), next);
 });

@@ -21,6 +21,7 @@ manual_capabilities:
   - add_edit_delete_strategies
   - reorder_within_collection
   - toggle_swot_tows
+  - import_validated_json
   - export_json_to_clipboard
   - save_standalone_html
 ai_actions:

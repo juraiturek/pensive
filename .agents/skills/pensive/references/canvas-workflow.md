@@ -4,7 +4,7 @@ SWOT initialization, guided action export, thought display, and collection-level
 
 ## Initialize
 
-Select an available framework explicitly. Use its schema-valid initial state and established canvas implementation. Produce standalone HTML containing complete JSON state, local editing, clipboard JSON export, and saved HTML. JSON input uses validated packaging, not a file-loading UI. Editing and navigation require neither AI nor a server.
+Select an available framework explicitly. Use its schema-valid initial state and established canvas implementation. Produce standalone HTML containing complete JSON state, local editing, clipboard JSON export, and saved HTML. Import JSON validates pasted complete state before confirmed replacement. Validated packaging can also initialize an artifact from JSON. Editing and navigation require neither AI nor a server.
 
 AI-assisted SWOT initialization follows [create.md](../frameworks/swot/prompts/create.md). It produces a new reviewable AI-authored draft without prior accepted state, action envelope, proposals, or acceptance controls.
 
