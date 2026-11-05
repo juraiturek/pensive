@@ -151,6 +151,91 @@ dialog textarea { display: block; font-size: .9rem; }
 @media (max-width: 560px) { .proposal-diff { grid-template-columns: minmax(0, 1fr); } }
 </style>
 <style>
+.annotation-toolbar, .annotation-controls, .annotation-actions, .annotation-note-actions {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+.annotation-controls { flex: 0 0 auto; }
+.band-heading > .annotation-controls { display: flex; margin-top: .55rem; }
+.cell-heading:has(.annotation-controls:not([hidden])),
+.vpc-heading:has(.annotation-controls:not([hidden])) { flex-wrap: wrap; }
+[data-context] li > .annotation-controls { margin-inline-start: .4rem; }
+.annotation-toolbar button, .annotation-controls button { font-size: .75rem; }
+.annotation-controls .annotation-trigger {
+  min-height: 28px;
+  padding: .22rem .48rem;
+  border-radius: .4rem;
+}
+.annotation-trigger::before {
+  content: '';
+  display: inline-block;
+  width: .9em;
+  height: .9em;
+  margin-inline-end: .3em;
+  vertical-align: -.05em;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M2.5 2.5h11v7l-4 4h-7z M9.5 13.5v-4h4 M5 6h6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.annotation-controls .annotation-add, .annotation-add:not([hidden]) + .annotation-show {
+  background: #fff1ae;
+  border-color: #c6a94d;
+  color: #493907;
+}
+.annotation-add[hidden] + .annotation-show {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+.annotation-toolbar button, .annotation-toolbar .annotation-trigger {
+  min-height: 34px;
+  padding: .28rem .58rem;
+  border-radius: .4rem;
+}
+.annotation-panel .annotation-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+.annotation-panel .annotation-icon:hover { background: #eae6d8; color: var(--ink); }
+.annotation-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.annotation-panel .annotation-close { position: absolute; inset: .65rem .65rem auto auto; }
+.annotation-panel h2 { padding-inline-end: 1.5rem; }
+.annotation-panel h2 { margin: .25rem 0 1rem; overflow-wrap: anywhere; }
+.annotation-panel textarea { display: block; width: 100%; margin-block: .5rem; }
+.annotation-list { list-style: none; padding: 0; margin: .75rem 0 0; }
+.annotation-list li {
+  background: #fffae8;
+  border: 1px solid #e7dbaa;
+  border-radius: .45rem;
+  padding: .75rem;
+  margin-bottom: .45rem;
+}
+.annotation-list p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.annotation-note-actions { margin-top: .5rem; }
+@media (max-width: 600px) {
+  .item .annotation-controls, .canvas-tree-stratum-header .annotation-controls {
+    flex: 0 1 auto;
+    max-width: 38%;
+  }
+  .item .annotation-trigger, .canvas-tree-stratum-header .annotation-trigger { min-height: 32px; }
+}
+</style>
+<style>
 /* Shared pointer-ordering presentation for flat collections. */
 .item { display: flex; position: relative; align-items: start; gap: .6rem; border-top: 1px solid #00000014; padding: .55rem 0 .55rem 1.15rem; }
 .item::before { content: "·"; color: var(--category); position: absolute; left: .15rem; top: .7rem; padding-top: 0; }
@@ -543,9 +628,57 @@ const SixHats = (() => {
 if (typeof module !== 'undefined' && module.exports) module.exports = SixHats;
 </script>
 <script data-implementation>
+/* Portable manual notes, shared by standalone canvases and packagers. */
+const Annotations = (() => {
+  'use strict';
+  const id = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value);
+  const text = value => typeof value === 'string' && !!value.trim();
+  const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
+    Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
+  const sameTarget = (left, right) => left.type === right.type && left.id === right.id;
+
+  function validate(notes, targetType, sections = []) {
+    if (notes === undefined) return;
+    if (!Array.isArray(notes)) throw new Error('Annotations must be an array.');
+    const targetTypes = Array.isArray(targetType) ? targetType : [targetType];
+    const seen = new Set();
+    for (const note of notes) {
+      if (!exact(note, ['id', 'target', 'target_label', 'text']) ||
+          !id(note.id) || seen.has(note.id) || !text(note.text) || !text(note.target_label)) {
+        throw new Error('Invalid annotation or duplicate annotation ID.');
+      }
+      const target = note.target;
+      if (!(exact(target, ['type']) && target.type === 'canvas') &&
+          !(exact(target, ['type', 'id']) && (targetTypes.includes(target.type) && id(target.id) ||
+            target.type === 'section' && sections.includes(target.id)))) {
+        throw new Error('Invalid annotation target.');
+      }
+      seen.add(note.id);
+    }
+  }
+
+  function save(state, targetType, note, sections) {
+    const notes = [...(state.annotations || [])];
+    const index = notes.findIndex(entry => entry.id === note.id);
+    if (index < 0) notes.push(note);
+    else notes[index] = note;
+    validate(notes, targetType, sections);
+    state.annotations = notes;
+  }
+
+  function remove(state, id) {
+    state.annotations = (state.annotations || []).filter(note => note.id !== id);
+  }
+
+  return Object.freeze({ validate, sameTarget, save, remove });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = Annotations;
+</script>
+<script data-implementation>
 /* SWOT-specific state operations, shared by the local page and Node packager. */
 const Swot = (() => {
   'use strict';
+  const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
@@ -602,9 +735,10 @@ const Swot = (() => {
     ids.add(thought.id);
   }
   function validate(state) {
-    objectWithKeys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals']);
+    objectWithKeys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals', 'annotations']);
     if (state.framework !== 'swot' || state.schema_version !== '1.0') throw new Error('Unsupported framework or schema version. Expected swot / 1.0.');
     const ids = validateContent(state.content);
+    Notes.validate(state.annotations, ['factor', 'strategy'], [...factors, ...strategies]);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
       for (const entry of state.thoughts) {
@@ -969,6 +1103,244 @@ const CanvasEditing = (() => {
 })();
 </script>
 <script data-implementation>
+/* Shared manual annotation workspace for standalone canvases. */
+const AnnotationUI = (() => {
+  'use strict';
+  const canvas = { type: 'canvas' };
+  const overview = { type: 'overview' };
+  function element(tag, text) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function button(text, action) {
+    const node = element('button', text);
+    node.type = 'button';
+    node.addEventListener('click', action);
+    return node;
+  }
+  function iconButton(label, path, action) {
+    const control = button('', action);
+    control.className = 'annotation-icon';
+    control.setAttribute('aria-label', label);
+    control.title = label;
+    const namespace = 'http://www.w3.org/2000/svg';
+    const icon = document.createElementNS(namespace, 'svg');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.setAttribute('aria-hidden', 'true');
+    const shape = document.createElementNS(namespace, 'path');
+    shape.setAttribute('d', path);
+    icon.append(shape);
+    control.append(icon);
+    return control;
+  }
+  function install({ getState, targetType, sections, lookup, setMode, canEnter, onEdit }) {
+    let active = false, selected = canvas, draft, opener;
+    const toolbar = element('div');
+    toolbar.className = 'annotation-toolbar';
+    const panel = element('dialog');
+    panel.className = 'annotation-panel';
+    panel.setAttribute('aria-label', 'Annotations');
+    const mode = button('Annotation Mode', () => changeMode(true));
+    const exit = button('Exit annotation mode', () => changeMode(false));
+    exit.hidden = true;
+    const unavailable = button('', () => open(null, unavailable));
+    document.querySelector('.toolbar .export-actions').before(toolbar);
+    document.body.append(panel);
+    panel.addEventListener('cancel', event => {
+      event.preventDefault();
+      close();
+    });
+
+    const notes = () => getState().annotations || [];
+    const label = target => target === overview ? 'All thoughts' :
+      target.type === 'canvas' ? 'Whole canvas' : lookup(target.id, target.type);
+    const matches = target => notes().filter(note => Annotations.sameTarget(note.target, target));
+    const missing = () => notes().filter(note => label(note.target) === undefined);
+
+    function updateBadge(group, target) {
+      const count = matches(target).length;
+      const [add, show] = group.children;
+      if (target.type === 'canvas' && !active) {
+        const specific = notes().length - count;
+        group.hidden = show.hidden = !notes().length;
+        add.hidden = true;
+        show.textContent = `${count} | ${specific}`;
+        const description = `${count} general thoughts, ${specific} specific thoughts`;
+        show.setAttribute('aria-label', description);
+        show.title = description;
+        return;
+      }
+      group.hidden = !active && !count;
+      add.hidden = !active;
+      show.hidden = !count;
+      if (group.hidden) return;
+      const name = label(target);
+      const addText = target.type === 'canvas' ? 'Add general thought' : 'Add thought';
+      add.textContent = addText;
+      add.setAttribute('aria-label', target.type === 'canvas' ? addText : `${addText} for ${name}`);
+      show.textContent = active ? `Show thoughts (${count})` : String(count);
+      const showLabel = active ? `Show thoughts (${count}) for ${name}` : `${count} ${count === 1 ? 'note' : 'notes'} for ${name}`;
+      show.setAttribute('aria-label', showLabel);
+      show.title = showLabel;
+    }
+    function refresh() {
+      if (selected && label(selected) === undefined) selected = null;
+      unavailable.hidden = !missing().length;
+      unavailable.textContent = `Unavailable targets (${missing().length})`;
+      for (const group of document.querySelectorAll('[data-annotation-type]')) {
+        updateBadge(group, { type: group.dataset.annotationType, id: group.dataset.annotationTarget });
+      }
+      if (panel.open && !draft) render();
+    }
+    function discardDraft() {
+      if (draft && draft.input.value !== draft.original && !confirm('Discard the unsaved note?')) return false;
+      draft = undefined;
+      return true;
+    }
+    function focusPanel() {
+      panel.querySelector('.annotation-close').focus();
+    }
+    function open(target, control, compose = false) {
+      selected = target;
+      opener = control;
+      render();
+      panel.showModal();
+      if (compose) edit();
+      else focusPanel();
+    }
+    function close() {
+      if (!discardDraft()) return;
+      panel.close();
+      const replacement = selected && [...document.querySelectorAll('[data-annotation-type]')]
+        .find(group => group.getClientRects().length && group.dataset.annotationType === selected.type &&
+          group.dataset.annotationTarget === selected.id);
+      const control = opener?.isConnected && opener.getClientRects().length
+        ? opener : replacement?.querySelector('button:not([hidden])');
+      (control && control.getClientRects().length ? control : active ? exit : mode).focus({ preventScroll: true });
+    }
+    function changeMode(next) {
+      if (next && canEnter && !canEnter()) return;
+      active = next;
+      mode.hidden = active;
+      exit.hidden = !active;
+      setMode(active);
+      refresh();
+      if (panel.open) focusPanel();
+      else (active ? exit : mode).focus({ preventScroll: true });
+    }
+    function edit(note) {
+      const form = element('form');
+      const field = element('label', 'Annotation text');
+      const input = element('textarea');
+      input.rows = 3;
+      input.required = true;
+      input.value = note?.text || '';
+      field.append(input);
+      const save = element('button', 'Save note');
+      save.type = 'submit';
+      const actions = element('div');
+      actions.className = 'annotation-actions';
+      actions.append(save, button('Cancel', () => {
+        draft = undefined;
+        render();
+        focusPanel();
+      }));
+      form.append(field, actions);
+      draft = { input, original: input.value };
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!active) return;
+        const text = input.value.trim();
+        if (!text) {
+          input.setCustomValidity('Enter a note.');
+          input.reportValidity();
+          return;
+        }
+        Annotations.save(getState(), targetType, note ? { ...note, text } : {
+          id: 'note-' + crypto.randomUUID(), target: selected, target_label: label(selected), text
+        }, sections);
+        draft = undefined;
+        onEdit();
+        refresh();
+        focusPanel();
+      });
+      input.addEventListener('input', () => input.setCustomValidity(''));
+      panel.querySelector('.annotation-actions').hidden = true;
+      panel.querySelector('.annotation-list').hidden = true;
+      panel.querySelector('.annotation-empty')?.setAttribute('hidden', '');
+      panel.append(form);
+      input.focus();
+    }
+    function render() {
+      const heading = element('h2', selected ? label(selected) : 'Unavailable targets');
+      const actions = element('div');
+      actions.className = 'annotation-actions';
+      const eyebrow = element('p', 'Thoughts');
+      eyebrow.className = 'eyebrow';
+      const dismiss = iconButton('Close notes', 'M6 6l12 12M18 6L6 18', close);
+      dismiss.classList.add('annotation-close');
+      panel.replaceChildren(dismiss, eyebrow, heading, actions);
+      if (active) {
+        if (selected) actions.append(button('Add thought', () => edit()));
+      } else if (selected !== overview) {
+        actions.append(button(selected ? 'Annotate this target' : 'Manage unavailable notes', () => changeMode(true)));
+      }
+      const entries = selected === overview ? notes() : selected ? matches(selected) : missing();
+      if (!entries.length) {
+        const empty = element('p', 'No thoughts yet.');
+        empty.className = 'annotation-empty';
+        panel.append(empty);
+      }
+      const list = element('ul');
+      list.className = 'annotation-list';
+      for (const note of entries) {
+        const card = element('li');
+        if (!selected || selected === overview) card.append(element('strong', label(note.target) ?? note.target_label));
+        card.append(element('p', note.text));
+        if (active) {
+          const controls = element('div');
+          controls.className = 'annotation-note-actions';
+          controls.append(iconButton('Edit note', 'M4 20l4-.8L20 7l-3-3L5 16z M14.5 6.5l3 3', () => { if (!draft) edit(note); }),
+            iconButton('Delete note', 'M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 10v7 M14 10v7', () => {
+              if (draft || !confirm('Delete this note?')) return;
+              Annotations.remove(getState(), note.id);
+              onEdit();
+              refresh();
+              focusPanel();
+            }));
+          card.append(controls);
+        }
+        list.append(card);
+      }
+      panel.append(list);
+    }
+    function badge(id, type = targetType) {
+      const target = id === undefined ? { type } : { type, id };
+      const group = element('span');
+      group.className = 'annotation-controls';
+      group.dataset.annotationType = type;
+      if (id !== undefined) group.dataset.annotationTarget = id;
+      const add = button('', () => open(target, add, true));
+      const show = button('', () => open(type === 'canvas' && !active ? overview : target, show));
+      add.className = 'annotation-trigger annotation-add';
+      show.className = 'annotation-trigger annotation-show';
+      group.append(add, show);
+      updateBadge(group, target);
+      return group;
+    }
+    function reset() {
+      selected = canvas;
+      draft = undefined;
+      opener = undefined;
+    }
+    toolbar.append(mode, badge(undefined, 'canvas'), exit, unavailable);
+    return { badge, refresh, reset, isActive: () => active };
+  }
+  return { install };
+})();
+</script>
+<script data-implementation>
 /* UI for this SWOT/TOWS canvas only. No storage or network operations. */
 (() => {
   'use strict';
@@ -982,10 +1354,12 @@ const CanvasEditing = (() => {
     wo: ['WO strategies', 'W × O', 'Use opportunities to overcome weaknesses.'],
     wt: ['WT strategies', 'W × T', 'Reduce weaknesses and exposure to threats.']
   };
+  const sections = [...Swot.factors, ...Swot.strategies];
+  const itemType = section => Swot.factors.includes(section) ? 'factor' : 'strategy';
   const $ = selector => document.querySelector(selector);
   // Capture before rendering. Exports reuse this pristine implementation, never the edited DOM.
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state;
+  let state, annotations;
   let mode = 'swot';
   let requestedAction = null;
   const ordering = CanvasEditing.collectionOrdering({ core: Swot, getState: () => state, renderSection, edited, status });
@@ -1015,13 +1389,14 @@ const CanvasEditing = (() => {
     $('#clipboard-fallback').hidden = true;
     status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
     countStrategies();
+    annotations.refresh();
   }
   function renderSection(section) {
     const container = $(`[data-section="${section}"]`);
     const [label, symbol, description] = labels[section];
     container.replaceChildren();
     const heading = element('div', 'cell-heading');
-    heading.append(element('h2', '', label), element('span', 'cell-symbol', symbol));
+    heading.append(element('h2', '', label), element('span', 'cell-symbol', symbol), annotations.badge(section, 'section'));
     container.append(heading);
     if (Swot.strategies.includes(section)) container.append(element('p', 'cell-description', description));
     const items = Swot.collection(state, section);
@@ -1031,13 +1406,13 @@ const CanvasEditing = (() => {
       const handle = ordering.createHandle(row, list, section, item, index, label);
       const input = element('textarea');
       CanvasEditing.finishOnEnter(input);
-      input.rows = 1;
+      input.readOnly = annotations.isActive(); input.rows = 1;
       input.value = item.text;
       input.dataset.id = item.id;
       input.setAttribute('aria-label', `${label} ${index + 1}`);
       input.placeholder = Swot.factors.includes(section) ? 'Write a factor…' : 'Write a strategy…';
       input.addEventListener('input', () => {
-        Swot.editItem(state, section, item.id, input.value);
+        if (annotations.isActive()) return; Swot.editItem(state, section, item.id, input.value);
         resize(input);
         edited();
       });
@@ -1050,7 +1425,8 @@ const CanvasEditing = (() => {
         container.querySelector('.add').focus();
         edited();
       });
-      row.append(handle, input, remove);
+      if (annotations.isActive()) handle.disabled = remove.disabled = true;
+      row.append(handle, input, annotations.badge(item.id, itemType(section)), remove);
       list.append(row);
     });
     container.append(list);
@@ -1058,7 +1434,9 @@ const CanvasEditing = (() => {
     const add = element('button', 'add', 'Add');
     add.setAttribute('aria-label', 'Add');
     add.type = 'button';
+    add.disabled = annotations.isActive();
     function beginItem() {
+      if (annotations.isActive()) return;
       const id = Swot.addItem(state, section);
       renderSection(section);
       const input = Array.from(container.querySelectorAll('textarea')).find(node => node.dataset.id === id);
@@ -1070,6 +1448,7 @@ const CanvasEditing = (() => {
     container.classList.toggle('empty-factor', emptyFactor);
     // Replace on re-render so clicks never accumulate handlers.
     container.onclick = Swot.factors.includes(section) ? event => {
+      if (annotations.isActive()) return;
       if (event.target.closest('button, textarea, .item, .cell-heading')) return;
       const current = Swot.collection(state, section);
       const last = current.at(-1);
@@ -1084,9 +1463,13 @@ const CanvasEditing = (() => {
   function renderContext() {
     for (const section of Swot.factors) {
       const container = $(`[data-context="${section}"]`);
-      container.replaceChildren(element('h2', '', labels[section][0]), element('p', 'readonly-label', 'Read-only context'));
+      container.replaceChildren(element('h2', '', labels[section][0]), element('p', 'readonly-label', 'Read-only context'), annotations.badge(section, 'section'));
       const list = element('ul');
-      for (const item of state.content[section]) list.append(element('li', '', item.text || '(Blank factor)'));
+      for (const item of state.content[section]) {
+        const row = element('li', '', item.text || '(Blank factor)');
+        row.append(annotations.badge(item.id, 'factor'));
+        list.append(row);
+      }
       container.append(list);
       if (!state.content[section].length) container.append(element('p', 'empty', 'No factors yet. Add them in SWOT.'));
     }
@@ -1133,6 +1516,7 @@ const CanvasEditing = (() => {
   function refreshCanvas() {
     for (const field of Swot.framing) {
       const input = $(`[data-framing="${field}"]`);
+      input.readOnly = annotations.isActive();
       input.value = state.content.framing[field];
       resize(input);
     }
@@ -1140,6 +1524,7 @@ const CanvasEditing = (() => {
     countStrategies();
     setMode(mode);
     renderAI();
+    annotations.refresh();
   }
   function renderAI() {
     const thoughts = $('#thoughts');
@@ -1160,15 +1545,17 @@ const CanvasEditing = (() => {
       thoughts.append(earlier);
     }
     const proposal = state.proposals?.[0];
-    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
+    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!proposal; });
     ProposalReviewUI.render({ state, core: Swot, panel: $('#proposal-panel'), labels,
       title: proposal?.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements',
       onDecision: (selected, decision) => {
+        if (annotations.isActive()) return;
         Swot.resolveProposal(state, selected, decision); refreshCanvas();
         $('#clipboard-fallback').hidden = true;
         status('Review decision saved in this tab. Export or save to keep it.');
       }
     });
+    if (annotations.isActive()) $('#proposal-panel').querySelectorAll('button, input').forEach(control => { control.disabled = true; });
   }
   function saveFile() {
     try {
@@ -1186,16 +1573,28 @@ const CanvasEditing = (() => {
   }
   try {
     state = Swot.parseState($('#canvas-state').textContent);
+    annotations = AnnotationUI.install({
+      getState: () => state, targetType: ['factor', 'strategy'], sections,
+      lookup: (id, type) => {
+        if (type === 'section') return labels[id]?.[0];
+        for (const section of sections) {
+          if (itemType(section) !== type) continue;
+          const item = Swot.collection(state, section).find(entry => entry.id === id);
+          if (item) return item.text.trim() || `Blank ${labels[section][0]} item`;
+        }
+      },
+      setMode: active => {
+        $('#thinking-tools').disabled = $('#import').disabled = active;
+        refreshCanvas();
+      },
+      onEdit: edited
+    });
     SixHatsUI.install(() => state, Swot, copyJson);
     for (const field of Swot.framing) {
       const input = $(`[data-framing="${field}"]`);
-      input.value = state.content.framing[field];
-      input.addEventListener('input', () => { state.content.framing[field] = input.value; resize(input); edited(); });
+      input.addEventListener('input', () => { if (annotations.isActive()) return; state.content.framing[field] = input.value; resize(input); edited(); });
     }
-    for (const section of [...Swot.factors, ...Swot.strategies]) renderSection(section);
-    countStrategies();
-    setMode('swot');
-    renderAI();
+    refreshCanvas();
     document.querySelectorAll('[data-ai]').forEach(button => button.addEventListener('click', () => openAction(button.dataset.ai)));
     $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());
     $('#ai-form').addEventListener('submit', async event => {
@@ -1228,8 +1627,8 @@ const CanvasEditing = (() => {
         $('#import-error').textContent = error.message;
         return;
       }
-      if (!confirm('Replace the current canvas, including edits, thoughts and pending proposal? Save or export first if you want to keep it.')) return;
-      state = next;
+      if (!confirm('Replace the current canvas, including edits, annotations, thoughts and pending proposal? Save or export first if you want to keep it.')) return;
+      state = next; annotations.reset();
       $('#import-dialog').close();
       refreshCanvas();
       edited();

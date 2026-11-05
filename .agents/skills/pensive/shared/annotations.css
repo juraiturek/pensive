@@ -6,6 +6,9 @@
 }
 .annotation-controls { flex: 0 0 auto; }
 .band-heading > .annotation-controls { display: flex; margin-top: .55rem; }
+.cell-heading:has(.annotation-controls:not([hidden])),
+.vpc-heading:has(.annotation-controls:not([hidden])) { flex-wrap: wrap; }
+[data-context] li > .annotation-controls { margin-inline-start: .4rem; }
 .annotation-toolbar button, .annotation-controls button { font-size: .75rem; }
 .annotation-controls .annotation-trigger {
   min-height: 28px;

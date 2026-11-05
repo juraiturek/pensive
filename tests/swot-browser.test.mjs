@@ -90,7 +90,8 @@ test('TOWS context is read-only, all strategies are editable, toggles preserve s
   assert.equal(await page.locator('#tows-count').textContent(), '0');
   await page.getByRole('button', { name: /TOWS/ }).click();
   const context = page.locator('#tows-view [data-context]');
-  assert.equal(await context.locator('textarea, input, button, [contenteditable="true"]').count(), 0);
+  assert.equal(await context.locator('textarea, input, button:not(.annotation-trigger), [contenteditable="true"]').count(), 0);
+  assert.equal(await context.getByRole('button').count(), 0);
   for (const section of ['strengths', 'weaknesses', 'opportunities', 'threats']) {
     assert.ok((await page.locator(`[data-context="${section}"]`).textContent()).includes(`${section} context`));
   }

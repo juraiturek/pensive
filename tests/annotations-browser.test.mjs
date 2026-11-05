@@ -144,3 +144,70 @@ for (const framework of ['pages', 'five_whys']) {
     assert.equal(await missing.isVisible(), false);
   });
 }
+
+for (const [framework, section, label] of [['swot', 'strengths', 'Strengths'], ['vpc', 'pains', 'Pains']]) {
+  test(`${framework} exposes collection and item thoughts offline`, async t => {
+    const browser = await chromium.launch({ executablePath: process.env.PENSIVE_BROWSER });
+    t.after(() => browser.close());
+    const context = await browser.newContext({ offline: true, acceptDownloads: true });
+    const page = await context.newPage();
+    page.setDefaultTimeout(3000);
+    await page.goto(new URL(`../.agents/skills/pensive/frameworks/${framework}/canvas.html`, import.meta.url).href);
+    const group = page.locator(`[data-section="${section}"]`);
+    await group.getByRole('button', { name: 'Add', exact: true }).click();
+    await group.locator('textarea').fill('Original item');
+    await page.getByRole('button', { name: 'Annotation Mode', exact: true }).click();
+    assert.equal(await group.locator('textarea').evaluate(input => input.readOnly), true);
+    assert.equal(await group.getByRole('button', { name: 'Add', exact: true }).isDisabled(), true);
+    const overlay = page.getByRole('dialog', { name: 'Annotations' });
+    for (const [target, text] of [[label, 'Collection note'], ['Original item', 'Item note']]) {
+      await group.getByRole('button', { name: `Add thought for ${target}`, exact: true }).click();
+      await overlay.getByRole('textbox', { name: 'Annotation text' }).fill(text);
+      await overlay.getByRole('button', { name: 'Save note' }).click();
+      await overlay.getByRole('button', { name: 'Close notes' }).click();
+    }
+    await page.getByRole('button', { name: 'Exit annotation mode' }).click();
+    await group.locator('textarea').fill('Renamed item');
+    if (framework === 'swot') {
+      await page.locator('#tows-toggle').click();
+      await page.locator('[data-context="strengths"]').getByRole('button', { name: '1 note for Renamed item' }).click();
+      assert.equal(await overlay.getByText('Item note').isVisible(), true);
+      await overlay.getByRole('button', { name: 'Close notes' }).click();
+      const strategy = page.locator('[data-section="so"]');
+      await strategy.getByRole('button', { name: 'Add', exact: true }).click();
+      await strategy.locator('textarea').fill('Pilot strategy');
+      await page.getByRole('button', { name: 'Annotation Mode', exact: true }).click();
+      for (const [target, text] of [['SO strategies', 'Strategy group note'], ['Pilot strategy', 'Strategy note']]) {
+        await strategy.getByRole('button', { name: `Add thought for ${target}`, exact: true }).click();
+        await overlay.getByRole('textbox', { name: 'Annotation text' }).fill(text);
+        await overlay.getByRole('button', { name: 'Save note' }).click();
+        await overlay.getByRole('button', { name: 'Close notes' }).click();
+      }
+      await page.getByRole('button', { name: 'Exit annotation mode' }).click();
+      await page.locator('#swot-toggle').click();
+    }
+    const count = framework === 'swot' ? 4 : 2;
+    const summary = page.getByRole('button', { name: `0 general thoughts, ${count} specific thoughts` });
+    assert.equal(await summary.textContent(), `0 | ${count}`);
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.getByRole('button', { name: 'Export to clipboard' }).click();
+    await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Copied'));
+    const state = JSON.parse(await page.evaluate(() => navigator.clipboard.readText()));
+    assert.deepEqual(state.annotations.map(note => note.target.type), framework === 'swot' ? ['section', 'factor', 'section', 'strategy'] : ['section', 'item']);
+    await page.getByRole('button', { name: 'Import JSON', exact: true }).click();
+    await page.getByRole('textbox', { name: 'Import canvas JSON' }).fill(JSON.stringify(state));
+    page.once('dialog', dialog => dialog.accept());
+    await page.getByRole('button', { name: 'Replace canvas', exact: true }).click();
+    assert.equal(await summary.textContent(), `0 | ${count}`);
+    const dir = await mkdtemp(join(tmpdir(), 'pensive-annotation-rollout-'));
+    t.after(() => rm(dir, { recursive: true, force: true }));
+    const download = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Save to File' }).click();
+    const path = join(dir, 'saved.html');
+    await (await download).saveAs(path);
+    await page.goto(pathToFileURL(path).href);
+    await summary.click();
+    assert.equal(await overlay.getByText('Collection note').isVisible(), true);
+    assert.equal(await overlay.getByText('Item note').isVisible(), true);
+  });
+}

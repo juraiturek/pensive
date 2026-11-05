@@ -1,6 +1,7 @@
 /* VPC-local state and safe packaging; shared by Node and standalone HTML. */
 const Vpc = (() => {
   'use strict';
+  const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const sections = Object.freeze(['jobs', 'pains', 'gains', 'products_services', 'pain_relievers', 'gain_creators']);
   const framing = Object.freeze(['product_offering', 'customer_segment', 'scenario_job_context', 'current_alternative', 'success_metric']);
@@ -46,9 +47,10 @@ const Vpc = (() => {
     }
   }
   function validate(state) {
-    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals']);
+    keys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals', 'annotations']);
     if (state.framework !== 'vpc' || state.schema_version !== '1.0') throw new Error('Unsupported framework/version; expected vpc / 1.0.');
     const ids = validateContent(state.content);
+    Notes.validate(state.annotations, 'item', sections);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
       for (const entry of state.thoughts) {

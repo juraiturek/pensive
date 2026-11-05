@@ -1,6 +1,7 @@
 /* SWOT-specific state operations, shared by the local page and Node packager. */
 const Swot = (() => {
   'use strict';
+  const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
@@ -57,9 +58,10 @@ const Swot = (() => {
     ids.add(thought.id);
   }
   function validate(state) {
-    objectWithKeys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals']);
+    objectWithKeys(state, ['framework', 'schema_version', 'content'], 'Canvas', ['thoughts', 'proposals', 'annotations']);
     if (state.framework !== 'swot' || state.schema_version !== '1.0') throw new Error('Unsupported framework or schema version. Expected swot / 1.0.');
     const ids = validateContent(state.content);
+    Notes.validate(state.annotations, ['factor', 'strategy'], [...factors, ...strategies]);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
       for (const entry of state.thoughts) {

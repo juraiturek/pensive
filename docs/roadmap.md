@@ -1,5 +1,9 @@
 # Implementation roadmap
 
+## Annotation Mode rollout
+
+Manual Annotation Mode is implemented across SWOT/TOWS, PAGES, VPC and 5 Whys. The flat frameworks support collection and item thoughts, and 5 Whys supports problem and cause thoughts. All four support canvas thoughts. The shared overlay and portable state satisfy the manual-note portion of L3. Selective AI context and research workflows remain separate design work.
+
 ## SWOT JSON import — 2026-11-05
 
 SWOT now follows the other canvases with validated pasted JSON and confirmation before replacing the current state. This supersedes the original Slice 1 import UI deferral. Complete exported state, including thoughts and pending review decisions, can be restored directly in the browser.
@@ -90,7 +94,7 @@ Core/creation, Reflect (whole-canvas thought-only), Expand Deepen then Branch (e
 ## SWOT next improvements — user sequencing, 2026-11-04
 
 1. Delivered: [Markdown-only methodology refinement](plans/2026-11-04-swot-methodology-refinement.md), approved and implemented 2026-11-04; checks and limits in `docs/testing.md`.
-2. Next SWOT feature: design canvas-level and node-linked notes/thoughts/comments, including support for research questions, prompts and findings. Resolve attachment, edit/deletion behavior, provenance, freshness, review semantics, compact presentation, export compatibility and research authorization before implementation. This sequencing records priority, not approval of a particular schema, interface or research execution mechanism.
+2. Delivered: manual canvas-, collection- and item-level thoughts in SWOT/TOWS. Research prompts, findings and workflow integration remain separate design work.
 
 The methodology refinement has no dependency on the second feature. It uses existing canvas-level thoughts for concise rationale, uncertainty and follow-up questions, existing request steering for explicit additional context, and existing content/proposal contracts. No node-linked storage, research action or new UI is needed to meet its acceptance criteria. Detailed persistent per-factor rationale and research workflow remain outside that slice.
 

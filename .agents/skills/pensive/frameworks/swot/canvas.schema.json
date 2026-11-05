@@ -10,6 +10,94 @@
     "content"
   ],
   "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "target",
+          "target_label",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+          },
+          "target": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "canvas"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "factor",
+                      "strategy"
+                    ]
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "section"
+                  },
+                  "id": {
+                    "enum": [
+                      "strengths",
+                      "weaknesses",
+                      "opportunities",
+                      "threats",
+                      "so",
+                      "st",
+                      "wo",
+                      "wt"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "target_label": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "text": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
     "framework": {
       "const": "swot"
     },

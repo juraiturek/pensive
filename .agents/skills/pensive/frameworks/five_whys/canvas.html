@@ -732,6 +732,9 @@ input:focus-visible, select:focus-visible { outline:2px solid var(--accent); out
 }
 .annotation-controls { flex: 0 0 auto; }
 .band-heading > .annotation-controls { display: flex; margin-top: .55rem; }
+.cell-heading:has(.annotation-controls:not([hidden])),
+.vpc-heading:has(.annotation-controls:not([hidden])) { flex-wrap: wrap; }
+[data-context] li > .annotation-controls { margin-inline-start: .4rem; }
 .annotation-toolbar button, .annotation-controls button { font-size: .75rem; }
 .annotation-controls .annotation-trigger {
   min-height: 28px;
@@ -996,6 +999,7 @@ const Annotations = (() => {
   function validate(notes, targetType, sections = []) {
     if (notes === undefined) return;
     if (!Array.isArray(notes)) throw new Error('Annotations must be an array.');
+    const targetTypes = Array.isArray(targetType) ? targetType : [targetType];
     const seen = new Set();
     for (const note of notes) {
       if (!exact(note, ['id', 'target', 'target_label', 'text']) ||
@@ -1004,7 +1008,7 @@ const Annotations = (() => {
       }
       const target = note.target;
       if (!(exact(target, ['type']) && target.type === 'canvas') &&
-          !(exact(target, ['type', 'id']) && (target.type === targetType && id(target.id) ||
+          !(exact(target, ['type', 'id']) && (targetTypes.includes(target.type) && id(target.id) ||
             target.type === 'section' && sections.includes(target.id)))) {
         throw new Error('Invalid annotation target.');
       }
@@ -1880,7 +1884,8 @@ const AnnotationUI = (() => {
       if (!discardDraft()) return;
       panel.close();
       const replacement = selected && [...document.querySelectorAll('[data-annotation-type]')]
-        .find(group => group.dataset.annotationType === selected.type && group.dataset.annotationTarget === selected.id);
+        .find(group => group.getClientRects().length && group.dataset.annotationType === selected.type &&
+          group.dataset.annotationTarget === selected.id);
       const control = opener?.isConnected && opener.getClientRects().length
         ? opener : replacement?.querySelector('button:not([hidden])');
       (control && control.getClientRects().length ? control : active ? exit : mode).focus({ preventScroll: true });

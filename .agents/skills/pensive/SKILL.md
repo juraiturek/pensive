@@ -19,7 +19,7 @@ Route `action.id: "six_hats"` here before framework-specific action routing. Rea
 
 ## Manual annotations
 
-PAGES and 5 Whys support whole-canvas and stable item or causal-node notes. PAGES also supports dimension notes. Edit Mode indicators open a read-only thought overlay. Annotation Mode pauses analytical edits and offers local note creation, editing and deletion. JSON export and HTML Save to File include notes. Notes whose targets disappear are retained under Unavailable targets.
+All four frameworks support whole-canvas thoughts. SWOT/TOWS, PAGES and VPC support collection and item thoughts. 5 Whys supports problem and cause thoughts. SWOT factor thoughts are also available in the TOWS context view. Edit Mode indicators open a read-only thought overlay. Annotation Mode pauses analytical edits and offers local note creation, editing and deletion. JSON export and HTML Save to File include notes. Notes whose targets disappear are retained under Unavailable targets.
 
 Preserve the complete submitted `annotations` collection through existing-state actions and packaging. Manual notes are supplemental interpretive context, not automatically validated analytical content. Existing `use_thoughts` flags apply to their documented AI thoughts only. Discuss manual notes as user-authored context when the user explicitly selects them, and preserve the distinction between questions, tentative interpretations and evidence.
 

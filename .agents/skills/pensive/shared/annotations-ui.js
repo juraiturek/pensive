@@ -108,7 +108,8 @@ const AnnotationUI = (() => {
       if (!discardDraft()) return;
       panel.close();
       const replacement = selected && [...document.querySelectorAll('[data-annotation-type]')]
-        .find(group => group.dataset.annotationType === selected.type && group.dataset.annotationTarget === selected.id);
+        .find(group => group.getClientRects().length && group.dataset.annotationType === selected.type &&
+          group.dataset.annotationTarget === selected.id);
       const control = opener?.isConnected && opener.getClientRects().length
         ? opener : replacement?.querySelector('button:not([hidden])');
       (control && control.getClientRects().length ? control : active ? exit : mode).focus({ preventScroll: true });

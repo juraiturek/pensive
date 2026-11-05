@@ -3,14 +3,14 @@ import { createRequire } from 'node:module';
 import test from 'node:test';
 
 const require = createRequire(import.meta.url);
-for (const framework of ['pages', 'five_whys']) {
+for (const framework of ['pages', 'five_whys', 'swot', 'vpc']) {
   test(`${framework} preserves manual annotations separately from content`, () => {
     const core = require(`../.agents/skills/pensive/frameworks/${framework}/state.js`);
     const state = core.initialState();
     const before = structuredClone(state.content);
     state.annotations = [
       { id: 'note-1', target: { type: 'canvas' }, target_label: 'Whole canvas', text: 'Check the premise.' },
-      { id: 'note-2', target: { type: framework === 'pages' ? 'item' : 'node', id: 'missing' }, target_label: 'Removed target', text: 'Still relevant.' }
+      { id: 'note-2', target: { type: ({ pages: 'item', five_whys: 'node', swot: 'factor', vpc: 'item' })[framework], id: 'missing' }, target_label: 'Removed target', text: 'Still relevant.' }
     ];
     assert.deepEqual(core.parseState(JSON.stringify(state)), state);
     assert.deepEqual(state.content, before);
@@ -68,3 +68,24 @@ test('PAGES dimension thoughts use a declared dimension key', () => {
   state.annotations[0].target.id = 'unknown';
   assert.throws(() => core.validate(state));
 });
+
+for (const [framework, section, type] of [['swot', 'strengths', 'factor'], ['vpc', 'pains', 'item']]) {
+  test(`${framework} proposal decisions preserve collection and item notes`, () => {
+    const core = require(`../.agents/skills/pensive/frameworks/${framework}/state.js`);
+    const state = core.initialState();
+    const id = core.addItem(state, section);
+    core.editItem(state, section, id, 'Initial concept');
+    state.annotations = [
+      { id: 'note-group', target: { type: 'section', id: section }, target_label: section, text: 'Collection note' },
+      { id: 'note-item', target: { type, id }, target_label: 'Initial concept', text: 'Keep this context' }
+    ];
+    const content = structuredClone(state.content);
+    content[section] = [{ id: 'replacement', text: 'New concept' }];
+    for (const decision of ['accept', 'reject']) {
+      const result = core.composeResult(core.buildRequest(state, { id: 'improve' }), { content, thought: 'Consider this replacement.' });
+      core.resolveProposal(result, undefined, decision);
+      assert.deepEqual(result.annotations, state.annotations);
+      assert.equal(result.content[section][0].id, decision === 'accept' ? 'replacement' : id);
+    }
+  });
+}

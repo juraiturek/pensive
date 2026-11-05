@@ -11,10 +11,12 @@
     wo: ['WO strategies', 'W × O', 'Use opportunities to overcome weaknesses.'],
     wt: ['WT strategies', 'W × T', 'Reduce weaknesses and exposure to threats.']
   };
+  const sections = [...Swot.factors, ...Swot.strategies];
+  const itemType = section => Swot.factors.includes(section) ? 'factor' : 'strategy';
   const $ = selector => document.querySelector(selector);
   // Capture before rendering. Exports reuse this pristine implementation, never the edited DOM.
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state;
+  let state, annotations;
   let mode = 'swot';
   let requestedAction = null;
   const ordering = CanvasEditing.collectionOrdering({ core: Swot, getState: () => state, renderSection, edited, status });
@@ -44,13 +46,14 @@
     $('#clipboard-fallback').hidden = true;
     status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
     countStrategies();
+    annotations.refresh();
   }
   function renderSection(section) {
     const container = $(`[data-section="${section}"]`);
     const [label, symbol, description] = labels[section];
     container.replaceChildren();
     const heading = element('div', 'cell-heading');
-    heading.append(element('h2', '', label), element('span', 'cell-symbol', symbol));
+    heading.append(element('h2', '', label), element('span', 'cell-symbol', symbol), annotations.badge(section, 'section'));
     container.append(heading);
     if (Swot.strategies.includes(section)) container.append(element('p', 'cell-description', description));
     const items = Swot.collection(state, section);
@@ -60,13 +63,13 @@
       const handle = ordering.createHandle(row, list, section, item, index, label);
       const input = element('textarea');
       CanvasEditing.finishOnEnter(input);
-      input.rows = 1;
+      input.readOnly = annotations.isActive(); input.rows = 1;
       input.value = item.text;
       input.dataset.id = item.id;
       input.setAttribute('aria-label', `${label} ${index + 1}`);
       input.placeholder = Swot.factors.includes(section) ? 'Write a factor…' : 'Write a strategy…';
       input.addEventListener('input', () => {
-        Swot.editItem(state, section, item.id, input.value);
+        if (annotations.isActive()) return; Swot.editItem(state, section, item.id, input.value);
         resize(input);
         edited();
       });
@@ -79,7 +82,8 @@
         container.querySelector('.add').focus();
         edited();
       });
-      row.append(handle, input, remove);
+      if (annotations.isActive()) handle.disabled = remove.disabled = true;
+      row.append(handle, input, annotations.badge(item.id, itemType(section)), remove);
       list.append(row);
     });
     container.append(list);
@@ -87,7 +91,9 @@
     const add = element('button', 'add', 'Add');
     add.setAttribute('aria-label', 'Add');
     add.type = 'button';
+    add.disabled = annotations.isActive();
     function beginItem() {
+      if (annotations.isActive()) return;
       const id = Swot.addItem(state, section);
       renderSection(section);
       const input = Array.from(container.querySelectorAll('textarea')).find(node => node.dataset.id === id);
@@ -99,6 +105,7 @@
     container.classList.toggle('empty-factor', emptyFactor);
     // Replace on re-render so clicks never accumulate handlers.
     container.onclick = Swot.factors.includes(section) ? event => {
+      if (annotations.isActive()) return;
       if (event.target.closest('button, textarea, .item, .cell-heading')) return;
       const current = Swot.collection(state, section);
       const last = current.at(-1);
@@ -113,9 +120,13 @@
   function renderContext() {
     for (const section of Swot.factors) {
       const container = $(`[data-context="${section}"]`);
-      container.replaceChildren(element('h2', '', labels[section][0]), element('p', 'readonly-label', 'Read-only context'));
+      container.replaceChildren(element('h2', '', labels[section][0]), element('p', 'readonly-label', 'Read-only context'), annotations.badge(section, 'section'));
       const list = element('ul');
-      for (const item of state.content[section]) list.append(element('li', '', item.text || '(Blank factor)'));
+      for (const item of state.content[section]) {
+        const row = element('li', '', item.text || '(Blank factor)');
+        row.append(annotations.badge(item.id, 'factor'));
+        list.append(row);
+      }
       container.append(list);
       if (!state.content[section].length) container.append(element('p', 'empty', 'No factors yet. Add them in SWOT.'));
     }
@@ -162,6 +173,7 @@
   function refreshCanvas() {
     for (const field of Swot.framing) {
       const input = $(`[data-framing="${field}"]`);
+      input.readOnly = annotations.isActive();
       input.value = state.content.framing[field];
       resize(input);
     }
@@ -169,6 +181,7 @@
     countStrategies();
     setMode(mode);
     renderAI();
+    annotations.refresh();
   }
   function renderAI() {
     const thoughts = $('#thoughts');
@@ -189,15 +202,17 @@
       thoughts.append(earlier);
     }
     const proposal = state.proposals?.[0];
-    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!proposal; });
+    document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!proposal; });
     ProposalReviewUI.render({ state, core: Swot, panel: $('#proposal-panel'), labels,
       title: proposal?.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements',
       onDecision: (selected, decision) => {
+        if (annotations.isActive()) return;
         Swot.resolveProposal(state, selected, decision); refreshCanvas();
         $('#clipboard-fallback').hidden = true;
         status('Review decision saved in this tab. Export or save to keep it.');
       }
     });
+    if (annotations.isActive()) $('#proposal-panel').querySelectorAll('button, input').forEach(control => { control.disabled = true; });
   }
   function saveFile() {
     try {
@@ -215,16 +230,28 @@
   }
   try {
     state = Swot.parseState($('#canvas-state').textContent);
+    annotations = AnnotationUI.install({
+      getState: () => state, targetType: ['factor', 'strategy'], sections,
+      lookup: (id, type) => {
+        if (type === 'section') return labels[id]?.[0];
+        for (const section of sections) {
+          if (itemType(section) !== type) continue;
+          const item = Swot.collection(state, section).find(entry => entry.id === id);
+          if (item) return item.text.trim() || `Blank ${labels[section][0]} item`;
+        }
+      },
+      setMode: active => {
+        $('#thinking-tools').disabled = $('#import').disabled = active;
+        refreshCanvas();
+      },
+      onEdit: edited
+    });
     SixHatsUI.install(() => state, Swot, copyJson);
     for (const field of Swot.framing) {
       const input = $(`[data-framing="${field}"]`);
-      input.value = state.content.framing[field];
-      input.addEventListener('input', () => { state.content.framing[field] = input.value; resize(input); edited(); });
+      input.addEventListener('input', () => { if (annotations.isActive()) return; state.content.framing[field] = input.value; resize(input); edited(); });
     }
-    for (const section of [...Swot.factors, ...Swot.strategies]) renderSection(section);
-    countStrategies();
-    setMode('swot');
-    renderAI();
+    refreshCanvas();
     document.querySelectorAll('[data-ai]').forEach(button => button.addEventListener('click', () => openAction(button.dataset.ai)));
     $('#cancel-ai').addEventListener('click', () => $('#ai-dialog').close());
     $('#ai-form').addEventListener('submit', async event => {
@@ -257,8 +284,8 @@
         $('#import-error').textContent = error.message;
         return;
       }
-      if (!confirm('Replace the current canvas, including edits, thoughts and pending proposal? Save or export first if you want to keep it.')) return;
-      state = next;
+      if (!confirm('Replace the current canvas, including edits, annotations, thoughts and pending proposal? Save or export first if you want to keep it.')) return;
+      state = next; annotations.reset();
       $('#import-dialog').close();
       refreshCanvas();
       edited();

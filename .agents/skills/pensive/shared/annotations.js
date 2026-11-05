@@ -10,6 +10,7 @@ const Annotations = (() => {
   function validate(notes, targetType, sections = []) {
     if (notes === undefined) return;
     if (!Array.isArray(notes)) throw new Error('Annotations must be an array.');
+    const targetTypes = Array.isArray(targetType) ? targetType : [targetType];
     const seen = new Set();
     for (const note of notes) {
       if (!exact(note, ['id', 'target', 'target_label', 'text']) ||
@@ -18,7 +19,7 @@ const Annotations = (() => {
       }
       const target = note.target;
       if (!(exact(target, ['type']) && target.type === 'canvas') &&
-          !(exact(target, ['type', 'id']) && (target.type === targetType && id(target.id) ||
+          !(exact(target, ['type', 'id']) && (targetTypes.includes(target.type) && id(target.id) ||
             target.type === 'section' && sections.includes(target.id)))) {
         throw new Error('Invalid annotation target.');
       }
