@@ -13,6 +13,8 @@ export async function buildCanvas(state = Vpc.initialState()) {
     ['<!--pensive-review-->', await readFile(new URL('../../shared/proposal-review.js', framework), 'utf8'), 'script'],
     ['<!--pensive-review-ui-->', await readFile(new URL('../../shared/proposal-review-ui.js', framework), 'utf8'), 'script'],
     ['<!--pensive-core-->', await readFile(new URL('state.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-six-hats-->', await readFile(new URL('../../shared/six-hats.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-six-hats-ui-->', await readFile(new URL('../../shared/six-hats-ui.js', framework), 'utf8'), 'script'],
     ['<!--pensive-editing-->', await readFile(new URL('../../shared/canvas-editing.js', framework), 'utf8'), 'script'],
     ['<!--pensive-runtime-->', await readFile(new URL('canvas.js', framework), 'utf8'), 'script']
   ]) {

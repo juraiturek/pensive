@@ -58,7 +58,7 @@ Subsequent ordering:
 
 1. Stabilize at least two frameworks (initially SWOT and PAGES), including their creation, editing, action handoff and import/export behavior.
 2. Implement partial accept/reject for suggested changes as a separately scoped slice. It is not a prerequisite for delivering PAGES.
-3. Implement Six Thinking Hats across supported canvases, producing both reflections and suggested changes. Require explicit framework compatibility and partial acceptance; do not limit Six Hats to PAGES or thought-only output.
+3. Six Thinking Hats is available across SWOT/TOWS, PAGES, VPC and 5 Whys. It appends observations and optional suggestions as thoughts. SWOT and 5 Whys pilot framework-specific prompt guidance.
 
 Other deferred tools and frameworks remain separately scoped. README remains unchanged.
 
@@ -93,3 +93,9 @@ Core/creation, Reflect (whole-canvas thought-only), Expand Deepen then Branch (e
 2. Next SWOT feature: design canvas-level and node-linked notes/thoughts/comments, including support for research questions, prompts and findings. Resolve attachment, edit/deletion behavior, provenance, freshness, review semantics, compact presentation, export compatibility and research authorization before implementation. This sequencing records priority, not approval of a particular schema, interface or research execution mechanism.
 
 The methodology refinement has no dependency on the second feature. It uses existing canvas-level thoughts for concise rationale, uncertainty and follow-up questions, existing request steering for explicit additional context, and existing content/proposal contracts. No node-linked storage, research action or new UI is needed to meet its acceptance criteria. Detailed persistent per-factor rationale and research workflow remain outside that slice.
+
+
+### Future Six Hats experiments
+
+- **Selectable personas within a hat.** Try a small set of distinct lenses while preserving the hat's stance. A Vonnegut-inspired Black Hat might notice institutional absurdity. A Philip K. Dick-inspired Black Hat might question which signals can be trusted.
+- **Sage lens.** Explore long horizons and competing values. Define its distinct contribution alongside Blue Hat's focus on managing the thinking process before deciding whether to offer it as a seventh hat.

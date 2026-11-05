@@ -175,6 +175,7 @@
     thoughts.replaceChildren();
     thoughts.hidden = !state.thoughts?.length;
     function thoughtCard(thought) {
+      if (thought.kind === 'six_hats') return SixHatsUI.card(state, thought);
       const card = element('article', 'thought');
       card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', strategize: 'Strategy rationale' }[thought.kind]), element('p', '', thought.text));
       return card;
@@ -214,6 +215,7 @@
   }
   try {
     state = Swot.parseState($('#canvas-state').textContent);
+    SixHatsUI.install(() => state, Swot, copyJson);
     for (const field of Swot.framing) {
       const input = $(`[data-framing="${field}"]`);
       input.value = state.content.framing[field];

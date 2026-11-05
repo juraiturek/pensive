@@ -1,6 +1,7 @@
 /* SWOT-specific state operations, shared by the local page and Node packager. */
 const Swot = (() => {
   'use strict';
+  const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
   const framing = Object.freeze(['focal_entity', 'objective', 'environment']);
@@ -61,7 +62,10 @@ const Swot = (() => {
     const ids = validateContent(state.content);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
-      for (const thought of state.thoughts) validateThought(thought, ids);
+      for (const entry of state.thoughts) {
+        if (entry?.kind === 'six_hats') Hats.validateThought(entry, ids, state.framework);
+        else validateThought(entry, ids);
+      }
     }
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one whole-canvas proposal is supported.');
@@ -141,6 +145,10 @@ const Swot = (() => {
   function buildRequest(state, action) {
     validate(state);
     if (state.proposals?.length) throw new Error('Accept or reject the pending proposal before requesting another AI action.');
+    if (action?.id === 'six_hats') {
+      Hats.validateAction(state, action);
+      return structuredClone({ canvas: state, action });
+    }
     const id = action?.id;
     if (!['strategize', 'evaluate', 'improve'].includes(id)) throw new Error('Unsupported AI action.');
     const optional = ['comment', 'use_thoughts', ...(id === 'strategize' ? ['mode'] : id === 'evaluate' ? ['scope'] : [])];
@@ -164,6 +172,7 @@ const Swot = (() => {
   function composeResult(input, response) {
     const request = validateRequest(input);
     const { canvas, action } = request;
+    if (action.id === 'six_hats') return validate(Hats.append(canvas, action, response));
     objectWithKeys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'AI response');
     if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('A nonempty explanatory thought is required.');
     const thought = { id: `thought-${globalThis.crypto.randomUUID()}`, kind: action.id === 'evaluate' ? 'evaluation' : action.id === 'improve' ? 'improvement' : 'strategize', text: response.thought };

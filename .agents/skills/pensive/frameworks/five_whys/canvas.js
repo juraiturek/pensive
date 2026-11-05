@@ -414,6 +414,11 @@
     panel.replaceChildren();
     panel.hidden = !state.thoughts?.length;
     for (const t of state.thoughts || []) {
+      if (t.kind === 'six_hats') {
+        panel.append(SixHatsUI.card(state, t));
+        continue;
+      }
+
       const card = el('article', 'thought');
       card.append(
         el('h3', '', t.kind === 'evaluation' ? 'Reflection' : 'Expansion rationale'),
@@ -533,6 +538,7 @@
       });
     });
     state = W.parseState($('#canvas-state').textContent);
+    SixHatsUI.install(() => state, W, copyJson);
     refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of W.framing)

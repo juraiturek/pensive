@@ -11,7 +11,20 @@
 <label>System or Process<textarea data-framing="system_or_process" rows="2" placeholder="Which system, process and boundaries are involved?"></textarea></label>
 <label>Investigation Owner<textarea data-framing="investigation_owner" rows="2" placeholder="Who can investigate and act on the findings?"></textarea></label>
 </section>
-<div class="toolbar"><div class="ai-actions" role="group" aria-label="Investigation actions"><button type="button" data-ai="evaluate">Reflect</button><button type="button" id="overview-open">View full tree</button></div><div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File ↗</button></div></div>
+<div class="toolbar"><div class="ai-actions" role="group" aria-label="Investigation actions"><button type="button" data-ai="evaluate">Reflect</button><button type="button" id="overview-open">View full tree</button><button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button></div><div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File ↗</button></div></div>
+<dialog id="thinking-tools-dialog" aria-labelledby="six-hats-title">
+  <form>
+    <p class="eyebrow">Thinking tools</p>
+    <h2 id="six-hats-title">Six Thinking Hats</h2>
+    <p class="dialog-note">Apply one perspective to the selected content. The result is a thought attached to the canvas.</p>
+    <p><label>Thinking hat <select name="hat" required></select></label></p>
+    <p><label>Target <select name="target" required style="max-width: 100%"></select></label></p>
+    <p><label>Optional guidance <textarea name="comment" rows="2"></textarea></label></p>
+    <p><label><input type="checkbox" name="use_thoughts"> Include previous thoughts as context</label></p>
+    <p class="error" role="alert"></p>
+    <div class="dialog-actions"><button type="button" data-cancel>Cancel</button><button type="submit" class="primary">Copy AI request</button></div>
+  </form>
+</dialog>
 <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section><section id="proposal-panel" class="proposal-panel" aria-label="AI expansion proposal" hidden></section>
 <section id="investigation-view" aria-label="Causal investigation"><section class="canvas-tree-strand" data-recursive-tree="strand" data-tree-layout="connected"><section class="canvas-tree-board" id="tree-board"></section></section>
 <p class="tree-guide">Ask why while the next question is useful. Follow side doors to explore alternatives. Use Observed, Reported, Hypothesis or Inference in text to preserve evidence distinctions. Closing a branch records a decision and countermeasure; it does not prove causation.</p></section>
@@ -25,7 +38,9 @@
 <!--pensive-state-start-->
 <script id="canvas-state" type="application/json">{}</script>
 <!--pensive-state-end-->
+<!--pensive-six-hats-->
 <!--pensive-core-->
+<!--pensive-six-hats-ui-->
 <!--pensive-editing-->
 <!--pensive-runtime-->
 </body></html>

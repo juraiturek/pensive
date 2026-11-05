@@ -81,6 +81,11 @@
   function renderAI() {
     const thoughts = $('#thoughts'); thoughts.replaceChildren(); thoughts.hidden = !state.thoughts?.length;
     for (const th of state.thoughts || []) {
+      if (th.kind === 'six_hats') {
+        thoughts.append(SixHatsUI.card(state, th));
+        continue;
+      }
+
       const card = element('article', 'thought');
       card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', ripple: 'Ripple implications' }[th.kind]), element('p', '', th.text)); thoughts.append(card);
     }
@@ -136,7 +141,8 @@
     } catch (e) { status(`Could not save: ${e.message}`, true); }
   }
   try {
-    state = Pages.parseState($('#canvas-state').textContent); refresh();
+    state = Pages.parseState($('#canvas-state').textContent);
+    SixHatsUI.install(() => state, Pages, copyJson); refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of Pages.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { state.content.framing[field] = e.target.value; resize(e.target); edited(); });
     document.querySelectorAll('[data-ai]').forEach(b => b.addEventListener('click', () => openAction(b.dataset.ai)));

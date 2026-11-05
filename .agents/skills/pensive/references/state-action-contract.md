@@ -46,3 +46,5 @@ The shared Node/browser `state.js` enforces structural and cross-field rules bey
 ## Implemented 5 Whys specialization
 
 5 Whys retains the two-key `{canvas,action}` request and framework-owned nested causal tree. Its complete state includes a top-level navigation cursor. Reflect (`evaluate`) appends only a thought. Expand requires `{target:{type:"node",id},mode:"deepen"|"branch"}` and returns new direct-child text plus a rationale, never replacement content. The composer resolves permitted parent, assigns IDs and creates an atomic append-batch proposal with a complete analytical-content guard. Navigation does not invalidate it; analytical edits do. See [5 Whys handoff](five-whys-workflow.md) for target/context/modification scopes and exact shapes. Existing collection review is unchanged.
+
+The shared [Six Thinking Hats action](six-hats-workflow.md) uses this envelope across all four canvases. Its response appends a typed reflection to `thoughts` while preserving the rest of the submitted state.

@@ -1,15 +1,21 @@
 ---
 name: pensive
-description: Use for Pensive canvas requests, SWOT/TOWS, PAGES, Value Proposition Canvas (VPC), or 5 Whys causal investigation, framework selection, analytical actions on supplied canvas JSON, or exploring the assumptions and structure of a limiting perspective.
+description: Use for Pensive canvas requests, SWOT/TOWS, PAGES, Value Proposition Canvas (VPC), 5 Whys causal investigation, framework selection, analytical actions on supplied canvas JSON, Six Thinking Hats, or exploring the assumptions and structure of a limiting perspective.
 ---
 
 # Pensive
 
 ## Availability
 
-SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve requests, and manual SWOT/TOWS editing. PAGES supports creation, Evaluate/Improve/Ripple, five editable dimensions, JSON import/export and artifact-persisted Ripple baselines. VPC supports blank/context-based creation, Evaluate/Improve, six editable content collections and JSON import/export. 5 Whys supports blank/context creation, causal strand/side-door/full-tree navigation, manual branching/editing/deletion/closure, JSON import/export, Reflect (thought-only) and node-targeted Expand (Deepen/Branch) with atomic append-batch review. Transformations use the full submitted state and return new standalone HTML; pages do not call AI. SWOT, PAGES and VPC support node-level and bulk acceptance/rejection; read [proposal review](references/proposal-review.md) when coordinating review. Bullet-level acceptance, Six Hats, built-in research actions, revision history and other frameworks are unavailable. SWOT has no import UI; PAGES, VPC and 5 Whys import pasted complete JSON. 5 Whys can use explicitly requested conversational research with available tools.
+SWOT supports initial AI-assisted creation, guided Strategize/Evaluate/Improve requests, and manual SWOT/TOWS editing. PAGES supports creation, Evaluate/Improve/Ripple, five editable dimensions, JSON import/export and artifact-persisted Ripple baselines. VPC supports blank/context-based creation, Evaluate/Improve, six editable content collections and JSON import/export. 5 Whys supports blank/context creation, causal strand/side-door/full-tree navigation, manual branching/editing/deletion/closure, JSON import/export, Reflect (thought-only) and node-targeted Expand (Deepen/Branch) with atomic append-batch review. Transformations use the full submitted state and return new standalone HTML; pages do not call AI. SWOT, PAGES and VPC support node-level and bulk acceptance/rejection; read [proposal review](references/proposal-review.md) when coordinating review. Six Thinking Hats is available through shared Thinking tools on all four canvases. Bullet-level acceptance, built-in research actions, revision history and other frameworks are unavailable. All four canvases import pasted complete JSON. 5 Whys can use explicitly requested conversational research with available tools.
 
 For context-based creation and existing-state analytical actions, read the shared [internal and external fit guidance](references/framing-content.md) with the selected framework method. Framework methodology and action boundaries remain authoritative; blank copying and JSON-only packaging need no analytical review.
+
+## Shared thinking tools
+
+Honor explicit Six Thinking Hats requests. When a deliberate lens could help with an impasse, challenge an analysis or generate alternatives, offer it selectively as a choice. Wait for the user's choice when only implicitly relevant. Apply one selected hat at a time.
+
+Route `action.id: "six_hats"` here before framework-specific action routing. Read the [Six Thinking Hats handoff](references/six-hats-workflow.md) for supported targets, validation, prompt layers and packaging. Observations are primary, suggestions optional. Append a reflection without changing analytical content.
 
 ## Shared local editing
 
@@ -48,7 +54,7 @@ Read [VPC framework](frameworks/vpc/framework.yaml) and [VPC handoff](references
 - New draft: follow [Create](frameworks/vpc/prompts/create.md) and the [framing–content contract](references/framing-content.md). Extract framing first, clarify essential gaps adaptively, generate supported content, then check coherence. Unknown optional fields and weak fit are valid; do not fabricate customer evidence or offering capabilities.
 - Complete JSON: `node scripts/package-vpc.mjs state.json new-output.html` from the skill directory.
 - Existing state: validate the full `{canvas,action}` and load only [Evaluate](frameworks/vpc/prompts/evaluate.md) or [Improve](frameworks/vpc/prompts/improve.md). Evaluate adds a thought; Improve proposes core changes while preserving framing. Use `--result` as specified in the handoff. Resolve pending proposals before another action.
-- VPC uses the shared collection-level and bulk [proposal review](references/proposal-review.md). Ripple, Restate framing and thinking tools remain deferred; no baseline is supported.
+- VPC uses the shared collection-level and bulk [proposal review](references/proposal-review.md). Ripple and Restate framing remain deferred; no baseline is supported.
 
 Return a new standalone HTML link. Import JSON confirms validated replacement; Export to clipboard copies complete state; Save to File preserves editable HTML, thoughts and proposals. Changes stay in the tab until exported.
 
@@ -60,7 +66,7 @@ Read [PAGES framework](frameworks/pages/framework.yaml) and [PAGES handoff](refe
 - New draft: follow [Create](frameworks/pages/prompts/create.md), using available context and adaptive elicitation only as needed. Initialize its Ripple baseline after generating content.
 - Complete JSON: validate/package with `node scripts/package-pages.mjs state.json new-output.html` from this skill directory. Preserve an existing baseline exactly; missing baseline stays missing until explicitly established.
 - Existing state: load only the selected [Evaluate](frameworks/pages/prompts/evaluate.md), [Improve](frameworks/pages/prompts/improve.md), or [Ripple](frameworks/pages/prompts/ripple.md) method and follow the PAGES handoff. Evaluate adds a thought; Improve/Ripple return whole-canvas proposals. Restate framing is deferred.
-- Ripple is a generic implication tool implemented here for PAGES. It compares selected changed dimensions with the persisted baseline. Never invent prior values from conversation. Local source edits are explicit user operations; AI proposals require review. Six Hats is deferred across all canvases until two frameworks are stable and partial accept/reject is implemented; its future scope includes reflections and suggested changes.
+- Ripple is a generic implication tool implemented here for PAGES. It compares selected changed dimensions with the persisted baseline. Never invent prior values from conversation. Local source edits are explicit user operations; AI proposals require review.
 
 Return a clickable link to the new HTML artifact. It runs locally without a server. Explain when useful: Import JSON validates and confirms replacement; Export to clipboard copies full state; Save to File preserves editable HTML, baseline and pending proposal. Changes remain in the tab until exported. Baseline reset is explicit; no automatic advancement or revision log exists.
 

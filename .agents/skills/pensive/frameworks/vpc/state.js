@@ -1,6 +1,7 @@
 /* VPC-local state and safe packaging; shared by Node and standalone HTML. */
 const Vpc = (() => {
   'use strict';
+  const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const sections = Object.freeze(['jobs', 'pains', 'gains', 'products_services', 'pain_relievers', 'gain_creators']);
   const framing = Object.freeze(['product_offering', 'customer_segment', 'scenario_job_context', 'current_alternative', 'success_metric']);
   const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
@@ -50,7 +51,10 @@ const Vpc = (() => {
     const ids = validateContent(state.content);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
-      for (const thought of state.thoughts) validateThought(thought, ids);
+      for (const entry of state.thoughts) {
+        if (entry?.kind === 'six_hats') Hats.validateThought(entry, ids, state.framework);
+        else validateThought(entry, ids);
+      }
     }
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one pending proposal is supported.');
@@ -104,6 +108,10 @@ const Vpc = (() => {
   function validateRequest(request) {
     keys(request, ['canvas', 'action'], 'Request'); validate(request.canvas);
     if (request.canvas.proposals?.length) throw new Error('Resolve the pending proposal first.');
+    if (request.action?.id === 'six_hats') {
+      Hats.validateAction(request.canvas, request.action);
+      return request;
+    }
     keys(request.action, ['id'], 'Action', ['comment', 'use_thoughts']);
     const action = request.action;
     if (!['evaluate', 'improve'].includes(action.id)) throw new Error('Unsupported VPC action.');
@@ -112,11 +120,13 @@ const Vpc = (() => {
     return request;
   }
   function buildRequest(state, action) {
+    if (action?.id === 'six_hats') return validateRequest(structuredClone({ canvas: state, action }));
     const request = { canvas: structuredClone(state), action: { ...structuredClone(action), use_thoughts: action.use_thoughts ?? true } };
     return validateRequest(request);
   }
   function composeResult(request, response) {
     validateRequest(request);
+    if (request.action.id === 'six_hats') return validate(Hats.append(request.canvas, request.action, response));
     keys(response, request.action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'Response');
     if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('Response thought must be nonempty text.');
     const result = structuredClone(request.canvas), ids = validateContent(result.content);

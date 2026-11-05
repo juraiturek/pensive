@@ -22,7 +22,14 @@
     "thoughts": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/thought"
+        "oneOf": [
+          {
+            "$ref": "#/$defs/thought"
+          },
+          {
+            "$ref": "#/$defs/six_hats_thought"
+          }
+        ]
       }
     },
     "proposals": {
@@ -126,6 +133,93 @@
     }
   },
   "$defs": {
+    "six_hats_thought": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "hat",
+        "target",
+        "target_label",
+        "observations"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+        },
+        "kind": {
+          "const": "six_hats"
+        },
+        "hat": {
+          "enum": [
+            "white",
+            "red",
+            "black",
+            "yellow",
+            "green",
+            "blue"
+          ]
+        },
+        "target": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "type": {
+                  "const": "canvas"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "id"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "factor",
+                    "strategy"
+                  ]
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+                }
+              }
+            }
+          ]
+        },
+        "target_label": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "observations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "suggestions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
     "item": {
       "type": "object",
       "additionalProperties": false,

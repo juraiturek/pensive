@@ -196,10 +196,23 @@ dialog textarea { display: block; font-size: .9rem; }
         <button type="button" data-ai="strategize" title="Derive SO/ST/WO/WT strategies from SWOT">Strategize</button>
         <button type="button" data-ai="evaluate" title="Evaluate SWOT, TOWS, or both">Evaluate</button>
         <button type="button" data-ai="improve" title="Improve the current SWOT/TOWS">Improve</button>
-      </div>
+      <button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button></div>
       <div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary" title="Copy the complete canvas for discussion or reuse. Use an AI action button to request a transformation.">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
-    <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <dialog id="thinking-tools-dialog" aria-labelledby="six-hats-title">
+  <form>
+    <p class="eyebrow">Thinking tools</p>
+    <h2 id="six-hats-title">Six Thinking Hats</h2>
+    <p class="dialog-note">Apply one perspective to the selected content. The result is a thought attached to the canvas.</p>
+    <p><label>Thinking hat <select name="hat" required></select></label></p>
+    <p><label>Target <select name="target" required style="max-width: 100%"></select></label></p>
+    <p><label>Optional guidance <textarea name="comment" rows="2"></textarea></label></p>
+    <p><label><input type="checkbox" name="use_thoughts"> Include previous thoughts as context</label></p>
+    <p class="error" role="alert"></p>
+    <div class="dialog-actions"><button type="button" data-cancel>Cancel</button><button type="submit" class="primary">Copy AI request</button></div>
+  </form>
+</dialog>
+<section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
     <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
     <section id="swot-view" aria-label="SWOT factors">
       <div class="swot-grid">
@@ -410,9 +423,130 @@ const ProposalReviewUI = (() => {
 })();
 </script>
 <script data-implementation>
+'use strict';
+
+const SixHats = (() => {
+  const hats = Object.freeze({
+    white: 'Facts and data',
+    red: 'Feelings and intuition',
+    black: 'Caution and critique',
+    yellow: 'Benefits and value',
+    green: 'Creativity and alternatives',
+    blue: 'Process and direction',
+  });
+  const title = hat => hat[0].toUpperCase() + hat.slice(1) + ' Hat';
+  const nonblank = value => typeof value === 'string' && !!value.trim();
+  const validId = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value);
+  const own = (object, key) => Object.hasOwn(object, key);
+  const itemTypes = framework => framework === 'swot' ? ['factor', 'strategy'] : framework === 'five_whys' ? ['node'] : ['item'];
+
+  function keys(value, required, optional, label) {
+    if (!value || typeof value !== 'object' || Array.isArray(value) ||
+        required.some(key => !own(value, key)) ||
+        Object.keys(value).some(key => !required.includes(key) && !optional.includes(key))) {
+      throw new Error('Invalid ' + label + '.');
+    }
+  }
+
+  function targets(canvas) {
+    const { content, framework } = canvas;
+    const choices = [{ type: 'canvas', label: 'Full canvas' }];
+    const add = (type, item, section) => {
+      if (nonblank(item.text)) choices.push({ type, id: item.id, label: item.text, section });
+    };
+    if (framework === 'five_whys') {
+      const stack = [content.tree];
+      while (stack.length) {
+        const node = stack.pop();
+        add('node', node);
+        for (let index = node.children.length - 1; index >= 0; index--) stack.push(node.children[index]);
+      }
+    } else {
+      const groups = framework === 'swot'
+        ? [['factor', content], ['strategy', content.strategies]]
+        : [['item', content]];
+      for (const [type, collections] of groups) {
+        for (const [section, items] of Object.entries(collections)) {
+          if (Array.isArray(items)) for (const item of items) add(type, item, section);
+        }
+      }
+    }
+    return choices;
+  }
+
+  function validateHat(hat) {
+    if (typeof hat !== 'string' || !own(hats, hat)) throw new Error('Choose one of the six thinking hats.');
+  }
+
+  function validateTarget(target, framework) {
+    keys(target, target?.type === 'canvas' ? ['type'] : ['type', 'id'], [], 'Six Hats target');
+    if (target.type !== 'canvas' && (!itemTypes(framework).includes(target.type) || !validId(target.id)))
+      throw new Error('Invalid Six Hats target type or ID for this framework.');
+  }
+
+  function resolve(canvas, target) {
+    return targets(canvas).find(choice => choice.type === target.type && choice.id === target.id);
+  }
+
+  function validateAction(canvas, action) {
+    keys(action, ['id', 'hat', 'target'], ['comment', 'use_thoughts'], 'Six Hats action');
+    validateHat(action.hat);
+    validateTarget(action.target, canvas.framework);
+    const choices = targets(canvas);
+    if (!choices.some(choice => choice.type === action.target.type && choice.id === action.target.id))
+      throw new Error('The Six Hats target is unavailable or blank.');
+    if (action.target.type === 'canvas' && choices.length === 1 &&
+        !Object.values(canvas.content.framing).some(nonblank))
+      throw new Error('Add framing or analytical content before applying a thinking hat.');
+    if ((own(action, 'comment') && typeof action.comment !== 'string') ||
+        (own(action, 'use_thoughts') && typeof action.use_thoughts !== 'boolean'))
+      throw new Error('Invalid Six Hats guidance.');
+  }
+
+  function validateReflection(value) {
+    for (const field of ['observations', 'suggestions']) {
+      if (field === 'suggestions' && !own(value, field)) continue;
+      if (!Array.isArray(value[field]) || !value[field].length || !Array.from(value[field]).every(nonblank))
+        throw new Error('Six Hats ' + field + ' must be a nonempty array of nonblank strings.');
+    }
+  }
+
+  function validateThought(thought, ids, framework) {
+    keys(thought, ['id', 'kind', 'hat', 'target', 'target_label', 'observations'], ['suggestions'], 'Six Hats thought');
+    validateHat(thought.hat);
+    validateTarget(thought.target, framework);
+    if (!nonblank(thought.target_label) || !validId(thought.id) || ids.has(thought.id))
+      throw new Error('Invalid Six Hats thought label or duplicate/invalid ID.');
+    validateReflection(thought);
+    ids.add(thought.id);
+  }
+
+  function append(canvas, action, response) {
+    keys(response, ['observations'], ['suggestions'], 'Six Hats response');
+    validateReflection(response);
+    const result = structuredClone(canvas);
+    const thought = {
+      id: 'thought-' + globalThis.crypto.randomUUID(),
+      kind: 'six_hats',
+      hat: action.hat,
+      target: structuredClone(action.target),
+      target_label: resolve(canvas, action.target).label,
+      ...structuredClone(response),
+    };
+    result.thoughts = [...(result.thoughts || []), thought];
+    return result;
+  }
+
+  return Object.freeze({ hats, title, targets, resolve, validateAction, validateThought, append });
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = SixHats;
+</script>
+<script data-implementation>
 /* SWOT-specific state operations, shared by the local page and Node packager. */
 const Swot = (() => {
   'use strict';
+  const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
   const framing = Object.freeze(['focal_entity', 'objective', 'environment']);
@@ -473,7 +607,10 @@ const Swot = (() => {
     const ids = validateContent(state.content);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
-      for (const thought of state.thoughts) validateThought(thought, ids);
+      for (const entry of state.thoughts) {
+        if (entry?.kind === 'six_hats') Hats.validateThought(entry, ids, state.framework);
+        else validateThought(entry, ids);
+      }
     }
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one whole-canvas proposal is supported.');
@@ -553,6 +690,10 @@ const Swot = (() => {
   function buildRequest(state, action) {
     validate(state);
     if (state.proposals?.length) throw new Error('Accept or reject the pending proposal before requesting another AI action.');
+    if (action?.id === 'six_hats') {
+      Hats.validateAction(state, action);
+      return structuredClone({ canvas: state, action });
+    }
     const id = action?.id;
     if (!['strategize', 'evaluate', 'improve'].includes(id)) throw new Error('Unsupported AI action.');
     const optional = ['comment', 'use_thoughts', ...(id === 'strategize' ? ['mode'] : id === 'evaluate' ? ['scope'] : [])];
@@ -576,6 +717,7 @@ const Swot = (() => {
   function composeResult(input, response) {
     const request = validateRequest(input);
     const { canvas, action } = request;
+    if (action.id === 'six_hats') return validate(Hats.append(canvas, action, response));
     objectWithKeys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'AI response');
     if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('A nonempty explanatory thought is required.');
     const thought = { id: `thought-${globalThis.crypto.randomUUID()}`, kind: action.id === 'evaluate' ? 'evaluation' : action.id === 'improve' ? 'improvement' : 'strategize', text: response.thought };
@@ -629,6 +771,73 @@ const Swot = (() => {
   return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
+</script>
+<script data-implementation>
+'use strict';
+
+const SixHatsUI = (() => {
+  function element(tag, text) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function card(canvas, thought) {
+    const article = element('article');
+    article.className = 'thought';
+    article.append(element('h3', SixHats.title(thought.hat) + ' · ' + thought.target_label));
+    if (!SixHats.resolve(canvas, thought.target)) article.append(element('p', 'Target unavailable'));
+    for (const [title, entries] of [['Observations', thought.observations], ['Suggestions', thought.suggestions]]) {
+      if (!entries) continue;
+      const list = element('ul');
+      for (const entry of entries) list.append(element('li', entry));
+      article.append(element('h4', title), list);
+    }
+    return article;
+  }
+
+  function install(getState, core, copyJson) {
+    const button = document.getElementById('thinking-tools');
+    const dialog = document.getElementById('thinking-tools-dialog');
+    const form = dialog.querySelector('form');
+    const hat = form.elements.hat;
+    const target = form.elements.target;
+    const error = dialog.querySelector('[role="alert"]');
+    let choices;
+    for (const [id, focus] of Object.entries(SixHats.hats))
+      hat.add(new Option(SixHats.title(id) + ' — ' + focus, id));
+
+    button.addEventListener('click', () => {
+      form.reset();
+      error.textContent = '';
+      choices = SixHats.targets(getState());
+      target.replaceChildren(...choices.map((choice, index) => {
+        const prefix = choice.section?.replaceAll('_', ' ') || (choice.id ? 'Node' : '');
+        const label = prefix ? prefix + ' · ' + choice.label : choice.label;
+        return new Option(label.length > 160 ? label.slice(0, 157) + '…' : label, index);
+      }));
+      dialog.showModal();
+    });
+    dialog.querySelector('[data-cancel]').addEventListener('click', () => dialog.close());
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      try {
+        const choice = choices[Number(target.value)];
+        const selection = choice.id ? { type: choice.type, id: choice.id } : { type: 'canvas' };
+        const request = core.buildRequest(getState(), {
+          id: 'six_hats', hat: hat.value, target: selection,
+          comment: form.elements.comment.value, use_thoughts: form.elements.use_thoughts.checked,
+        });
+        dialog.close();
+        await copyJson(JSON.stringify(request, null, 2), 'Copied Six Hats request. Paste it into Codex or ChatGPT with the Pensive skill.', true);
+      } catch (err) {
+        error.textContent = err.message;
+      }
+    });
+  }
+
+  return Object.freeze({ card, install });
+})();
 </script>
 <script data-implementation>
 /* Shared local text editing and flat-collection pointer ordering. No state or network service. */
@@ -937,6 +1146,7 @@ const CanvasEditing = (() => {
     thoughts.replaceChildren();
     thoughts.hidden = !state.thoughts?.length;
     function thoughtCard(thought) {
+      if (thought.kind === 'six_hats') return SixHatsUI.card(state, thought);
       const card = element('article', 'thought');
       card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', strategize: 'Strategy rationale' }[thought.kind]), element('p', '', thought.text));
       return card;
@@ -976,6 +1186,7 @@ const CanvasEditing = (() => {
   }
   try {
     state = Swot.parseState($('#canvas-state').textContent);
+    SixHatsUI.install(() => state, Swot, copyJson);
     for (const field of Swot.framing) {
       const input = $(`[data-framing="${field}"]`);
       input.value = state.content.framing[field];

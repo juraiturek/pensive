@@ -39,7 +39,12 @@
   }
   function renderThoughts() {
     const container = $('#thoughts'); container.replaceChildren(); container.hidden = !state.thoughts?.length;
-    for (const thought of state.thoughts || []) { const card = element('article', 'thought'); card.append(element('h3', '', thought.kind === 'evaluation' ? 'Evaluation' : 'What improved and why'), element('p', '', thought.text)); container.append(card); }
+    for (const thought of state.thoughts || []) {
+      if (thought.kind === 'six_hats') {
+        container.append(SixHatsUI.card(state, thought));
+        continue;
+      }
+      const card = element('article', 'thought'); card.append(element('h3', '', thought.kind === 'evaluation' ? 'Evaluation' : 'What improved and why'), element('p', '', thought.text)); container.append(card); }
   }
   function renderProposal() {
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = !!state.proposals?.length; });
@@ -61,7 +66,8 @@
     catch (e) { status(`Could not save: ${e.message}`, true); }
   }
   try {
-    state = Vpc.parseState($('#canvas-state').textContent); refresh();
+    state = Vpc.parseState($('#canvas-state').textContent);
+    SixHatsUI.install(() => state, Vpc, copyJson); refresh();
     document.querySelectorAll('[data-framing]').forEach(input => CanvasEditing.finishOnEnter(input));
     for (const field of Vpc.framing) $(`[data-framing="${field}"]`).addEventListener('input', e => { state.content.framing[field] = e.target.value; resize(e.target); edited(); });
     document.querySelectorAll('[data-ai]').forEach(button => button.addEventListener('click', () => {

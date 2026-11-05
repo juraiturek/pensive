@@ -5,6 +5,7 @@
   else root.FiveWhys = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
+  const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const framing = [
     'observable_symptom',
     'expected_condition',
@@ -82,6 +83,10 @@
     if (s.thoughts !== undefined) {
       if (!Array.isArray(s.thoughts)) fail('Thoughts must be an array.');
       for (const t of s.thoughts) {
+        if (t?.kind === 'six_hats') {
+          Hats.validateThought(t, ids, s.framework);
+          continue;
+        }
         keys(t, ['id', 'kind', 'text'], [], 'Thought');
         identity(t.id, ids);
         if (!['evaluation', 'expansion'].includes(t.kind)) fail('Unsupported thought kind.');
@@ -371,6 +376,10 @@
     keys(request, ['canvas', 'action'], [], 'Request');
     validate(request.canvas);
     if (request.canvas.proposals?.length) fail('Resolve pending proposal first.');
+    if (request.action?.id === 'six_hats') {
+      Hats.validateAction(request.canvas, request.action);
+      return request;
+    }
     const a = request.action;
     keys(
       a,
@@ -394,6 +403,7 @@
   }
   function composeResult(request, response) {
     validateRequest(request);
+    if (request.action.id === 'six_hats') return validate(Hats.append(request.canvas, request.action, response));
     const expanding = request.action.id === 'expand';
     keys(response, ['thought', ...(expanding ? ['children'] : [])], [], 'Response');
     string(response.thought, 'Thought', true);

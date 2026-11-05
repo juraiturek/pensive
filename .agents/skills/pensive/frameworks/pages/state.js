@@ -1,6 +1,7 @@
 /* PAGES state and action boundaries. Used by the standalone page and Node. */
 const Pages = (() => {
   'use strict';
+  const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const sections = Object.freeze(['parts', 'actions', 'goals', 'events', 'self_concepts']);
   const framing = Object.freeze(['what', 'why', 'intuition']);
   const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
@@ -66,7 +67,10 @@ const Pages = (() => {
     if (state.ripple_baseline !== undefined) validateCollections(state.ripple_baseline);
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
-      state.thoughts.forEach(t => thought(t, ids));
+      for (const entry of state.thoughts) {
+        if (entry?.kind === 'six_hats') Hats.validateThought(entry, ids, state.framework);
+        else thought(entry, ids);
+      }
     }
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one pending proposal is supported.');
@@ -148,6 +152,10 @@ const Pages = (() => {
   function buildRequest(state, action) {
     validate(state);
     if (state.proposals?.length) throw new Error('Resolve the pending proposal first.');
+    if (action?.id === 'six_hats') {
+      Hats.validateAction(state, action);
+      return structuredClone({ canvas: state, action });
+    }
     const id = action?.id;
     if (!['evaluate', 'improve', 'ripple'].includes(id)) throw new Error('Unsupported PAGES action.');
     keys(action, ['id'], 'Action', ['comment', 'use_thoughts', ...(id === 'ripple' ? ['sources'] : [])]);
@@ -165,6 +173,7 @@ const Pages = (() => {
   function validateRequest(request) { keys(request, ['canvas', 'action'], 'Request'); return buildRequest(request.canvas, request.action); }
   function composeResult(input, response) {
     const { canvas, action } = validateRequest(input);
+    if (action.id === 'six_hats') return validate(Hats.append(canvas, action, response));
     keys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'Response');
     if (typeof response.thought !== 'string' || !response.thought.trim()) throw new Error('A nonempty explanatory thought is required.');
     const th = { id: `thought-${globalThis.crypto.randomUUID()}`, kind: action.id === 'evaluate' ? 'evaluation' : action.id === 'improve' ? 'improvement' : 'ripple', text: response.thought };

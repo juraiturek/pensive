@@ -18,11 +18,24 @@
       <details><summary>Inkling <span class="optional">/ optional</span></summary><label for="intuition">Initial intuition<textarea id="intuition" data-framing="intuition" rows="2" placeholder="How do you currently see it?"></textarea></label></details>
     </section>
     <div class="toolbar">
-      <div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button><button type="button" data-ai="ripple" title="Explore implications of changed dimensions">Ripple</button></div>
+      <div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button><button type="button" data-ai="ripple" title="Explore implications of changed dimensions">Ripple</button><button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button></div>
       <div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div>
     </div>
     <div class="baseline-bar"><p id="baseline-status">Changes are marked against the initial canvas.</p><button type="button" id="reset-baseline">Set current state as Ripple baseline</button></div>
-    <section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <dialog id="thinking-tools-dialog" aria-labelledby="six-hats-title">
+  <form>
+    <p class="eyebrow">Thinking tools</p>
+    <h2 id="six-hats-title">Six Thinking Hats</h2>
+    <p class="dialog-note">Apply one perspective to the selected content. The result is a thought attached to the canvas.</p>
+    <p><label>Thinking hat <select name="hat" required></select></label></p>
+    <p><label>Target <select name="target" required style="max-width: 100%"></select></label></p>
+    <p><label>Optional guidance <textarea name="comment" rows="2"></textarea></label></p>
+    <p><label><input type="checkbox" name="use_thoughts"> Include previous thoughts as context</label></p>
+    <p class="error" role="alert"></p>
+    <div class="dialog-actions"><button type="button" data-cancel>Cancel</button><button type="submit" class="primary">Copy AI request</button></div>
+  </form>
+</dialog>
+<section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
     <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
     <section id="pages-view" aria-label="PAGES perspective">
       <p class="pages-guide">A perspective through five elements: Parts, Actions, Goals, Events, Self-concepts. Explore their connections; the bands are not a causal hierarchy.</p>
@@ -52,7 +65,9 @@
 <!--pensive-state-end-->
 <!--pensive-review-->
 <!--pensive-review-ui-->
+<!--pensive-six-hats-->
 <!--pensive-core-->
+<!--pensive-six-hats-ui-->
 <!--pensive-editing-->
 <!--pensive-runtime-->
 </body>

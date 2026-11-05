@@ -16,6 +16,8 @@ export async function buildCanvas(state = Swot.initialState()) {
     ['<!--pensive-review-->', '../../shared/proposal-review.js', 'script'],
     ['<!--pensive-review-ui-->', '../../shared/proposal-review-ui.js', 'script'],
     ['<!--pensive-core-->', 'state.js', 'script'],
+    ['<!--pensive-six-hats-->', '../../shared/six-hats.js', 'script'],
+    ['<!--pensive-six-hats-ui-->', '../../shared/six-hats-ui.js', 'script'],
     ['<!--pensive-editing-->', '../../shared/canvas-editing.js', 'script'],
     ['<!--pensive-runtime-->', 'canvas.js', 'script']
   ];
