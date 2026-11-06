@@ -62,7 +62,9 @@ Claude chat is an intended distribution target. A prior ZIP export exists, and i
 
 ## Design and architecture
 
-Each framework gives the analysis its own visual structure and analytical rules. Framing defines the question. Framework content develops the analysis. Annotations hold supporting observations and questions. Takeaways record what the user wants to carry forward.
+Each framework gives the analysis its own visual structure and analytical rules. **Framing → Canvas → Takeaways** describes how the pieces fit together. Framing defines the question. The canvas holds the analysis as it develops. Takeaways record what you want to carry forward. Annotations keep questions, observations, and tentative connections alongside the work. You can explicitly include relevant notes when asking AI to formulate or review Takeaways.
+
+One way to think about the canvas is as a graph of free-text nodes. Each node holds an idea whose meaning depends in part on the other ideas around it. A change to one or more nodes can give you a reason to revisit others. In PAGES, **Ripple** makes this concrete. Select changed dimensions and ask AI to explore what those changes imply for the rest of the analysis. Pensive compares them with a saved baseline and returns proposed revisions for you to review.
 
 - **The canvas** is standalone HTML, CSS, and JavaScript with embedded JSON. It runs locally without a Pensive backend, database, or account.
 - **The Skill** selects the framework and action, then loads the relevant Markdown methodology. Each action starts from the submitted state, so local edits travel with the request.
