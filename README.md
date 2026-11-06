@@ -2,22 +2,27 @@
 
 **A workspace for structured thinking**
 
-Pensive gives you an editable canvas for working through a strategic question, examining a customer need, challenging a perspective, or investigating a recurring problem. Frame the question, develop the analysis, and save the work as a file you can reopen.
+An AI assistant can hold onto context and give you a useful answer in seconds. When you’re working through an open question, that answer can also set the direction before you’ve had time to decide what matters, which ideas belong together, or what you’re still unsure about. Even a good set of options reflects choices about what to put in front of you.
 
-Pensive offers a different way to work with a language model. The canvas keeps the current analysis in view as you edit it. When you want a second look, send the model the current canvas and a specific request. Its assessment or proposed changes come back in a new copy of the canvas, where you can review them alongside your work.
+Pensive gives you a different way to work with AI. You develop an analysis in an editable canvas at your own pace. Established management frameworks such as SWOT and the Value Proposition Canvas give you a starting point for a range of problems and a shared language for explaining your analysis to others who know the framework. As you work, you can ask Pensive to draw on guidance informed by research and practice, whether you need help applying the framework or want to explore another perspective. You can make connections yourself and decide which of the model’s suggestions to carry forward. Sometimes a review exposes a gap in the analysis. Sometimes it gives you a reason to reconsider the question you started with.
 
-**AI supports the thinking process. You own the conclusions.**
+Some thoughts need time. Save a question alongside the item that raised it, or keep a reflection next to the analysis and revisit it as the work develops. An unresolved thought can stay in the canvas until you see what it connects to. When you’re ready, record what you want to carry forward in **Takeaways**.
 
-## How it works
+**AI supports the thinking. You decide where it goes.**
 
-Suppose you’re weighing whether a neighborhood repair shop should offer pickup and delivery.
+## From conversation to canvas and back
 
-1. **Frame the question.** Start a SWOT canvas and describe the shop, the objective, and the environment. Begin with a blank canvas or ask Pensive for a draft from the context you provide.
-2. **Develop the analysis.** Add what you know about the shop’s capacity and customer demand. Attach a note where an assumption needs checking.
-3. **Ask for a second look.** Choose **Strategize** to explore options that connect internal factors with external conditions. Copy the action request into the Pensive-enabled chat and open the returned canvas.
-4. **Review and carry forward.** Compare the proposed strategies with your current analysis and decide which collections of changes to accept. Record conclusions, next steps, or open questions in **Takeaways**, then save the editable HTML.
+Pensive began as a web app built around the idea of a *living parchment*, a surface where an analysis could grow and hold unfinished thoughts. This version brings that idea into the chat as a Skill. Start in conversation and open a standalone HTML canvas when the work needs a place of its own.
 
-The browser handles local editing. AI actions run in the chat after you send the request, which includes the complete current canvas state.
+Edit the canvas in your browser. When you want the model’s help, choose an action and paste the request into the chat. The clipboard carries the complete current canvas and the action you chose as JSON. The Skill returns a new editable HTML file containing the assessment or proposal. You can continue editing locally, review suggested changes, and save the result when you’re ready.
+
+## Who it’s for
+
+Bring a problem that would benefit from structure. You might be advising a client, investigating a recurring problem at work, thinking through a personal situation, or learning to apply a framework for the first time.
+
+Work through the canvas yourself or bring AI in when it would help you brainstorm, get past an impasse, or challenge an assumption. When you request AI help, Pensive uses guidance specific to the framework. You can also choose a shared technique such as **Six Thinking Hats** to examine the same analysis from a different perspective.
+
+When a SWOT proposal touches several collections, you can accept one change, reject another, and leave the rest pending while you continue thinking. Your review decisions travel with the saved canvas.
 
 ## What you can use today
 
