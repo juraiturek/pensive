@@ -1,142 +1,78 @@
 # Pensive
 
-**Less conversation. More thinking.**
+**A workspace for structured thinking**
 
-Pensive is a local-first, methodology-driven visual thinking environment. It offers distinctive, editable canvases for structured analysis and lets people invoke AI selectively for substantive reasoning—not for routine editing or navigation.
+Pensive gives you an editable canvas for working through a strategic question, examining a customer need, challenging a perspective, or investigating a recurring problem. Frame the question, develop the analysis, and save the work as a file you can reopen.
 
-> **Project status:** Architecture agreed; existing application audit and selective extraction are planned. This repository is not yet a released product.
+Pensive offers a different way to work with a language model. The canvas keeps the current analysis in view as you edit it. When you want a second look, send the model the current canvas and a specific request. Its assessment or proposed changes come back in a new copy of the canvas, where you can review them alongside your work.
 
-## Why Pensive?
+**AI supports the thinking process. You own the conclusions.**
 
-Long, linear AI conversations can obscure the structure of an analysis and make it difficult to maintain perspective. Pensive explores a different interaction model: the user works in a persistent visual representation of a thinking methodology, controls its content and organization, and requests AI assistance only when useful.
+## How it works
 
-The central product hypothesis is that framework-specific visual interaction combined with selective, well-grounded AI transformations can support clearer, more deliberate thinking. This hypothesis will be evaluated through use and testing.
+Suppose you’re weighing whether a neighborhood repair shop should offer pickup and delivery.
 
-## Design principles
+1. **Frame the question.** Start a SWOT canvas and describe the shop, the objective, and the environment. Begin with a blank canvas or ask Pensive for a draft from the context you provide.
+2. **Develop the analysis.** Add what you know about the shop’s capacity and customer demand. Attach a note where an assumption needs checking.
+3. **Ask for a second look.** Choose **Strategize** to explore options that connect internal factors with external conditions. Copy the action request into the Pensive-enabled chat and open the returned canvas.
+4. **Review and carry forward.** Compare the proposed strategies with your current analysis and decide which collections of changes to accept. Record conclusions, next steps, or open questions in **Takeaways**, then save the editable HTML.
 
-1. **Human agency first.** Users own the analysis, its structure, and decisions. AI suggestions must be distinguishable from user-authored content.
-2. **Visual structure is methodological.** SWOT, PAGES, Value Proposition Canvas, and 5 Whys deserve different visual interfaces; they are not skins on a generic node editor.
-3. **Less code, more methodology.** Encode reasoning strategies, conditional guidance, and evaluation criteria in readable Markdown. Write software for interaction, deterministic state management, validation, and packaging—not to imitate model reasoning.
-4. **Useful without AI.** Editing, arranging, tagging, and exporting must work locally without an LLM or server.
-5. **Portable, explicit state.** Framework-specific JSON is the authoritative canvas state. Users can export and reuse it outside Pensive.
-6. **Stateless AI operations.** Each transformation request contains the complete current canvas JSON plus an action trigger and optional instructions. No server session or stored history is required.
-7. **Small, testable increments.** Extract proven functionality from the original application; avoid wholesale rewrites and premature generalization.
-8. **Inspectability.** Methodological prompts and AI-generated changes should be understandable and reviewable.
+The browser handles local editing. AI actions run in the chat after you send the request, which includes the complete current canvas state.
 
-## How it works (MVP)
+## What you can use today
 
-1. A user or the Pensive skill selects a thinking framework.
-2. Pensive initializes a framework-specific, standalone HTML canvas containing its JSON state.
-3. The user edits the canvas locally, without AI.
-4. When the user selects an AI action, the canvas exports a JSON request with two top-level fields: `canvas` and `action`.
-5. The user supplies that request to Codex. The Pensive skill loads the relevant framework definition and Markdown methodology prompt.
-6. Codex applies the methodology and produces a new standalone HTML canvas with updated embedded JSON, reusing the established HTML/CSS/JS implementation rather than regenerating it.
-7. The user reviews the result, continues editing, and can repeat the process.
+| Canvas | What it helps you explore | AI actions |
+| --- | --- | --- |
+| **SWOT/TOWS** | What helps or hinders an objective, and which strategies follow from the combination of internal and external factors? | Strategize, Evaluate, Improve |
+| **PAGES** | What parts, actions, goals, events, and self-concepts make up a perspective, and what follows if one of them changes? | Evaluate, Improve, Ripple |
+| **Value Proposition Canvas** | How does an offering fit a particular customer segment’s jobs, pains, and gains? | Evaluate, Improve |
+| **5 Whys** | What might explain a recurring problem, and where should you investigate competing causes? | Reflect, Expand a causal branch |
 
-The transformation is stateless: the submitted canvas is authoritative. Conversation context can assist interpretation but must not silently override user edits. The MVP does not track revisions automatically.
+All four canvases support **Six Thinking Hats** for exploring one perspective at a time, **Annotation Mode** for keeping notes alongside the analysis, and **Takeaways** for recording what to carry forward. You can write Takeaways yourself or ask AI to formulate or review the text. The proposed text stays separate until you accept it.
 
-### Illustrative action request
+SWOT/TOWS, PAGES, and Value Proposition Canvas review analytical proposals by collection. A 5 Whys expansion is reviewed as one batch. Assessments and Six Thinking Hats reflections add observations while leaving the analytical content intact.
 
-```json
-{
-  "canvas": {
-    "framework": "swot",
-    "schema_version": "1.0",
-    "content": {
-      "strengths": [],
-      "weaknesses": [],
-      "opportunities": [],
-      "threats": []
-    }
-  },
-  "action": {
-    "id": "evaluate",
-    "comment": "Check whether significant risks have been overlooked."
-  }
-}
-```
+## Try it
 
-This example is conceptual; the final SWOT schema will be selected after auditing the existing application.
+### Browser only
 
-## Architecture
+Download the [blank SWOT/TOWS canvas](.agents/skills/pensive/frameworks/swot/canvas.html) using GitHub’s raw download control and open the file in your browser. You can edit the canvas and add annotations locally. Use **Save to File** to download an editable copy and reopen that copy to continue. Changes in the tab need an explicit save or export.
 
-- **Codex skill (`SKILL.md`):** Activation, framework selection, canvas initialization, action routing, and output rules.
-- **Framework definitions (YAML):** Framework semantics, fields, relationships, and supported actions; not generic page composition.
-- **Framework-specific HTML/JavaScript:** Distinctive visual presentation and local interactions.
-- **JSON schemas:** Explicit contracts for each framework's canvas state and action requests.
-- **Markdown prompt library:** Framework-specific and shared methodological transformations, conditional reasoning rules, and common output/evidence requirements.
-- **Shared assets:** Limited styling and browser utilities where reuse is demonstrably useful.
+**Export to clipboard** copies complete canvas JSON for reuse or transfer. **Import JSON** validates pasted state for the same framework and asks before replacing the current canvas. An AI action copies a separate request that includes the canvas and the instructions for the action.
 
-The MVP requires **no Unicorn server, backend, database, Jinja runtime, SDK, MCP, or hosted inference service**. It is initially packaged for Codex; the semantic JSON protocol is intended to remain usable with ChatGPT when the necessary prompts and file-generation capabilities are available.
+### Codex
 
-## Proposed repository layout
+The repository includes the Pensive Skill at `.agents/skills/pensive/`. Open a local checkout as a Codex project, with Node.js available for packaging and a writable location for the generated HTML. The repository’s tests used Node.js 24.22.1.
 
-```text
-pensive/
-├── README.md
-├── AGENTS.md
-├── LICENSE                 # Choose before public release
-├── .gitignore
-├── .agents/
-│   └── skills/
-│       └── pensive/
-│           ├── SKILL.md
-│           ├── guidance/
-│           │   ├── framework-selection.md
-│           │   └── canvas-workflow.md
-│           ├── frameworks/
-│           │   └── swot/
-│           │       ├── framework.yaml
-│           │       ├── canvas.html
-│           │       ├── canvas.schema.json
-│           │       └── prompts/
-│           │           ├── evaluate.md
-│           │           └── cross-analyze.md
-│           ├── prompts/
-│           │   ├── shared/
-│           │   └── common/
-│           └── assets/
-│               └── shared/
-├── examples/
-├── tests/
-└── docs/
-    ├── architecture.md
-    ├── extraction-map.md
-    └── roadmap.md
-```
+1. Start a Codex chat in the checkout and try: “`$pensive` Create a blank SWOT canvas for a neighborhood repair shop evaluating pickup and delivery.”
+2. Open the returned HTML in your browser and enter your framing and factors.
+3. Choose **Evaluate**, copy the request, and paste it into the chat. Open the new HTML to read the assessment. Try **Strategize** to see a proposal you can accept or reject.
+4. Use **Save to File** after editing or reviewing, then reopen the saved file to continue.
 
-This is a target structure, not a claim that these files already exist. Add files as they become necessary.
+See [Codex skill discovery](https://learn.chatgpt.com/docs/build-skills) for project setup and the [testing guide](docs/testing.md) for contributor dependencies. The local canvas and packaging flows have regression coverage. A clean Codex installation walkthrough is pending for public release.
 
-## Methodology development
+### Claude
 
-Pensive uses **RrEAC — Research → Review → Extract → Adjust → Compile** to develop methodological instructions. Source-supported principles, adaptations, and original design choices should be distinguished and documented. The prompt library is a core product asset, not incidental application configuration.
+Claude chat is an intended distribution target. A prior ZIP export exists, and its contents and compatibility with the current workflow are unverified. Current release support depends on testing Skill upload and activation, Node execution, and downloadable HTML delivery in Claude. See [Anthropic’s custom Skill setup](https://support.claude.com/en/articles/12512180-use-skills-in-claude) for the host requirements.
 
-Markdown prompts should be human-readable and refer directly to framework JSON fields. They may contain conditional reasoning instructions. Deterministic operations and JSON validation remain conventional code responsibilities.
+## Design and architecture
 
-## Initial milestone: SWOT vertical slice
+Each framework gives the analysis its own visual structure and analytical rules. Framing defines the question. Framework content develops the analysis. Annotations hold supporting observations and questions. Takeaways record what the user wants to carry forward.
 
-The first MVP is complete when:
+- **The canvas** is standalone HTML, CSS, and JavaScript with embedded JSON. It runs locally without a Pensive backend, database, or account.
+- **The Skill** selects the framework and action, then loads the relevant Markdown methodology. Each action starts from the submitted state, so local edits travel with the request.
+- **The packager** validates the result and embeds it in the established canvas implementation. The model supplies analytical data. The browser presents proposed changes for explicit review.
 
-- A standalone SWOT canvas opens locally without a server.
-- Users can add, edit, delete, and organize factors.
-- JSON export and import preserve the canvas state.
-- An explicit `cross_analyze` request carries the complete canvas and action.
-- Codex uses the SWOT methodology prompt to generate an updated standalone HTML canvas.
-- Existing user-authored factors remain intact unless the requested action explicitly changes them.
-- A second transformation cycle works without losing prior content.
+Pensive uses **RrEAC — Research → Review → Extract → Adjust → Compile** to develop its methodological instructions. The [architecture notes](docs/architecture.md), [extraction map](docs/extraction-map.md), and [testing guide](docs/testing.md) describe design decisions, source provenance, and verification.
 
-## Roadmap
+## Development
 
-**Phase 1 — Working MVP:** Read-only audit of the existing application; selective extraction of SWOT interface, semantic YAML/Pydantic concepts, and Jinja methodology content into Markdown; standalone HTML and JSON workflow; one tested AI transformation.
+Pensive’s creator conceived the product, designed its architecture and human–AI workflow, developed and reviewed its methodological prompts, specified features, and reviewed and validated the resulting work. AI coding agents generated the application source code under the creator’s direction.
 
-**Phase 2 — Reflection and continuity:** Historical snapshots and lookback across prior states, including examination of how the analysis and the user's thinking evolved. This is a promising research direction but is intentionally excluded from the MVP.
+## Future direction
 
-**Later:** Additional visual frameworks, richer evaluations, optional MCP/SDK integration, and potential distribution of specialized methodology packs. These are possibilities, not committed MVP features.
+Dedicated contextual educational guidance is planned. Decision Canvases are being researched as a way to make alternatives, criteria, assumptions, and trade-offs visible for the person making the decision. See the [implementation roadmap](docs/roadmap.md) for delivery records and deferred work.
 
-## Development approach
+## Licensing and contributing
 
-The original local Git repository remains intact as a read-only reference. Pensive starts with a separate Git history and a new GitHub repository. Codex performs a read-only architectural and historical audit before any extraction. Components are copied or minimally adapted into the new structure in small, tested commits. No original server infrastructure is migrated by default.
-
-## Contributing and licensing
-
-Contribution guidelines and a license will be selected before public release. Until a license is explicitly added, do not assume the repository grants permission for reuse or redistribution.
+Licensing and contribution terms are pending for public release. Reuse and redistribution require permission.
