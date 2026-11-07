@@ -1,5 +1,13 @@
 # Implementation roadmap
 
+## Host integration and distribution spikes — 2026-11-07
+
+User-approved architectural direction: Pensive owns core behavior; add a thin host-specific instruction/output layer only when demonstrated necessary. Keep one authoritative implementation across distributions.
+
+Recorded [exploratory spikes and exit evidence](plans/2026-11-07-host-integration-spikes.md): H1 Claude native viewer clipboard/annotation failures and fixability; H2 equivalent Codex/ChatGPT surface tests; H3 persistent HTML interface with versioned JSON and host binding; H4 action-only requests referencing exact stored canvas revisions, with possible deterministic Python history/reconstruction tooling. These are investigations, not delivered features or implementation authorization. Full-state fallback, manual-edit preservation and explicit proposal review remain required.
+
+Also retain Improve targeting, copy completion feedback/dialog behavior and installed resource-path reliability as separate follow-ups. Experimental distribution need not wait for persistent-state/history features; release readiness depends on a working documented handoff/recovery path and accurate limitations. No release/publication is authorized by this entry.
+
 ## Annotation Mode rollout
 
 Manual Annotation Mode is implemented across SWOT/TOWS, PAGES, VPC and 5 Whys. The flat frameworks support collection and item thoughts, and 5 Whys supports problem and cause thoughts. All four support canvas thoughts. The shared overlay and portable state satisfy the manual-note portion of L3. Selective AI context and research workflows remain separate design work.

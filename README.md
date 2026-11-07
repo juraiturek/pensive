@@ -4,7 +4,11 @@
 
 An AI assistant can hold onto context and give you a useful answer in seconds. When you’re working through an open question, that answer can also set the direction before you’ve had time to decide what matters, which ideas belong together, or what you’re still unsure about. Even a good set of options reflects choices about what to put in front of you.
 
-Pensive gives you a different way to work with AI. You develop an analysis in an editable canvas at your own pace. Established management frameworks such as SWOT and the Value Proposition Canvas give you a starting point for a range of problems and a shared language for explaining your analysis to others who know the framework. As you work, you can ask Pensive to draw on guidance informed by research and practice, whether you need help applying the framework or want to explore another perspective. You can make connections yourself and decide which of the model’s suggestions to carry forward. Sometimes a review exposes a gap in the analysis. Sometimes it gives you a reason to reconsider the question you started with.
+Thinking can also be hard to begin. Sometimes you need a starting point, an example, or a draft to react to. At other times, a useful question challenges an assumption, exposes a gap, or encourages you to consider another perspective.
+
+Pensive gives you a different way to work with AI, making room for both assistance and challenge. You develop an analysis in an editable canvas at your own pace. Established management frameworks such as SWOT and the Value Proposition Canvas provide a starting point and a shared language for explaining your analysis to others who know the framework.
+
+Work through ideas yourself, ask AI for a draft, or request framework-specific guidance to examine what you’ve developed. A reaction like “this doesn’t fit my situation” can be a starting point for revision, even before you can explain exactly why. You decide which suggestions to carry forward. Sometimes a review exposes a gap in the analysis. Sometimes it gives you a reason to reconsider the question you started with.
 
 Some thoughts need time. Save a question alongside the item that raised it, or keep a reflection next to the analysis and revisit it as the work develops. An unresolved thought can stay in the canvas until you see what it connects to. When you’re ready, record what you want to carry forward in **Takeaways**.
 
@@ -12,38 +16,38 @@ Some thoughts need time. Save a question alongside the item that raised it, or k
 
 ## From conversation to canvas and back
 
-Pensive began as a web app built around the idea of a *living parchment*, a surface where an analysis could grow and hold unfinished thoughts. This version brings that idea into the chat as a Skill. Start in conversation and open a standalone HTML canvas when the work needs a place of its own.
+Pensive works as a Skill within your AI conversation. Start in chat and open a standalone HTML canvas when the work needs a place of its own.
 
 Edit the canvas in your browser. When you want the model’s help, choose an action and paste the request into the chat. The clipboard carries the complete current canvas and the action you chose as JSON. The Skill returns a new editable HTML file containing the assessment or proposal. You can continue editing locally, review suggested changes, and save the result when you’re ready.
+
+Save the editable HTML to revisit the analysis, or exchange its complete JSON with someone using a compatible Pensive canvas for the same framework. They can import it and continue the work without the original conversation.
 
 ## Who it’s for
 
 Bring a problem that would benefit from structure. You might be advising a client, investigating a recurring problem at work, thinking through a personal situation, or learning to apply a framework for the first time.
 
-Work through the canvas yourself or bring AI in when it would help you brainstorm, get past an impasse, or challenge an assumption. When you request AI help, Pensive uses guidance specific to the framework. You can also choose a shared technique such as **Six Thinking Hats** to examine the same analysis from a different perspective.
+### Different ways to work
+
+| When you want to… | What you can do |
+| --- | --- |
+| Start from scratch | Open a blank canvas and develop the analysis yourself. |
+| Get past a blank page | Ask for an initial draft, then edit it or question its assumptions. |
+| Examine your ideas | Request a framework-specific Evaluate or Reflect action. |
+| Explore another perspective | Choose Six Thinking Hats, or explore the implications of changed PAGES dimensions with Ripple. |
+| Preserve an unfinished thought | Attach a note or question and return to it as the analysis develops. |
+| Develop conclusions | Write Takeaways or ask AI to propose text for review. |
 
 When a SWOT proposal touches several collections, you can accept one change, reject another, and leave the rest pending while you continue thinking. Your review decisions travel with the saved canvas.
 
-## What you can use today
-
-| Canvas | What it helps you explore | AI actions |
-| --- | --- | --- |
-| **SWOT/TOWS** | What helps or hinders an objective, and which strategies follow from the combination of internal and external factors? | Strategize, Evaluate, Improve |
-| **PAGES** | What parts, actions, goals, events, and self-concepts make up a perspective, and what follows if one of them changes? | Evaluate, Improve, Ripple |
-| **Value Proposition Canvas** | How does an offering fit a particular customer segment’s jobs, pains, and gains? | Evaluate, Improve |
-| **5 Whys** | What might explain a recurring problem, and where should you investigate competing causes? | Reflect, Expand a causal branch |
-
-All four canvases support **Six Thinking Hats** for exploring one perspective at a time, **Annotation Mode** for keeping notes alongside the analysis, and **Takeaways** for recording what to carry forward. You can write Takeaways yourself or ask AI to formulate or review the text. The proposed text stays separate until you accept it.
-
-SWOT/TOWS, PAGES, and Value Proposition Canvas review analytical proposals by collection. A 5 Whys expansion is reviewed as one batch. Assessments and Six Thinking Hats reflections add observations while leaving the analytical content intact.
-
 ## Try it
 
-### Browser only
+To use Pensive with AI, install or enable the Pensive Skill in your assistant. The Skill supplies the framework methodology and the tools to validate results and return an updated canvas. Choose the Codex or Claude setup below.
 
-Download the [blank SWOT/TOWS canvas](.agents/skills/pensive/frameworks/swot/canvas.html) using GitHub’s raw download control and open the file in your browser. You can edit the canvas and add annotations locally. Use **Save to File** to download an editable copy and reopen that copy to continue. Changes in the tab need an explicit save or export.
+### Preview the canvas
 
-**Export to clipboard** copies complete canvas JSON for reuse or transfer. **Import JSON** validates pasted state for the same framework and asks before replacing the current canvas. An AI action copies a separate request that includes the canvas and the instructions for the action.
+To preview the interface before setting up the Skill, download the [blank SWOT/TOWS canvas](.agents/skills/pensive/frameworks/swot/canvas.html) using GitHub’s raw download control and open the file in your browser. You can edit the canvas and add annotations locally. Use **Save to File** to download an editable copy and reopen that copy to continue. Changes in the tab need an explicit save or export.
+
+**Export to clipboard** copies complete canvas JSON for reuse or transfer. **Import JSON** validates pasted state for the same framework and asks before replacing the current canvas. An AI action copies a separate request containing the canvas state and action settings. Processing that request requires an assistant with the Pensive Skill installed and available. The HTML file alone supports local editing, annotations, and saving.
 
 ### Codex
 
@@ -58,7 +62,30 @@ See [Codex skill discovery](https://learn.chatgpt.com/docs/build-skills) for pro
 
 ### Claude
 
-Claude chat is an intended distribution target. A prior ZIP export exists, and its contents and compatibility with the current workflow are unverified. Current release support depends on testing Skill upload and activation, Node execution, and downloadable HTML delivery in Claude. See [Anthropic’s custom Skill setup](https://support.claude.com/en/articles/12512180-use-skills-in-claude) for the host requirements.
+Pensive is available as an experimental Skill package for Claude.
+
+[**Download Pensive for Claude v0.1.0 (Experimental)**](https://github.com/juraiturek/pensive/releases/tag/v0.1.0-experimental.1)
+
+1. Download `pensive-claude-v0.1.0-experimental.1.zip` from the release assets.
+2. Upload the ZIP through Claude’s custom Skill installation interface.
+3. Activate the Skill and start working with Pensive.
+
+This is an experimental distribution. Compatibility has been tested in a limited environment, and additional validation is planned.
+
+See [all releases](https://github.com/juraiturek/pensive/releases) for future versions.
+
+## What you can use today
+
+| Canvas | What it helps you explore | AI actions |
+| --- | --- | --- |
+| **SWOT/TOWS** | What helps or hinders an objective, and which strategies follow from the combination of internal and external factors? | Strategize, Evaluate, Improve |
+| **PAGES** | What parts, actions, goals, events, and self-concepts make up a perspective, and what follows if one of them changes? | Evaluate, Improve, Ripple |
+| **Value Proposition Canvas** | How does an offering fit a particular customer segment’s jobs, pains, and gains? | Evaluate, Improve |
+| **5 Whys** | What might explain a recurring problem, and where should you investigate competing causes? | Reflect, Expand a causal branch |
+
+All four canvases support **Six Thinking Hats** for exploring one perspective at a time, **Annotation Mode** for keeping notes alongside the analysis, and **Takeaways** for recording what to carry forward. You can write Takeaways yourself or ask AI to formulate or review the text. The proposed text stays separate until you accept it.
+
+SWOT/TOWS, PAGES, and Value Proposition Canvas review analytical proposals by collection. A 5 Whys expansion is reviewed as one batch. Assessments and Six Thinking Hats reflections add observations while leaving the analytical content intact.
 
 ## Design and architecture
 
@@ -72,7 +99,9 @@ One way to think about the canvas is as a graph of free-text nodes. Each node ho
 
 Pensive uses **RrEAC — Research → Review → Extract → Adjust → Compile** to develop its methodological instructions. The [architecture notes](docs/architecture.md), [extraction map](docs/extraction-map.md), and [testing guide](docs/testing.md) describe design decisions, source provenance, and verification.
 
-## Development
+## Development and origins
+
+Pensive began as a web app built around the idea of a *living parchment*, a surface where an analysis could grow and hold unfinished thoughts. The Skill version brings that workspace into an existing AI conversation and opens a canvas when needed.
 
 Pensive’s creator conceived the product, designed its architecture and human–AI workflow, developed and reviewed its methodological prompts, specified features, and reviewed and validated the resulting work. AI coding agents generated the application source code under the creator’s direction.
 
@@ -82,4 +111,6 @@ Dedicated contextual educational guidance is planned. Decision Canvases are bein
 
 ## Licensing and contributing
 
-Licensing and contribution terms are pending for public release. Reuse and redistribution require permission.
+Pensive is open-source software licensed under the [Apache License 2.0](LICENSE).
+
+Contributions, bug reports, and feedback are welcome through [GitHub Issues](https://github.com/juraiturek/pensive/issues) and [pull requests](https://github.com/juraiturek/pensive/pulls).
