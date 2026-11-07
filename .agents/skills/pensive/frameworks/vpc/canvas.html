@@ -408,12 +408,13 @@ const ProposalReview = (() => {
     const keys = Object.keys(a);
     return keys.length === Object.keys(b).length && keys.every(k => Object.hasOwn(b, k) && same(a[k], b[k]));
   }
-  function create({ sections, collection, validateContent }) {
+  function create({ sections, collection, validateContent, snapshot = collection, replaceSection }) {
     function entries(proposal) {
-      return sections.filter(s => !same(collection(proposal.base_content, s), collection(proposal.content, s)))
+      return sections.filter(s => !same(snapshot(proposal.base_content, s), snapshot(proposal.content, s)))
         .map(section => ({ section, status: proposal.resolutions?.[section] || 'pending' }));
     }
     function replace(content, proposal, section) {
+      if (replaceSection) { replaceSection(content, proposal.content, section); return; }
       const destination = collection(content, section);
       destination.splice(0, destination.length, ...structuredClone(collection(proposal.content, section)));
     }
@@ -473,7 +474,7 @@ const ProposalReviewUI = (() => {
     if (text !== undefined) node.textContent = text;
     return node;
   }
-  function render({ state, core, panel, labels, title, onDecision }) {
+  function render({ state, core, panel, labels, title, onDecision, renderSupporting }) {
     const expanded = !!panel.querySelector('details')?.open;
     const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
     panel.replaceChildren();
@@ -523,7 +524,9 @@ const ProposalReviewUI = (() => {
           list.append(bullet);
         }
         if (!items.length) list.append(element('li', '', '(Empty)'));
-        column.append(list); diff.append(column);
+        column.append(list);
+        if (renderSupporting) renderSupporting(columnLabel === 'Proposed' ? proposal.content : status === 'accepted' ? proposal.base_content : state.content, section, column);
+        diff.append(column);
       }
       review.append(diff);
     }

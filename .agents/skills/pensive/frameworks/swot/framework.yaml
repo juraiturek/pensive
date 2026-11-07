@@ -41,16 +41,24 @@ ai_actions:
     method: prompts/improve.md
     effect: Propose coherent improvements to factors and strategies with an explanatory thought.
     required_context: Complete submitted canvas; steering guidance is optional.
+  - id: research
+    method: prompts/research.md
+    effect: Use host search for a reviewable report and optional factor-scoped changes.
+    required_context: Complete submitted canvas and an explicit canvas, factor-section or factor-item target.
 target_types:
+  canvas: Full SWOT context; Research may propose factors only, not TOWS strategies.
+  section: One of strengths, weaknesses, opportunities or threats for Research.
+  item: A stable SWOT factor identity for Research; not a TOWS strategy.
   factor: Stable item ID in one of the four SWOT collections.
   strategy: Stable item ID in one of the four TOWS collections.
 action_compatibility:
   - {action: strategize, target: canvas}
   - {action: evaluate, target: canvas}
   - {action: improve, target: canvas}
+  - {action: research, target: canvas_or_factor_section_or_item}
 quality_criteria:
   - Distinguish internal factors from external conditions.
   - Relate factors to the stated entity and objective.
   - Use the named factor categories for each strategy pairing.
   - Prefer concrete factors and actionable strategies over vague claims.
-acceptance: Creation and evaluation require no content acceptance. Strategize and Improve support explicit collection-level and bulk acceptance/rejection, with atomic resulting-state validation. Earlier acceptances remain applied while other collections are pending; unrelated edits make further acceptance stale. Bullet-level review is deferred. Manual edits remain direct user operations.
+acceptance: Creation and evaluation require no content acceptance. Strategize and Improve support explicit collection-level and bulk acceptance/rejection, with atomic resulting-state validation. Earlier acceptances remain applied while other collections are pending; unrelated edits make further acceptance stale. Bullet-level review is deferred. Research findings, sources and any factor changes use one atomic approval batch with stale-input checks. Manual edits remain direct user operations.

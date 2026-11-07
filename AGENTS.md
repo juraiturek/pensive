@@ -9,4 +9,5 @@ README.md is the authoritative product vision. Preserve it unchanged unless the 
 - V1 and V2 are read-only references. Access only when granted; follow the extraction policy in docs/architecture.md. Never bulk-copy legacy directories.
 - Preserve tested framework HTML/CSS/JS when packaging artifacts. Keep reasoning in readable Markdown and deterministic operations in code.
 - Follow docs/testing.md. Run the skill validator for skill changes and relevant focused and regression tests for executable changes. Report checks actually run and their limits.
+- Create distribution builds (including Claude ZIPs) only on explicit user instruction, never automatically for feature work or validation. After a major feature is completed, tested, and ready to commit, you may ask whether the user wants new distribution build(s). This does not restrict framework HTML rebuilds needed to implement and test canvas changes.
 - Keep README vision statements separate from current capability claims. Do not add a remote, push, or publish without explicit authorization.

@@ -1,5 +1,16 @@
 # Implementation roadmap
 
+## VARS and shared Research — 2026-11-07
+
+Implemented the user-approved [VARS/Research plan](plans/2026-11-07-vars-and-shared-research.md): Overview/Focus, quadrant/item Markdown, optional nested VRI guidance, Create/Evaluate/Improve/explicit-change Ripple, annotations, Takeaways, Six Hats, and shared host-executed Research initially integrated into VARS and SWOT. Five Forces remains planned. Framework methodology is a seed for refinement through actual usage and primary-source research, not a complete revenue, scope or financial-viability method.
+
+Future user stories explicitly retained:
+
+- Simplify approval after usage feedback, potentially paired with loading an earlier complete JSON through the host. This slice retains explicit approval and implements no previous-version recovery, history or rollback.
+- Extend the Research adapters to other canvases using their own methodological and mutation boundaries.
+- Explore simple ways to recognize already-made changes for VARS Ripple; changing PAGES' persisted baseline requires a separate decision.
+- Enrich revenue-model, scope, time-dependent VRI and quantitative viability methods based on evidence and use. Structured assessments and graph infrastructure remain deferred.
+
 ## Host integration and distribution spikes — 2026-11-07
 
 User-approved architectural direction: Pensive owns core behavior; add a thin host-specific instruction/output layer only when demonstrated necessary. Keep one authoritative implementation across distributions.

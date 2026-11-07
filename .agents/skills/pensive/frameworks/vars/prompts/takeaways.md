@@ -1,0 +1,3 @@
+# VARS Takeaways
+
+Use the accepted working business model and the framed purpose. Summarize principal conclusions, consequential coherence issues, critical assumptions, capture/viability concerns, experiments and unresolved choices. Name relevant V/A/R/S relationships and the mechanism rather than repeating four lists. Distinguish internally coherent, economically plausible, quantitatively supported and competitively advantaged. Retain uncertainty and distinguish proposed pivots from accepted model facts. Include optional VRI only when it materially changes the conclusion. Do not use pending proposals as accepted content. Follow the shared [Takeaways workflow](../../../references/takeaways-workflow.md) for context selection and whole-text review.

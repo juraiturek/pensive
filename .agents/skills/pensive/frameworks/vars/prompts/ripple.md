@@ -1,0 +1,9 @@
+# Explore VARS ripple effects
+
+Follow the [handoff](../../../references/vars-workflow.md). Validate `action.id: "ripple"`, an existing section/item target and nonblank `change`. The current canvas is the before-state. There is no persisted baseline or automatic recognition of past edits; never reconstruct an earlier state from chat or call an already-present statement a new change without clarification.
+
+Interpret the explicit change in its targeted context. Propose the initiating change and plausible consequences together. Trace which other elements may be affected and explain each material mechanism, secondary consequence, trade-off and uncertainty. Do not assume effects are linear, symmetric or present in every quadrant. A switch to subscriptions may require continuing customer value, recurring delivery/billing/retention capabilities, changed partner boundaries and revised capture assumptions; the actual submitted model determines which links matter.
+
+Load only relevant [V](../methods/v.md), [A](../methods/a.md), [R](../methods/r.md), [S](../methods/s.md) guidance. Preserve framing and unrelated content/detail. Distinguish consequences entailed by the proposed premise from hypotheses needing evidence. Do not invent resources, customer willingness, rights or revenue to repair a model. Explain if a coherent configuration cannot yet be established or the proposal would require explicit reframing.
+
+Return exactly `{content,thought}` with complete candidate content and a rationale tracing the initiating change to proposed consequences. Preserve retained identities. Package with `--result` for quadrant/bulk review; neither the initiating change nor consequences are automatically accepted. A no-change result can become an assessment. PAGES baseline behavior is unaffected by this VARS method.

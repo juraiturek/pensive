@@ -3,11 +3,13 @@ const Swot = (() => {
   'use strict';
   const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
   const Results = typeof module !== 'undefined' && module.exports ? require('../../shared/takeaways.js') : Takeaways;
+  const Research = typeof module !== 'undefined' && module.exports ? require('../../shared/research.js') : PensiveResearch;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
   const framing = Object.freeze(['focal_entity', 'objective', 'environment']);
   const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
+  const research = Research.create({ sections: factors, validateContent, boundary: (before,after) => checkBoundary(before,after,'improve'), replaceSection: (content,candidate,section) => { content[section] = structuredClone(candidate[section]); } });
   const review = Review.create({ sections: [...factors, ...strategies], collection: (content, section) => collection({ content }, section), validateContent });
   const start = ['<!--', 'pensive-state-start', '-->'].join('');
   const end = ['<!--', 'pensive-state-end', '-->'].join('');
@@ -67,13 +69,15 @@ const Swot = (() => {
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
       for (const entry of state.thoughts) {
-        if (entry?.kind === 'six_hats') Hats.validateThought(entry, ids, state.framework);
+        if (entry?.kind === 'research') Research.validateThought(entry, ids);
+        else if (entry?.kind === 'six_hats') Hats.validateThought(entry, ids, state.framework);
         else validateThought(entry, ids);
       }
     }
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one whole-canvas proposal is supported.');
       for (const proposal of state.proposals) {
+        if (proposal?.action === 'research') { research.validateProposal(proposal); const proposedIds = validateContent(proposal.content || proposal.base_content); if ((state.thoughts || []).some(t => proposedIds.has(t.id))) throw new Error('Research item collides with a thought ID.'); continue; }
         if (Results.handles(proposal?.action)) {
           Results.validateProposal(proposal, validateContent, notes => Notes.validate(notes, ['factor', 'strategy'], [...factors, ...strategies]));
           continue;
@@ -153,6 +157,7 @@ const Swot = (() => {
   function buildRequest(state, action) {
     validate(state);
     if (state.proposals?.length) throw new Error('Accept or reject the pending proposal before requesting another AI action.');
+    if (action?.id === 'research') return research.request(state, action);
     if (Results.handles(action?.id)) return Results.request(state, action);
     if (action?.id === 'six_hats') {
       Hats.validateAction(state, action);
@@ -181,6 +186,7 @@ const Swot = (() => {
   function composeResult(input, response) {
     const request = validateRequest(input);
     const { canvas, action } = request;
+    if (action.id === 'research') return validate(research.compose(canvas, action, response));
     if (Results.handles(action.id)) return validate(Results.compose(canvas, action, response));
     if (action.id === 'six_hats') return validate(Hats.append(canvas, action, response));
     objectWithKeys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'AI response');
@@ -204,12 +210,13 @@ const Swot = (() => {
   }
   function proposalSections(state) {
     validate(state);
-    return state.proposals?.length && !Results.handles(state.proposals[0].action) ? review.entries(state.proposals[0]) : [];
+    return state.proposals?.length && !Results.handles(state.proposals[0].action) && state.proposals[0].action !== 'research' ? review.entries(state.proposals[0]) : [];
   }
   function resolveProposal(state, selected, decision) {
     validate(state);
     const proposal = state.proposals?.[0];
     if (!proposal) throw new Error('No pending proposal.');
+    if (proposal.action === 'research') { if (selected !== undefined) throw new Error('Research review applies to the whole batch.'); return research.resolveProposal(state, decision, validate); }
     if (Results.handles(proposal.action)) {
       if (selected !== undefined) throw new Error('Takeaways review applies to the whole text.');
       return Results.resolve(state, decision);
@@ -237,6 +244,6 @@ const Swot = (() => {
     const slot = `${start}\n<script id="canvas-state" type="application/json">${json}<${'/script>'}\n${end}`;
     return html.slice(0, first) + slot + html.slice(last + end.length);
   }
-  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
+  return Object.freeze({ factors, strategies, framing, researchTargets: research.targets, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Swot;

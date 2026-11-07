@@ -10,7 +10,9 @@
     "content"
   ],
   "properties": {
-    "takeaways": { "type": "string" },
+    "takeaways": {
+      "type": "string"
+    },
     "annotations": {
       "type": "array",
       "items": {
@@ -117,6 +119,9 @@
           },
           {
             "$ref": "#/$defs/six_hats_thought"
+          },
+          {
+            "$ref": "#/$defs/research_thought"
           }
         ]
       }
@@ -256,6 +261,9 @@
                 "minLength": 1
               }
             }
+          },
+          {
+            "$ref": "#/$defs/research_proposal"
           }
         ]
       }
@@ -485,6 +493,127 @@
         "text": {
           "type": "string",
           "pattern": "\\S"
+        }
+      }
+    },
+    "research_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "url"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https?://[^\\s\\\\]+$"
+        }
+      }
+    },
+    "research_thought": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "text",
+        "sources"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "kind": {
+          "const": "research"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/research_source"
+          }
+        }
+      }
+    },
+    "research_proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "target",
+        "base_content",
+        "report",
+        "sources"
+      ],
+      "properties": {
+        "action": {
+          "const": "research"
+        },
+        "target": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "type": {
+                  "const": "canvas"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "id"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "section",
+                    "item"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "base_content": {
+          "$ref": "#/$defs/content"
+        },
+        "content": {
+          "$ref": "#/$defs/content"
+        },
+        "report": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/research_source"
+          }
+        },
+        "base_thoughts": {
+          "$ref": "#/properties/thoughts"
+        },
+        "base_annotations": {
+          "$ref": "#/properties/annotations"
         }
       }
     }

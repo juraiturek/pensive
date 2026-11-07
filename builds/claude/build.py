@@ -11,7 +11,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / '.agents/skills/pensive'
-DESCRIPTION = ('Use Pensive for SWOT/TOWS, PAGES, Value Proposition Canvas, 5 Whys, '
+DESCRIPTION = ('Use Pensive for SWOT/TOWS, PAGES, Value Proposition Canvas, 5 Whys, VARS, '
                'Six Thinking Hats, framework selection, and analytical actions on complete canvas JSON.')
 
 def sha(data):
@@ -78,7 +78,7 @@ def main():
                 assert dest.is_relative_to(skill.resolve()) and dest.is_file(), (p, target)
                 links += 1
         checks.append(f'{links} relative Markdown file references resolve within the extracted skill.')
-        for framework, script in [('swot', 'swot'), ('pages', 'pages'), ('vpc', 'vpc'), ('five_whys', 'five-whys')]:
+        for framework, script in [('swot', 'swot'), ('pages', 'pages'), ('vpc', 'vpc'), ('five_whys', 'five-whys'), ('vars', 'vars')]:
             canvas = skill / f'frameworks/{framework}/canvas.html'
             before = canvas.read_bytes()
             command = [args.node, str(skill / f'scripts/package-{script}.mjs')]

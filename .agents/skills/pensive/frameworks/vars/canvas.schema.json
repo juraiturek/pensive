@@ -1,0 +1,572 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pensive VARS state 1.0",
+  "$comment": "Runtime additionally enforces globally unique identities, action boundaries, valid partial decisions and stale acceptance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "framework",
+    "schema_version",
+    "content"
+  ],
+  "properties": {
+    "takeaways": {
+      "type": "string"
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "target",
+          "target_label",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+          },
+          "target": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "canvas"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "item"
+                  },
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "section"
+                  },
+                  "id": {
+                    "enum": [
+                      "v",
+                      "a",
+                      "r",
+                      "s"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "target_label": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "text": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "framework": {
+      "const": "vars"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "content": {
+      "$ref": "#/$defs/content"
+    },
+    "thoughts": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/thought"
+          },
+          {
+            "$ref": "#/$defs/six_hats_thought"
+          },
+          {
+            "$ref": "#/$defs/research_thought"
+          }
+        ]
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/proposal"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "action",
+              "base_content",
+              "base_takeaways",
+              "takeaways",
+              "rationale"
+            ],
+            "properties": {
+              "action": {
+                "enum": [
+                  "formulate_takeaways",
+                  "review_takeaways"
+                ]
+              },
+              "base_content": {
+                "$ref": "#/$defs/content"
+              },
+              "base_takeaways": {
+                "type": "string"
+              },
+              "base_annotations": {
+                "$ref": "#/properties/annotations"
+              },
+              "takeaways": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "$ref": "#/$defs/research_proposal"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "six_hats_thought": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "hat",
+        "target",
+        "target_label",
+        "observations"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+        },
+        "kind": {
+          "const": "six_hats"
+        },
+        "hat": {
+          "enum": [
+            "white",
+            "red",
+            "black",
+            "yellow",
+            "green",
+            "blue"
+          ]
+        },
+        "target": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "type": {
+                  "const": "canvas"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "id"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "item"
+                  ]
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+                }
+              }
+            }
+          ]
+        },
+        "target_label": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "observations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "suggestions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "text": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        }
+      }
+    },
+    "thought": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "kind": {
+          "enum": [
+            "evaluation",
+            "improvement",
+            "ripple"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "framing",
+        "v",
+        "a",
+        "r",
+        "s"
+      ],
+      "properties": {
+        "framing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "business",
+            "objective",
+            "scope"
+          ],
+          "properties": {
+            "business": {
+              "type": "string"
+            },
+            "objective": {
+              "type": "string"
+            },
+            "scope": {
+              "type": "string"
+            }
+          }
+        },
+        "v": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "a": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "r": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "s": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "v": {
+              "type": "string"
+            },
+            "a": {
+              "type": "string"
+            },
+            "r": {
+              "type": "string"
+            },
+            "s": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "action",
+        "base_content",
+        "content",
+        "thought"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "action": {
+          "enum": [
+            "improve",
+            "ripple"
+          ]
+        },
+        "base_content": {
+          "$ref": "#/$defs/content"
+        },
+        "content": {
+          "$ref": "#/$defs/content"
+        },
+        "thought": {
+          "$ref": "#/$defs/thought"
+        },
+        "resolutions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "v": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            },
+            "a": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            },
+            "r": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            },
+            "s": {
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "research_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "url"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https?://[^\\s\\\\]+$"
+        }
+      }
+    },
+    "research_thought": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "text",
+        "sources"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+        },
+        "kind": {
+          "const": "research"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/research_source"
+          }
+        }
+      }
+    },
+    "research_proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "target",
+        "base_content",
+        "report",
+        "sources"
+      ],
+      "properties": {
+        "action": {
+          "const": "research"
+        },
+        "target": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "type": {
+                  "const": "canvas"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "id"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "section",
+                    "item"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "base_content": {
+          "$ref": "#/$defs/content"
+        },
+        "content": {
+          "$ref": "#/$defs/content"
+        },
+        "report": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/research_source"
+          }
+        },
+        "base_thoughts": {
+          "$ref": "#/properties/thoughts"
+        },
+        "base_annotations": {
+          "$ref": "#/properties/annotations"
+        }
+      }
+    }
+  }
+}

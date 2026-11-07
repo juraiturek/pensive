@@ -41,3 +41,9 @@ VPC keeps five framing strings and six content collections; see its [manifest](.
 ## 5 Whys specialization
 
 [5 Whys](../frameworks/five_whys/framework.yaml) owns a recursive tree and four framing fields; [handoff](five-whys-workflow.md) defines its separate append-batch review. Navigation cursor is view state outside analytical content. Reflect is thought-only; Expand uses an explicit node target with Deepen/Branch mode, full-tree/framing context and a narrower deterministic append boundary. Do not map recursive branches onto the fixed collection-review protocol. Root generation, broad Improve/reframing, generic scope interfaces and individual-child acceptance are deferred.
+
+## VARS and shared Research extension
+
+[VARS](vars-workflow.md) owns a fixed four-quadrant summary plus optional quadrant/item Markdown. Improve and explicit-change Ripple resolve quadrants atomically, including detail text; Ripple uses no saved baseline. Shared annotations, Six Hats and Takeaways retain their established boundaries.
+
+[Research](research-workflow.md) is host-executed and supported initially by VARS and SWOT. Full-state requests carry explicit targets and separate opt-in AI-thought/manual-annotation flags. A report, sources and optional target-scoped candidate form one pending batch. Acceptance checks submitted content and opted-in context, applies edits and records findings atomically. Research does not infer organizational facts from competitors or introduce an HTML search backend, history or rollback.

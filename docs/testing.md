@@ -1,5 +1,47 @@
 # Testing strategy
 
+## VARS final pre-commit regression — 2026-11-07
+
+After all Focus interaction refinements, ran the full suite from the primary workspace:
+
+`PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright /Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test --test-concurrency=2 tests/*.test.mjs`
+
+**230 passed, zero failures/skips.** Skill validator and staged whitespace checks passed; README remains unchanged. Tests use offline Chromium and authored methodology fixtures, with the cross-host/live-search limits documented below. No Claude ZIP or other distribution build was created for this verification. Generated user preview canvases remain in ignored `outputs/` and are not part of the commit.
+
+## VARS active-quadrant Overview control — 2026-11-07
+
+A new browser regression first failed because the selected quadrant had no Return to Overview control. The active tile now uses a four-box grid icon with accessible label/tooltip; other tiles retain eyes and switch the Focus pane when their heading, summary or background is clicked. The regression checks switching, keyboard activation of the return control, restoration of Overview and unchanged exported state. All VARS browser/state checks passed: **17 tests, zero failures/skips** in offline Chromium. Skill validator, deterministic rebuild and whitespace/README checks passed. Scope is VARS navigation presentation only; no schema/shared code change or full cross-framework rerun.
+
+## VARS Add from Focus — 2026-11-07
+
+The new browser regression first failed because the active quadrant lacked + Add. The implementation creates an inline transient draft only in the active tile; Enter/checkmark saves and selects the stable new item on the right. Tests cover unchanged export before save, Enter and checkmark saves, rendered summaries, save/reopen persistence, Escape/cancel, whitespace-only rejection, navigation cancellation, and pending-review/Annotation Mode locks. Existing VARS browser/state regressions also passed: **16 tests, zero failures/skips**, using offline Chromium. Desktop/narrow screenshots were inspected; no narrow page overflow was observed. Skill validator, deterministic VARS rebuild, whitespace and README checks passed. No schema/shared-framework changes were made; the full cross-framework suite was not repeated for this VARS-only UI slice.
+
+## VARS compact Focus summaries — 2026-11-07
+
+Added a browser regression that first failed because compact summary rows were absent. It now verifies read-only single-line summaries, long-text ellipsis, full-text titles, newline normalization for display, blank-draft omission, upper-right icon-only controls, navigation by clicking summary text, unchanged exported state, and restoration of editable lists/labeled controls in Overview. All existing VARS browser/state checks passed: **14 tests, zero failures/skips**. Skill validator, deterministic VARS rebuild and whitespace checks passed. Desktop and narrow screenshots were inspected; the narrow page has no horizontal overflow. This isolated VARS presentation change did not repeat the full cross-framework suite. README and JSON/approval contracts remain unchanged.
+
+## VARS Focus rendered-only presentation — 2026-11-07
+
+The new browser regression first failed because raw Markdown was visible on entering Focus. The updated interface shows only rendered content until the pencil or double-click opens an editor; Done or Ctrl/Cmd+Enter returns to preview. Tests cover one visible representation, focus transfer, updated rendering, item/quadrant selection reset, pending-review and Annotation Mode locks, decorative eye icons, and the existing Markdown/save/offline behavior. A broad label selector was narrowed after the new accessible button labels made it ambiguous.
+
+Executed focused VARS/Research/Markdown suites: **26 passed, zero failures/skips**, using offline Chromium and bundled Node. Skill validator passed; deterministic VARS rebuild and README/whitespace checks passed. Read/edit screenshots were visually inspected. Scope is VARS presentation only; the full cross-framework suite was not repeated for these isolated UI changes. Existing exported HTML retains its embedded interface; package complete state into a new canvas or import latest JSON into a newly generated canvas to obtain the change.
+
+## VARS and shared Research — 2026-11-07
+
+Implemented the approved [plan](plans/2026-11-07-vars-and-shared-research.md). Focused state/browser cases first failed for missing VARS/Research functionality. Independent review exposed and reproduced a Ripple visible-target/submitted-target mismatch, hidden draft creation from compact tile padding, incomplete pending-quadrant Delete locking, and sparse/normalized optional Markdown Research scope failures. Regression cases now cover each. A Research preview test was corrected to expand the existing change disclosure before asserting its visible content.
+
+Full regression command:
+
+`PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright /Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test --test-concurrency=2 tests/*.test.mjs`
+
+**224 passed, zero failures/skips.** The initial unbounded run passed 222/223 with one existing SWOT editing timeout under concurrent browser load. That editing suite passed 9/9 alone; the bounded full run then passed without relaxing assertions or timeouts. A subsequently added optional-empty normalization regression is included in the final 224. The final shared Markdown CSS adjustment only improves narrow table layout; focused VARS/Research checks were rerun after it: **22 passed, zero failures/skips**.
+
+Coverage includes partial/blank state, summary/detail identity and round-trip, safe offline Markdown/VRI tables, Overview/Focus switching, compact padding behavior, narrow overflow, stale and partial approval, explicit-change Ripple targeting, report-only and candidate Research, source URL safety, scope boundaries, independent context flags, pending-action restrictions, annotations/Takeaways/Six Hats compatibility, deterministic packaging and preserved implementation. Direct VARS/SWOT Research `--result` CLI smoke fixtures also packaged and validated successfully. All five blank builders and the experimental Claude package's isolated rebuild/packaging/overwrite-refusal checks passed.
+
+Skill validator passed with an isolated temporary PyYAML dependency after the previously documented temporary dependency path proved incomplete. All five manifests parse and **179** local skill Markdown file references resolve. `git diff --check` passed; README matches Git. Desktop Overview/Focus and narrow Focus screenshots were inspected; the narrow table now scrolls inside its pane instead of breaking criterion labels into tiny fragments.
+
+Limits: browser verification is offline Chromium, not new Safari/Firefox, physical-device or cross-host inference testing. Methodology scenarios are authored/static guardrail checks and primary-source corroboration, not live research benchmarks or statistical analytical-quality evidence. No production search backend or host service was added. The experimental ZIP was validated locally only and was not published. Newly packaged HTML is required to obtain new runtime controls; old artifacts are not automatically upgraded.
+
 ## SWOT JSON import — 2026-11-05
 
 A new offline Chromium test reproduced the missing Import JSON control before implementation. It now covers invalid framework state, declined replacement, and confirmed import with rendering and complete JSON export. Existing clipboard and action-dialog tests use precise selectors to distinguish the new import dialog. The full `node --test tests/*.test.mjs` suite passed 162 tests with zero failures or skips using bundled Node and offline Chromium. The skill validator and `git diff --check` passed. Browser coverage was Chromium only.

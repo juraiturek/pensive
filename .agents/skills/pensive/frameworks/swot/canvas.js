@@ -16,6 +16,7 @@
   const $ = selector => document.querySelector(selector);
   // Capture before rendering. Exports reuse this pristine implementation, never the edited DOM.
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
+  let researchUI;
   let state, annotations, renderTakeaways;
   let mode = 'swot';
   let requestedAction = null;
@@ -188,6 +189,7 @@
     thoughts.replaceChildren();
     thoughts.hidden = !state.thoughts?.length;
     function thoughtCard(thought) {
+      if (thought.kind === 'research') return ResearchUI.thoughtCard(thought);
       if (thought.kind === 'six_hats') return SixHatsUI.card(state, thought);
       const card = element('article', 'thought');
       card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', strategize: 'Strategy rationale' }[thought.kind]), element('p', '', thought.text));
@@ -203,6 +205,7 @@
     }
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!proposal; });
+    if (researchUI?.renderProposal($('#proposal-panel'))) { renderTakeaways(); return; }
     if (renderTakeaways()) { $('#proposal-panel').hidden = true; return; }
     ProposalReviewUI.render({ state, core: Swot, panel: $('#proposal-panel'), labels,
       title: proposal?.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements',
@@ -251,6 +254,7 @@
       getState: () => state, core: Swot, isLocked: () => annotations.isActive(),
       refresh: refreshCanvas, edited, copy: copyJson,
     });
+    researchUI = ResearchUI.install({getState:()=>state,core:Swot,labels,isLocked:()=>annotations.isActive(),copy:copyJson,refresh:refreshCanvas,edited});
     SixHatsUI.install(() => state, Swot, copyJson);
     for (const field of Swot.framing) {
       const input = $(`[data-framing="${field}"]`);

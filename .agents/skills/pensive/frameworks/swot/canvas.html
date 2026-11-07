@@ -159,6 +159,9 @@ dialog textarea { display: block; font-size: .9rem; }
 #takeaways-current, #takeaways-proposed, #takeaways-rationale { white-space: pre-wrap; overflow-wrap: anywhere; }
 </style>
 <style>
+.markdown{line-height:1.65;overflow-wrap:anywhere}.markdown p{white-space:pre-wrap}.markdown-table{overflow-x:auto;max-width:100%}.markdown table{border-collapse:collapse;width:100%;min-width:360px;margin:16px 0}.markdown th,.markdown td{border-bottom:1px solid #ddd;padding:10px;text-align:left;min-width:90px;overflow-wrap:normal}.markdown h3{font-size:17px}.markdown a{color:#285b46}
+</style>
+<style>
 .annotation-toolbar, .annotation-controls, .annotation-actions, .annotation-note-actions {
   display: inline-flex;
   align-items: center;
@@ -417,6 +420,69 @@ dialog textarea { display: block; font-size: .9rem; }
 }</script>
 <!--pensive-state-end-->
 <script data-implementation>
+/* Deliberately small offline Markdown subset. No HTML interpretation or external assets. */
+const PensiveMarkdown = (() => {
+  'use strict';
+  function safeUrl(value) {
+    if (typeof value !== 'string' || !/^https?:\/\//i.test(value) || /[\s\\\u0000-\u001f\u007f]/.test(value)) return null;
+    try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? url.href : null; } catch { return null; }
+  }
+  const cells = line => line.trim().replace(/^\||\|$/g, '').split('|').map(cell => cell.trim());
+  const separator = line => cells(line).every(cell => /^:?-{3,}:?$/.test(cell));
+  function blocks(markdown) {
+    const lines = markdown.replace(/\r\n?/g, '\n').split('\n'), result = [];
+    for (let i = 0; i < lines.length;) {
+      const line = lines[i];
+      if (!line.trim()) { i++; continue; }
+      const heading = /^(#{1,6})\s+(.+)$/.exec(line);
+      if (heading) { result.push({ type: 'heading', level: heading[1].length, text: heading[2] }); i++; continue; }
+      if (line.includes('|') && i + 1 < lines.length && lines[i+1].includes('|') && separator(lines[i+1])) {
+        const header = cells(line), rows = []; i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) rows.push(cells(lines[i++]));
+        result.push({ type: 'table', header, rows }); continue;
+      }
+      if (/^\s*[-*+]\s+/.test(line) || /^\s*\d+\.\s+/.test(line)) {
+        const ordered = /^\s*\d+\./.test(line), items = [], pattern = ordered ? /^\s*\d+\.\s+/ : /^\s*[-*+]\s+/;
+        while (i < lines.length && pattern.test(lines[i])) items.push(lines[i++].replace(pattern,''));
+        result.push({ type: 'list', ordered, items }); continue;
+      }
+      const text = [line]; i++;
+      while (i < lines.length && lines[i].trim() && !/^(#{1,6})\s|^\s*[-*+]\s|^\s*\d+\.\s/.test(lines[i]) && !(lines[i].includes('|') && i+1 < lines.length && separator(lines[i+1]))) text.push(lines[i++]);
+      result.push({ type: 'paragraph', text: text.join('\n') });
+    }
+    return result;
+  }
+  function inline(document, parent, text) {
+    // Images remain literal; inline formatting does not recursively parse untrusted markup.
+    const pattern = /(?<!!)\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)|\*\*([^*\n]+)\*\*|\*([^*\n]+)\*/g;
+    let start = 0;
+    for (const match of text.matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start,match.index)));
+      if (match[1] && safeUrl(match[2])) { const a = document.createElement('a'); a.textContent = match[1]; a.href = safeUrl(match[2]); a.target = '_blank'; a.rel = 'noopener noreferrer'; parent.append(a); }
+      else if (match[3] || match[4]) { const e = document.createElement(match[3] ? 'strong' : 'em'); e.textContent = match[3] || match[4]; parent.append(e); }
+      else parent.append(document.createTextNode(match[0]));
+      start = match.index + match[0].length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  function render(document, markdown) {
+    const root = document.createElement('div'); root.className = 'markdown';
+    const textNode = (tag, text) => { const node = document.createElement(tag); inline(document,node,text); return node; };
+    for (const block of blocks(markdown)) {
+      if (block.type === 'table') {
+        const wrapper = document.createElement('div'); wrapper.className = 'markdown-table'; const table = document.createElement('table');
+        const head = document.createElement('thead'), row = document.createElement('tr'); for (const text of block.header) row.append(textNode('th',text)); head.append(row); table.append(head);
+        const body = document.createElement('tbody'); for (const cells of block.rows) { const row = document.createElement('tr'); for (let i=0;i<block.header.length;i++) row.append(textNode('td',cells[i] ?? '')); body.append(row); } table.append(body); wrapper.append(table); root.append(wrapper);
+      } else if (block.type === 'list') { const list = document.createElement(block.ordered ? 'ol' : 'ul'); for (const item of block.items) list.append(textNode('li',item)); root.append(list); }
+      else root.append(textNode(block.type === 'heading' ? `h${Math.max(3,block.level)}` : 'p',block.text));
+    }
+    return root;
+  }
+  return Object.freeze({ blocks, safeUrl, render });
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMarkdown;
+</script>
+<script data-implementation>
 /* Collection-level proposal decisions, shared by Node and standalone canvases. */
 const ProposalReview = (() => {
   'use strict';
@@ -426,12 +492,13 @@ const ProposalReview = (() => {
     const keys = Object.keys(a);
     return keys.length === Object.keys(b).length && keys.every(k => Object.hasOwn(b, k) && same(a[k], b[k]));
   }
-  function create({ sections, collection, validateContent }) {
+  function create({ sections, collection, validateContent, snapshot = collection, replaceSection }) {
     function entries(proposal) {
-      return sections.filter(s => !same(collection(proposal.base_content, s), collection(proposal.content, s)))
+      return sections.filter(s => !same(snapshot(proposal.base_content, s), snapshot(proposal.content, s)))
         .map(section => ({ section, status: proposal.resolutions?.[section] || 'pending' }));
     }
     function replace(content, proposal, section) {
+      if (replaceSection) { replaceSection(content, proposal.content, section); return; }
       const destination = collection(content, section);
       destination.splice(0, destination.length, ...structuredClone(collection(proposal.content, section)));
     }
@@ -491,7 +558,7 @@ const ProposalReviewUI = (() => {
     if (text !== undefined) node.textContent = text;
     return node;
   }
-  function render({ state, core, panel, labels, title, onDecision }) {
+  function render({ state, core, panel, labels, title, onDecision, renderSupporting }) {
     const expanded = !!panel.querySelector('details')?.open;
     const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
     panel.replaceChildren();
@@ -541,7 +608,9 @@ const ProposalReviewUI = (() => {
           list.append(bullet);
         }
         if (!items.length) list.append(element('li', '', '(Empty)'));
-        column.append(list); diff.append(column);
+        column.append(list);
+        if (renderSupporting) renderSupporting(columnLabel === 'Proposed' ? proposal.content : status === 'accepted' ? proposal.base_content : state.content, section, column);
+        diff.append(column);
       }
       review.append(diff);
     }
@@ -883,16 +952,97 @@ const TakeawaysUI = (() => {
 })();
 </script>
 <script data-implementation>
+/* Host-executed Research: shared protocol, framework-owned targets and boundaries. */
+const PensiveResearch = (() => {
+  'use strict';
+  const Review = typeof module !== 'undefined' && module.exports ? require('./proposal-review.js') : ProposalReview;
+  const Markdown = typeof module !== 'undefined' && module.exports ? require('./markdown.js') : PensiveMarkdown;
+  const nonblank = v => typeof v === 'string' && !!v.trim();
+  function keys(v, required, optional = []) {
+    if (!v || typeof v !== 'object' || Array.isArray(v) || required.some(k => !Object.hasOwn(v,k)) || Object.keys(v).some(k => !required.includes(k) && !optional.includes(k))) throw new Error('Invalid Research fields.');
+  }
+  function sources(value) {
+    if (!Array.isArray(value)) throw new Error('Research sources must be an array.');
+    for (const source of value) { keys(source,['title','url']); if (!nonblank(source.title) || !Markdown.safeUrl(source.url)) throw new Error('Research source needs a title and safe HTTP(S) URL.'); }
+  }
+  function validateThought(thought, ids) {
+    keys(thought,['id','kind','text','sources']); sources(thought.sources);
+    if (thought.kind !== 'research' || !nonblank(thought.text) || typeof thought.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(thought.id) || ids.has(thought.id)) throw new Error('Invalid Research thought or duplicate ID.');
+    ids.add(thought.id);
+  }
+  function create({ sections, validateContent, boundary, equivalent = Review.same, replaceSection }) {
+    function targets(canvas) {
+      const result = [{type:'canvas',label:'Full canvas'}];
+      for (const section of sections) { result.push({type:'section',id:section,label:section}); for (const item of canvas.content[section]) result.push({type:'item',id:item.id,label:item.text || '(Blank statement)',section}); }
+      return result;
+    }
+    function resolve(canvas,target) {
+      keys(target,target?.type === 'canvas' ? ['type'] : ['type','id']);
+      const found=targets(canvas).find(t=>t.type===target.type && t.id===target.id);
+      if (!found) throw new Error('Research target unavailable.'); return found;
+    }
+    function request(canvas,action) {
+      keys(action,['id','target'],['comment','use_thoughts','include_annotations','method']);
+      if (action.id !== 'research') throw new Error('Invalid Research action.');
+      const selected=resolve(canvas,action.target);
+      if (action.method !== undefined && !(canvas.framework==='vars' && selected.type==='item' && selected.section==='a' && action.method==='vri')) throw new Error('VRI Research requires a selected VARS A item.');
+      if (action.comment !== undefined && typeof action.comment !== 'string' || ['use_thoughts','include_annotations'].some(k=>action[k]!==undefined && typeof action[k]!=='boolean')) throw new Error('Invalid Research context options.');
+      return structuredClone({canvas,action:{...action,use_thoughts:action.use_thoughts??false,include_annotations:action.include_annotations??false}});
+    }
+    function candidate(before,after,target) {
+      validateContent(before);validateContent(after);boundary(before,after);
+      const selected=resolve({content:before},target), allowed=structuredClone(before);
+      if (selected.type==='canvas') for(const section of sections) replaceSection(allowed,after,section);
+      else if(selected.type==='section') replaceSection(allowed,after,selected.id);
+      else {
+        const old=before[selected.section].find(i=>i.id===selected.id), next=after[selected.section].find(i=>i.id===selected.id);
+        if(!next) throw new Error('Item Research must preserve the selected item identity.');
+        allowed[selected.section]=allowed[selected.section].map(i=>i.id===old.id?structuredClone(next):i);
+      }
+      // Optional empty Markdown representation does not authorize other semantic changes.
+      if (!equivalent(allowed,after)) throw new Error('Research candidate changed content outside the target.');
+    }
+    function validateProposal(proposal) {
+      keys(proposal,['action','target','base_content','report','sources'],['content','base_thoughts','base_annotations']);
+      if (proposal.action!=='research' || !nonblank(proposal.report)) throw new Error('Invalid Research proposal.');
+      validateContent(proposal.base_content);resolve({content:proposal.base_content},proposal.target);sources(proposal.sources);
+      if (proposal.content!==undefined) candidate(proposal.base_content,proposal.content,proposal.target);
+      for(const field of ['base_thoughts','base_annotations']) if(proposal[field]!==undefined && !Array.isArray(proposal[field])) throw new Error('Invalid Research context snapshot.');
+    }
+    function compose(canvas,action,response) {
+      keys(response,['report','sources'],['content']);
+      const result=structuredClone(canvas);
+      result.proposals=[{action:'research',target:structuredClone(action.target),base_content:structuredClone(canvas.content),...structuredClone(response),...(action.use_thoughts?{base_thoughts:structuredClone(canvas.thoughts??[])}:{}),...(action.include_annotations?{base_annotations:structuredClone(canvas.annotations??[])}:{})}];
+      validateProposal(result.proposals[0]);return result;
+    }
+    function resolveProposal(state,decision,validateState) {
+      const proposal=state.proposals[0];validateProposal(proposal);
+      if(decision!=='accept' && decision!=='reject') throw new Error('Unknown Research decision.');
+      if(decision==='reject'){delete state.proposals;return;}
+      if(!Review.same(state.content,proposal.base_content) || proposal.base_thoughts!==undefined && !Review.same(state.thoughts??[],proposal.base_thoughts) || proposal.base_annotations!==undefined && !Review.same(state.annotations??[],proposal.base_annotations)) throw new Error('Research proposal is stale. Reject it and request fresh research.');
+      const next=structuredClone(state);if(proposal.content)next.content=structuredClone(proposal.content);
+      const used=new Set([...validateContent(next.content),...(next.thoughts??[]).map(t=>t.id),...(next.annotations??[]).map(t=>t.id)]);let id;do{id='thought-'+globalThis.crypto.randomUUID();}while(used.has(id));
+      next.thoughts=[...(next.thoughts??[]),{id,kind:'research',text:proposal.report,sources:structuredClone(proposal.sources)}];delete next.proposals;validateState(next);Object.assign(state,next);delete state.proposals;
+    }
+    return Object.freeze({targets,request,validateProposal,compose,resolveProposal});
+  }
+  return Object.freeze({create,validateThought,sources});
+})();
+if(typeof module!=='undefined' && module.exports)module.exports=PensiveResearch;
+</script>
+<script data-implementation>
 /* SWOT-specific state operations, shared by the local page and Node packager. */
 const Swot = (() => {
   'use strict';
   const Notes = typeof module !== 'undefined' && module.exports ? require('../../shared/annotations.js') : Annotations;
   const Results = typeof module !== 'undefined' && module.exports ? require('../../shared/takeaways.js') : Takeaways;
+  const Research = typeof module !== 'undefined' && module.exports ? require('../../shared/research.js') : PensiveResearch;
   const Hats = typeof module !== 'undefined' && module.exports ? require('../../shared/six-hats.js') : SixHats;
   const factors = Object.freeze(['strengths', 'weaknesses', 'opportunities', 'threats']);
   const strategies = Object.freeze(['so', 'st', 'wo', 'wt']);
   const framing = Object.freeze(['focal_entity', 'objective', 'environment']);
   const Review = typeof module !== 'undefined' && module.exports ? require('../../shared/proposal-review.js') : ProposalReview;
+  const research = Research.create({ sections: factors, validateContent, boundary: (before,after) => checkBoundary(before,after,'improve'), replaceSection: (content,candidate,section) => { content[section] = structuredClone(candidate[section]); } });
   const review = Review.create({ sections: [...factors, ...strategies], collection: (content, section) => collection({ content }, section), validateContent });
   const start = ['<!--', 'pensive-state-start', '-->'].join('');
   const end = ['<!--', 'pensive-state-end', '-->'].join('');
@@ -952,13 +1102,15 @@ const Swot = (() => {
     if (state.thoughts !== undefined) {
       if (!Array.isArray(state.thoughts)) throw new Error('Thoughts must be an array.');
       for (const entry of state.thoughts) {
-        if (entry?.kind === 'six_hats') Hats.validateThought(entry, ids, state.framework);
+        if (entry?.kind === 'research') Research.validateThought(entry, ids);
+        else if (entry?.kind === 'six_hats') Hats.validateThought(entry, ids, state.framework);
         else validateThought(entry, ids);
       }
     }
     if (state.proposals !== undefined) {
       if (!Array.isArray(state.proposals) || state.proposals.length > 1) throw new Error('At most one whole-canvas proposal is supported.');
       for (const proposal of state.proposals) {
+        if (proposal?.action === 'research') { research.validateProposal(proposal); const proposedIds = validateContent(proposal.content || proposal.base_content); if ((state.thoughts || []).some(t => proposedIds.has(t.id))) throw new Error('Research item collides with a thought ID.'); continue; }
         if (Results.handles(proposal?.action)) {
           Results.validateProposal(proposal, validateContent, notes => Notes.validate(notes, ['factor', 'strategy'], [...factors, ...strategies]));
           continue;
@@ -1038,6 +1190,7 @@ const Swot = (() => {
   function buildRequest(state, action) {
     validate(state);
     if (state.proposals?.length) throw new Error('Accept or reject the pending proposal before requesting another AI action.');
+    if (action?.id === 'research') return research.request(state, action);
     if (Results.handles(action?.id)) return Results.request(state, action);
     if (action?.id === 'six_hats') {
       Hats.validateAction(state, action);
@@ -1066,6 +1219,7 @@ const Swot = (() => {
   function composeResult(input, response) {
     const request = validateRequest(input);
     const { canvas, action } = request;
+    if (action.id === 'research') return validate(research.compose(canvas, action, response));
     if (Results.handles(action.id)) return validate(Results.compose(canvas, action, response));
     if (action.id === 'six_hats') return validate(Hats.append(canvas, action, response));
     objectWithKeys(response, action.id === 'evaluate' ? ['thought'] : ['content', 'thought'], 'AI response');
@@ -1089,12 +1243,13 @@ const Swot = (() => {
   }
   function proposalSections(state) {
     validate(state);
-    return state.proposals?.length && !Results.handles(state.proposals[0].action) ? review.entries(state.proposals[0]) : [];
+    return state.proposals?.length && !Results.handles(state.proposals[0].action) && state.proposals[0].action !== 'research' ? review.entries(state.proposals[0]) : [];
   }
   function resolveProposal(state, selected, decision) {
     validate(state);
     const proposal = state.proposals?.[0];
     if (!proposal) throw new Error('No pending proposal.');
+    if (proposal.action === 'research') { if (selected !== undefined) throw new Error('Research review applies to the whole batch.'); return research.resolveProposal(state, decision, validate); }
     if (Results.handles(proposal.action)) {
       if (selected !== undefined) throw new Error('Takeaways review applies to the whole text.');
       return Results.resolve(state, decision);
@@ -1122,7 +1277,7 @@ const Swot = (() => {
     const slot = `${start}\n<script id="canvas-state" type="application/json">${json}<${'/script>'}\n${end}`;
     return html.slice(0, first) + slot + html.slice(last + end.length);
   }
-  return Object.freeze({ factors, strategies, framing, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
+  return Object.freeze({ factors, strategies, framing, researchTargets: research.targets, initialState, validate, collection, parseState, addItem, editItem, deleteItem, reorderItem, buildRequest, validateRequest, composeResult, proposalSections, resolveProposal, acceptProposal, rejectProposal, safeJson, packageHtml });
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = Swot;
 </script>
@@ -1561,6 +1716,69 @@ const AnnotationUI = (() => {
 })();
 </script>
 <script data-implementation>
+/* Shared Research handoff and atomic approval. All searching happens in the host. */
+const ResearchUI = (() => {
+  'use strict';
+  function element(tag, text) { const node=document.createElement(tag);if(text!==undefined)node.textContent=text;return node; }
+  function button(text,run) { const node=element('button',text);node.type='button';node.addEventListener('click',run);return node; }
+  function report(document,text,sources) {
+    const node=PensiveMarkdown.render(document,text), list=element('ul');
+    for(const source of sources){const li=element('li'),a=element('a',source.title);a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';li.append(a);list.append(li);}
+    if(sources.length)node.append(element('h4','Sources'),list);return node;
+  }
+  function thoughtCard(thought) { const card=element('article');card.className='thought';card.append(element('h3','Research findings'),report(document,thought.text,thought.sources));return card; }
+  function install({getState,core,labels,isLocked,copy,refresh,edited,currentTarget}) {
+    let trigger=document.getElementById('research');if(!trigger){trigger=element('button','Research');trigger.type='button';trigger.id='research';document.querySelector('.ai-actions').append(trigger);}
+    const dialog=element('dialog');dialog.setAttribute('aria-labelledby','research-title');dialog.id='research-dialog';
+    const form=element('form'),title=element('h2','Research'),note=element('p','Copy the request to your assistant with the Pensive skill. The host searches; findings return for review.');title.id='research-title';
+    const field=(labelText,input)=>{const label=element('label',labelText);label.append(input);return label;};
+    const target=element('select');target.setAttribute('aria-label','Research target');target.style.maxWidth='100%';
+    const question=element('textarea');question.rows=3;question.setAttribute('aria-label','Research question');
+    const thoughts=element('input');thoughts.type='checkbox';const annotations=element('input');annotations.type='checkbox';
+    const method=element('select');method.setAttribute('aria-label','Research method');for(const [value,label] of [['','Element guidance'],['vri','VRI assessment']]){const option=element('option',label);option.value=value;method.append(option);}
+    const methodLabel=field('Research method',method),error=element('p');error.className='error';error.setAttribute('role','alert');
+    const actions=element('div');actions.className='dialog-actions';const submit=element('button','Copy Research request');submit.type='submit';submit.className='primary';actions.append(button('Cancel Research request',()=>dialog.close()),submit);
+    form.append(title,note,field('Research target',target),field('Research question',question),methodLabel,field('Include previous AI thoughts',thoughts),field('Include user-authored annotations',annotations),error,actions);dialog.append(form);document.body.append(dialog);
+    let choices=[];
+    function choice(){return choices.find(c=>`${c.type}:${c.id||''}`===target.value);}
+    function updateMethod(){const c=choice();methodLabel.hidden=!(getState().framework==='vars' && c?.type==='item' && c.section==='a');if(methodLabel.hidden)method.value='';}
+    target.addEventListener('change',updateMethod);
+    trigger.addEventListener('click',()=>{
+      if(isLocked() || getState().proposals?.length)return;
+      form.reset();error.textContent='';choices=core.researchTargets(getState());target.replaceChildren();
+      for(const c of choices){const option=element('option',c.type==='section'?(labels[c.id]?.[0]||c.label):c.type==='item'?`${labels[c.section]?.[0]||c.section}: ${c.label}`:c.label);option.value=`${c.type}:${c.id||''}`;target.append(option);}
+      const preferred=currentTarget?.();if(preferred && choices.some(c=>c.type===preferred.type && c.id===preferred.id))target.value=`${preferred.type}:${preferred.id||''}`;
+      updateMethod();dialog.showModal();question.focus();
+    });
+    form.addEventListener('submit',async event=>{
+      event.preventDefault();try{const c=choice(),action={id:'research',target:c.type==='canvas'?{type:'canvas'}:{type:c.type,id:c.id},comment:question.value,use_thoughts:thoughts.checked,include_annotations:annotations.checked,...(method.value?{method:method.value}:{})};const request=core.buildRequest(getState(),action);dialog.close();await copy(JSON.stringify(request,null,2),'Copied Research request. Paste it into your assistant with the Pensive skill.');}catch(e){error.textContent=e.message;}
+    });
+    function renderProposal(panel) {
+      trigger.disabled=isLocked() || !!getState().proposals?.length;
+      const state=getState(),proposal=state.proposals?.[0];if(proposal?.action!=='research')return false;
+      panel.hidden=false;panel.replaceChildren(element('h3','Research findings for review'),report(document,proposal.report,proposal.sources));
+      if(proposal.content){
+        const diff=element('details');diff.append(element('summary','Review proposed canvas changes'));
+        for(const section of core.sections||core.factors){
+          const before=core.sectionSnapshot?core.sectionSnapshot(proposal.base_content,section):proposal.base_content[section],after=core.sectionSnapshot?core.sectionSnapshot(proposal.content,section):proposal.content[section];
+          if(ProposalReview.same(before,after))continue;
+          diff.append(element('h4',labels[section]?.[0]||section));
+          for(const [title,content]of[['Current',proposal.base_content],['Proposed',proposal.content]]){
+            diff.append(element('strong',title));const list=element('ul');for(const item of content[section]){const li=element('li',item.text||'(Blank statement)');if(item.details)li.append(PensiveMarkdown.render(document,item.details));list.append(li);}if(!content[section].length)list.append(element('li','(Empty)'));diff.append(list);if(content.details?.[section])diff.append(PensiveMarkdown.render(document,content.details[section]));
+          }
+        }
+        panel.append(diff);
+      }
+      const error=element('p');error.className='error';error.setAttribute('role','alert');const actions=element('div');actions.className='proposal-actions';
+      for(const [label,decision]of[['Reject Research','reject'],['Accept Research','accept']]){const b=button(label,()=>{try{core.resolveProposal(state,undefined,decision);refresh();edited();}catch(e){error.textContent=e.message;}});b.disabled=isLocked();actions.append(b);}
+      panel.append(element('p','Accept applies this report and all proposed changes together.'),error,actions);return true;
+    }
+    return Object.freeze({renderProposal});
+  }
+  return Object.freeze({install,thoughtCard});
+})();
+</script>
+<script data-implementation>
 /* UI for this SWOT/TOWS canvas only. No storage or network operations. */
 (() => {
   'use strict';
@@ -1579,6 +1797,7 @@ const AnnotationUI = (() => {
   const $ = selector => document.querySelector(selector);
   // Capture before rendering. Exports reuse this pristine implementation, never the edited DOM.
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
+  let researchUI;
   let state, annotations, renderTakeaways;
   let mode = 'swot';
   let requestedAction = null;
@@ -1751,6 +1970,7 @@ const AnnotationUI = (() => {
     thoughts.replaceChildren();
     thoughts.hidden = !state.thoughts?.length;
     function thoughtCard(thought) {
+      if (thought.kind === 'research') return ResearchUI.thoughtCard(thought);
       if (thought.kind === 'six_hats') return SixHatsUI.card(state, thought);
       const card = element('article', 'thought');
       card.append(element('h3', '', { evaluation: 'Evaluation', improvement: 'What improved and why', strategize: 'Strategy rationale' }[thought.kind]), element('p', '', thought.text));
@@ -1766,6 +1986,7 @@ const AnnotationUI = (() => {
     }
     const proposal = state.proposals?.[0];
     document.querySelectorAll('[data-ai]').forEach(button => { button.disabled = annotations.isActive() || !!proposal; });
+    if (researchUI?.renderProposal($('#proposal-panel'))) { renderTakeaways(); return; }
     if (renderTakeaways()) { $('#proposal-panel').hidden = true; return; }
     ProposalReviewUI.render({ state, core: Swot, panel: $('#proposal-panel'), labels,
       title: proposal?.action === 'strategize' ? 'Proposed strategies' : 'Proposed improvements',
@@ -1814,6 +2035,7 @@ const AnnotationUI = (() => {
       getState: () => state, core: Swot, isLocked: () => annotations.isActive(),
       refresh: refreshCanvas, edited, copy: copyJson,
     });
+    researchUI = ResearchUI.install({getState:()=>state,core:Swot,labels,isLocked:()=>annotations.isActive(),copy:copyJson,refresh:refreshCanvas,edited});
     SixHatsUI.install(() => state, Swot, copyJson);
     for (const field of Swot.framing) {
       const input = $(`[data-framing="${field}"]`);

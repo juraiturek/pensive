@@ -1,0 +1,49 @@
+id: vars
+name: VARS Business Model
+package_version: 0.1.0
+schema_version: '1.0'
+state_schema: canvas.schema.json
+canvas: canvas.html
+semantics:
+  framing: [business, objective, scope]
+  layout: [[v, a], [r, s]]
+  v: Value proposition; what economic value is created, for whom, and how.
+  a: Activities, resources and capabilities enabling value creation.
+  r: Realization of value; who pays, for what, and by which revenue mechanism.
+  s: Scope of the enterprise; customers, offerings and organizational boundaries.
+  relationships: Examine material interdependencies without assuming every pair must change.
+manual_capabilities: [edit_framing, add_edit_delete_items, reorder_within_collection, overview_focus, quadrant_item_markdown, import_validated_json, export_complete_json, save_standalone_html]
+ai_actions:
+  create:
+    method: prompts/create.md
+    effect: Establish a preliminary business-model representation from supported context.
+    required_context: An identifiable business model, or explicit agreement to a blank or sparse draft.
+  evaluate:
+    method: prompts/evaluate.md
+    effect: Add an assessment of cross-element consistency, evidence and framing fit without modifying content.
+  improve:
+    method: prompts/improve.md
+    effect: Propose substantive coherent revisions while preserving framing.
+  ripple:
+    method: prompts/ripple.md
+    effect: Propose an explicit initiating change and material consequences against the current canvas.
+  research:
+    method: prompts/research.md
+    effect: Use host search for scoped evidence and return one reviewable report and optional scoped candidate.
+target_types: [canvas, section, item]
+action_compatibility:
+  create: new_canvas
+  evaluate: complete_canvas
+  improve: complete_canvas
+  ripple: explicit_section_or_item_change
+  research: explicit_canvas_section_or_item
+quality_criteria:
+  - Concise summaries describe the business model rather than an exhaustive operational plan.
+  - Explain consequential relationships and distinguish contradiction from uncertainty.
+  - Internal consistency does not establish viability or competitive advantage.
+  - Evidence, interpretations, assumptions and proposals remain distinguishable.
+  - Empty quadrants and partial optional VRI assessments are valid.
+acceptance:
+  granularity: quadrant_and_bulk
+  proposal_actions: [improve, ripple]
+  research: Atomic approval of report, sources and any permitted content changes.

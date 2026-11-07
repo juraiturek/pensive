@@ -7,12 +7,13 @@ const ProposalReview = (() => {
     const keys = Object.keys(a);
     return keys.length === Object.keys(b).length && keys.every(k => Object.hasOwn(b, k) && same(a[k], b[k]));
   }
-  function create({ sections, collection, validateContent }) {
+  function create({ sections, collection, validateContent, snapshot = collection, replaceSection }) {
     function entries(proposal) {
-      return sections.filter(s => !same(collection(proposal.base_content, s), collection(proposal.content, s)))
+      return sections.filter(s => !same(snapshot(proposal.base_content, s), snapshot(proposal.content, s)))
         .map(section => ({ section, status: proposal.resolutions?.[section] || 'pending' }));
     }
     function replace(content, proposal, section) {
+      if (replaceSection) { replaceSection(content, proposal.content, section); return; }
       const destination = collection(content, section);
       destination.splice(0, destination.length, ...structuredClone(collection(proposal.content, section)));
     }

@@ -7,7 +7,7 @@ const ProposalReviewUI = (() => {
     if (text !== undefined) node.textContent = text;
     return node;
   }
-  function render({ state, core, panel, labels, title, onDecision }) {
+  function render({ state, core, panel, labels, title, onDecision, renderSupporting }) {
     const expanded = !!panel.querySelector('details')?.open;
     const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
     panel.replaceChildren();
@@ -57,7 +57,9 @@ const ProposalReviewUI = (() => {
           list.append(bullet);
         }
         if (!items.length) list.append(element('li', '', '(Empty)'));
-        column.append(list); diff.append(column);
+        column.append(list);
+        if (renderSupporting) renderSupporting(columnLabel === 'Proposed' ? proposal.content : status === 'accepted' ? proposal.base_content : state.content, section, column);
+        diff.append(column);
       }
       review.append(diff);
     }

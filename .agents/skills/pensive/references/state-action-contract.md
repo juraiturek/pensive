@@ -48,3 +48,9 @@ The shared Node/browser `state.js` enforces structural and cross-field rules bey
 5 Whys retains the two-key `{canvas,action}` request and framework-owned nested causal tree. Its complete state includes a top-level navigation cursor. Reflect (`evaluate`) appends only a thought. Expand requires `{target:{type:"node",id},mode:"deepen"|"branch"}` and returns new direct-child text plus a rationale, never replacement content. The composer resolves permitted parent, assigns IDs and creates an atomic append-batch proposal with a complete analytical-content guard. Navigation does not invalidate it; analytical edits do. See [5 Whys handoff](five-whys-workflow.md) for target/context/modification scopes and exact shapes. Existing collection review is unchanged.
 
 The shared [Six Thinking Hats action](six-hats-workflow.md) uses this envelope across all four canvases. Its response appends a typed reflection to `thoughts` while preserving the rest of the submitted state.
+
+## VARS and shared Research extension
+
+[VARS](vars-workflow.md) owns a fixed four-quadrant summary plus optional quadrant/item Markdown. Improve and explicit-change Ripple resolve quadrants atomically, including detail text; Ripple uses no saved baseline. Shared annotations, Six Hats and Takeaways retain their established boundaries.
+
+[Research](research-workflow.md) is host-executed and supported initially by VARS and SWOT. Full-state requests carry explicit targets and separate opt-in AI-thought/manual-annotation flags. A report, sources and optional target-scoped candidate form one pending batch. Acceptance checks submitted content and opted-in context, applies edits and records findings atomically. Research does not infer organizational facts from competitors or introduce an HTML search backend, history or rollback.
