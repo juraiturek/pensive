@@ -1,8 +1,22 @@
 # Implementation roadmap
 
+## Five Forces MVP — 2026-11-08
+
+Implemented the approved [three-phase plan](plans/2026-11-08-five-forces-implementation.md), including the user’s revised contract: nullable qualitative strength, nullable numeric confidence shown as percentage, stable reasoning snippets and separate supporting research notes. The framework includes Porter-based shared diagnostic guidance, framing prerequisites, consistency evaluation, scoped Improve/Research, force-level review, Overview/Focus, current/trajectory views and flexible T1–T4 Takeaways. No causal graph or scoring formula.
+
+Optional follow-ups remain: a dedicated framing proposal dialog; explicit persisted freshness/basis snapshots; multiple temporal scenarios; richer source traceability; participant entities; and specialized cross-framework transfer controls. These require separate design and demonstrated use. Automatic history, backend inference and distribution builds remain outside this feature.
+
+### Five Forces backlog — accepted evaluation findings attached to elements
+
+**Feature idea recorded 2026-11-08; outside the committed MVP.** After a user accepts guidance from an evaluation, allow relevant parts of that evaluation to be decomposed and attached to the individual force or analytical element they address. One evaluation may address several nodes; preserve the original evaluation and the connection between each attached part and its source rather than presenting extracted text as an independent observation.
+
+The attached contributions would form a readable conversation over time within each element’s vertical detail view, alongside the user’s own contributions. Future AI-assisted actions on one or several selected nodes could explicitly include the relevant accepted contributions as context, retaining their attribution, uncertainty and relationship to the evaluated state. This would make earlier reasoning available where the user is working instead of requiring them or the AI to rediscover it in a whole-canvas thought.
+
+Design questions for a future slice: user review of decomposition and target assignments; multi-node findings without losing cross-force context; how acceptance of guidance differs from accepting a factual claim or content edit; editing, rejection and duplicate handling; explicit AI-context selection; and indicating when a finding may need reconsideration after node or framing changes. Start with Five Forces; generalization, automatic attachment, new persistence schemas and history infrastructure are not approved by recording this idea.
+
 ## VARS and shared Research — 2026-11-07
 
-Implemented the user-approved [VARS/Research plan](plans/2026-11-07-vars-and-shared-research.md): Overview/Focus, quadrant/item Markdown, optional nested VRI guidance, Create/Evaluate/Improve/explicit-change Ripple, annotations, Takeaways, Six Hats, and shared host-executed Research initially integrated into VARS and SWOT. Five Forces remains planned. Framework methodology is a seed for refinement through actual usage and primary-source research, not a complete revenue, scope or financial-viability method.
+Implemented the user-approved [VARS/Research plan](plans/2026-11-07-vars-and-shared-research.md): Overview/Focus, quadrant/item Markdown, optional nested VRI guidance, Create/Evaluate/Improve/explicit-change Ripple, annotations, Takeaways, Six Hats, and shared host-executed Research initially integrated into VARS and SWOT. At that milestone Five Forces remained planned; the entry above records its subsequent implementation. Framework methodology is a seed for refinement through actual usage and primary-source research, not a complete revenue, scope or financial-viability method.
 
 Future user stories explicitly retained:
 

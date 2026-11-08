@@ -474,7 +474,7 @@ const ProposalReviewUI = (() => {
     if (text !== undefined) node.textContent = text;
     return node;
   }
-  function render({ state, core, panel, labels, title, onDecision, renderSupporting }) {
+  function render({ state, core, panel, labels, title, onDecision, renderSupporting, renderRecord }) {
     const expanded = !!panel.querySelector('details')?.open;
     const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
     panel.replaceChildren();
@@ -510,6 +510,13 @@ const ProposalReviewUI = (() => {
         controls.append(select, accept, reject); header.append(controls);
       } else header.append(element('span', `node-status ${status}`, status === 'accepted' ? 'Accepted' : 'Rejected'));
       diff.append(header);
+      if (renderRecord) {
+        for (const [columnLabel, content] of [[status === 'accepted' ? 'Original' : 'Current', status === 'accepted' ? proposal.base_content : state.content], ['Proposed', proposal.content]]) {
+          const column = element('div'); column.append(element('strong', '', columnLabel));
+          renderRecord(content, section, column); diff.append(column);
+        }
+        review.append(diff); continue;
+      }
       const original = core.collection({ content: proposal.base_content }, section);
       const before = status === 'accepted' ? original : core.collection(state, section);
       const after = core.collection({ content: proposal.content }, section);
@@ -555,7 +562,7 @@ const SixHats = (() => {
   const nonblank = value => typeof value === 'string' && !!value.trim();
   const validId = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value);
   const own = (object, key) => Object.hasOwn(object, key);
-  const itemTypes = framework => framework === 'swot' ? ['factor', 'strategy'] : framework === 'five_whys' ? ['node'] : ['item'];
+  const itemTypes = framework => framework === 'five_forces' ? ['section'] : framework === 'swot' ? ['factor', 'strategy'] : framework === 'five_whys' ? ['node'] : ['item'];
 
   function keys(value, required, optional, label) {
     if (!value || typeof value !== 'object' || Array.isArray(value) ||
@@ -571,7 +578,9 @@ const SixHats = (() => {
     const add = (type, item, section) => {
       if (nonblank(item.text)) choices.push({ type, id: item.id, label: item.text, section });
     };
-    if (framework === 'five_whys') {
+    if (framework === 'five_forces') {
+      for (const section of ['new_entrants', 'substitutes', 'buyers', 'suppliers', 'rivalry']) choices.push({type:'section', id:section, label:section.replaceAll('_', ' ')});
+    } else if (framework === 'five_whys') {
       const stack = [content.tree];
       while (stack.length) {
         const node = stack.pop();

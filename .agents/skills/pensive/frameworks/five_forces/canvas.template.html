@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Pensive — Porter’s Five Forces</title>
+<!--pensive-style-->
+<!--pensive-markdown-style-->
+<!--pensive-annotations-style-->
+</head>
+<body>
+<div class="shell">
+  <header class="masthead"><div class="brand"><a class="wordmark" href="#main" aria-label="Pensive, skip to canvas">pensive<span aria-hidden="true">.</span></a><p class="eyebrow">FIVE FORCES: THE STRUCTURE OF COMPETITION</p></div></header>
+  <main id="main">
+    <section class="framing" aria-label="Analysis context">
+<label>Industry / product-service boundary<textarea data-framing="industry" rows="1"></textarea></label>
+<label>Geographic scope<textarea data-framing="geography" rows="1"></textarea></label>
+<label>Strategic question / objective<textarea data-framing="objective" rows="1"></textarea></label>
+<details><summary>Initial participant map — refine as analysis develops</summary><p>Identify relevant groups. Explicit unknowns are valid; exhaustive lists are not required.</p><label>Existing competitors<textarea data-framing="rivals" rows="1"></textarea></label><label>Buyer groups<textarea data-framing="buyers" rows="1"></textarea></label><label>Supplier groups<textarea data-framing="suppliers" rows="1"></textarea></label><label>Substitute offerings<textarea data-framing="substitutes" rows="1"></textarea></label><label>Potential entrants<textarea data-framing="entrants" rows="1"></textarea></label></details><p id="framing-reassessment" role="status" hidden>Framing changed. Reassess the force conclusions and Takeaways against this boundary; existing analysis has been preserved.</p>
+    </section>
+    <div id="analysis-toolbar" class="toolbar" tabindex="-1"><div class="ai-actions" role="group" aria-label="Request AI action"><button type="button" data-ai="evaluate">Evaluate</button><button type="button" data-ai="improve">Improve</button><button type="button" id="research">Research</button><button type="button" id="thinking-tools" aria-haspopup="dialog">Thinking tools</button><a href="#takeaways">Takeaways</a></div><div class="export-actions"><button id="import" type="button">Import JSON</button><button id="copy" type="button" class="primary">Export to clipboard</button><button id="save" type="button">Save to File <span aria-hidden="true">↗</span></button></div></div>
+    <dialog id="thinking-tools-dialog" aria-labelledby="six-hats-title">
+  <form>
+    <p class="eyebrow">Thinking tools</p>
+    <h2 id="six-hats-title">Six Thinking Hats</h2>
+    <p class="dialog-note">Apply one perspective to the selected content. The result is a thought attached to the canvas.</p>
+    <p><label>Thinking hat <select name="hat" required></select></label></p>
+    <p><label>Target <select name="target" required style="max-width: 100%"></select></label></p>
+    <p><label>Optional guidance <textarea name="comment" rows="2"></textarea></label></p>
+    <p><label><input type="checkbox" name="use_thoughts"> Include previous thoughts as context</label></p>
+    <p class="error" role="alert"></p>
+    <div class="dialog-actions"><button type="button" data-cancel>Cancel</button><button type="submit" class="primary">Copy AI request</button></div>
+  </form>
+</dialog>
+<section id="thoughts" class="thoughts" aria-label="AI thoughts" hidden></section>
+    <section id="proposal-panel" class="proposal-panel" aria-label="AI transformation proposal" hidden></section>
+    <nav class="view-controls" aria-label="Analysis perspective"><button id="current-toggle" type="button" aria-pressed="true">Current structure</button><button id="trajectory-toggle" type="button" aria-pressed="false">Structural trajectory</button><button id="overview" type="button" hidden>Back to Overview</button></nav>
+    <p class="pressure-legend">Trajectory: ↑ increasing · ↓ decreasing · → stable competitive pressure. Direction describes force strength.</p>
+    <section id="forces-workspace" aria-label="Five Forces"><div id="force-overview" class="force-overview"></div>
+      <section id="focus-pane" aria-labelledby="focus-title" hidden>
+        <p class="eyebrow" id="perspective-label">Current structure</p><h2 id="focus-title" tabindex="-1"></h2>
+        <details id="diagnostics"><summary>Diagnostic guidance</summary><div id="diagnostic-body" class="markdown"></div></details>
+        <div class="assessment-fields"><label id="strength-field">Force strength<select id="force-strength" aria-label="Force strength"></select></label><label id="direction-field" hidden>Pressure direction<select id="pressure-direction" aria-label="Pressure direction"></select></label><label>Confidence (%)<input id="confidence" aria-label="Confidence (%)" type="number" min="0" max="100" step="any" placeholder="Not selected"></label></div>
+        <label id="horizon-field" hidden>Time horizon<input id="horizon" aria-label="Time horizon" type="text" placeholder="e.g. 2027–2030"></label>
+        <p class="confidence-hint">Confidence reflects evidence and reasoning, not checklist completion. Percentages express judgment, not a calibrated probability.</p>
+        <h3>Reasoning / analysis</h3><p id="analysis-hint">Connect observations → structural mechanisms → competitive implications. State assumptions and uncertainty.</p><ul id="analysis-points"></ul><button id="add-point" type="button">Add analysis point</button>
+        <div class="notes-heading"><h3>Supporting research notes</h3><button id="edit-notes" type="button" aria-label="Edit supporting research notes">Edit</button><button id="done-notes" type="button" aria-label="Done editing research notes" hidden>Done</button></div><textarea id="research-notes" aria-label="Supporting research notes" rows="7" hidden placeholder="Markdown: findings, sources, qualifications…"></textarea><div id="notes-preview" class="markdown detail-preview"></div>
+      </section>
+    </section>
+    <section id="takeaways" class="takeaways" aria-labelledby="takeaways-title">
+      <div class="takeaways-heading">
+        <h2 id="takeaways-title"><label for="takeaways-text">Takeaways</label></h2>
+        <a href="#analysis-toolbar">Back to analysis</a>
+      </div>
+      <p id="takeaways-hint">Use these prompts flexibly; provisional conclusions and unanswered questions are valid.</p>
+      <div class="takeaways-prompts"><p><strong>T1 — Current competitive structure</strong><br>Controlling forces, mechanisms and industry economics.</p><p><strong>T2 — Structural trajectory</strong><br>Changes, horizons, assumptions and uncertainty.</p><p><strong>T3 — Strategic alternatives</strong><br>Positioning, exploiting change or shaping structure; feasibility and unintended effects.</p><p><strong>T4 — Open questions and assumptions</strong><br>Evidence gaps, contradictions and further investigations.</p></div><textarea id="takeaways-text" rows="4" aria-describedby="takeaways-hint"></textarea>
+      <div class="ai-actions" role="group" aria-label="Takeaways actions">
+        <button id="takeaways-formulate" type="button" aria-haspopup="dialog">Formulate Takeaways</button>
+        <button id="takeaways-improve" type="button" aria-haspopup="dialog">Review / Improve Takeaways</button>
+      </div>
+      <section id="takeaways-review" class="proposal-panel" aria-labelledby="takeaways-review-title" hidden>
+        <h3 id="takeaways-review-title">Proposed Takeaways</h3>
+        <p id="takeaways-rationale"></p>
+        <h4>Current</h4>
+        <p id="takeaways-current"></p>
+        <h4>Proposed</h4>
+        <p id="takeaways-proposed"></p>
+        <p id="takeaways-error" class="error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="takeaways-reject" type="button">Reject Takeaways</button>
+          <button id="takeaways-accept" type="button" class="primary">Accept Takeaways</button>
+        </div>
+      </section>
+    </section>
+    <dialog id="takeaways-dialog" aria-labelledby="takeaways-action-title">
+      <form>
+        <h2 id="takeaways-action-title">Takeaways</h2>
+        <p class="dialog-note">Copy this request into Codex with the Pensive skill to get a proposal for review.</p>
+        <label for="takeaways-guidance">Focus for this proposal</label>
+        <textarea id="takeaways-guidance" rows="3"></textarea>
+        <label class="checkbox-label"><input id="takeaways-include-annotations" type="checkbox"> Include user-authored Thoughts</label>
+        <p id="takeaways-request-error" class="error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="takeaways-cancel" type="button">Cancel Takeaways request</button>
+          <button type="submit" class="primary">Copy Takeaways request</button>
+        </div>
+      </form>
+    </dialog>
+    <section id="clipboard-fallback" class="clipboard-fallback" aria-label="Manual JSON copy" hidden><label for="clipboard-json">Canvas JSON</label><p>Your browser blocked clipboard access. Select and copy this JSON manually.</p><textarea id="clipboard-json" rows="8" readonly spellcheck="false"></textarea><button id="close-copy" type="button">Close</button></section>
+    <p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save to File to keep an editable HTML copy.</p>
+  </main>
+  <footer><span>Less conversation. More thinking.</span><span>Five Forces <span aria-hidden="true">·</span> Pensive</span></footer>
+</div>
+<dialog id="ai-dialog" aria-labelledby="ai-title"><form id="ai-form"><h2 id="ai-title">Evaluate Five Forces</h2><p class="dialog-note">Copy the request, then paste it into Codex or ChatGPT with the Pensive skill.</p><p id="action-target"></p><label for="ai-guidance">Steering guidance</label><textarea id="ai-guidance" rows="3" placeholder="Focus, constraints, evidence to consider…"></textarea><label class="checkbox-label"><input id="use-thoughts" type="checkbox" checked> Use existing thoughts as guidance</label><p id="ai-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-ai" type="button">Cancel</button><button type="submit" class="primary">Copy AI request</button></div></form></dialog>
+<dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><h2 id="import-title">Import Five Forces JSON</h2><p class="dialog-note">Paste complete exported Five Forces state. Validation happens before replacement.</p><label for="import-json">Import canvas JSON</label><textarea id="import-json" rows="10" spellcheck="false"></textarea><p id="import-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-import" type="button">Cancel import</button><button type="submit" class="primary">Replace canvas</button></div></form></dialog>
+<noscript>This canvas requires JavaScript for local editing and export. No server is needed.</noscript>
+<!--pensive-state-start-->
+<script id="canvas-state" type="application/json">{}</script>
+<!--pensive-state-end-->
+<!--pensive-markdown-->
+<!--pensive-review-->
+<!--pensive-review-ui-->
+<!--pensive-six-hats-->
+<!--pensive-annotations-->
+<!--pensive-takeaways-->
+<!--pensive-takeaways-ui-->
+<!--pensive-research-->
+<!--pensive-core-->
+<!--pensive-six-hats-ui-->
+<!--pensive-editing-->
+<!--pensive-annotations-ui-->
+<!--pensive-research-ui-->
+<!--pensive-guidance-->
+<!--pensive-runtime-->
+</body>
+</html>

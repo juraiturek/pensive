@@ -1,0 +1,669 @@
+{
+  "status": "Synthetic fresh-subagent application walkthrough; not a live research or statistical evaluation",
+  "actor": "Codex methodology application subagent",
+  "date": "2026-11-08",
+  "baseline": {
+    "observed": "Before the new guidance, SKILL.md supported five canvases and explicitly limited Research to VARS/SWOT. No Five Forces route, manifest, schema, canvas or packaging command existed; roadmap marked it planned.",
+    "interpretation": "Unsupported-route baseline established by read-only inspection. This is not an observed empirical reasoning failure or before/after model-quality measurement."
+  },
+  "loaded_guidance": [
+    ".agents/skills/pensive/SKILL.md",
+    ".agents/skills/pensive/references/five-forces-workflow.md",
+    ".agents/skills/pensive/frameworks/five_forces/methodology.md",
+    ".agents/skills/pensive/frameworks/five_forces/prompts/create.md",
+    ".agents/skills/pensive/frameworks/five_forces/prompts/evaluate.md",
+    ".agents/skills/pensive/frameworks/five_forces/prompts/improve.md",
+    ".agents/skills/pensive/frameworks/five_forces/methods/new_entrants.md",
+    ".agents/skills/pensive/frameworks/five_forces/methods/substitutes.md",
+    ".agents/skills/pensive/frameworks/five_forces/methods/suppliers.md",
+    ".agents/skills/pensive/references/framing-content.md"
+  ],
+  "validation": {
+    "executed": [
+      "FiveForces.validate(create output)",
+      "FiveForces.requireFraming(create output.content)",
+      "FiveForces.buildRequest and validateRequest for all five action cases",
+      "FiveForces.composeResult and validate for all five response compositions",
+      "FiveForces.acceptProposal and validate for all three Improve cases",
+      "Evaluate content preservation assertions for both Evaluate cases"
+    ],
+    "limits": "Valid JSON/runtime protocol and explicit-scope acceptance do not establish factual correctness or robust analytical quality. No live search, API evaluation, cross-model sampling, customer evidence, browser verification or statistical calibration was performed."
+  },
+  "guidance_findings": [
+    "No substantive methodological gap blocked these six cases. Numeric confidence is clearly identified as judgment rather than a probability or checklist formula.",
+    "Initial participant identification can remain incomplete. The deterministic gate checks only missing core fields plus some participant text; semantic adequacy remains a host responsibility, as documented.",
+    "The synthetic high-confidence case retains a conditional strong hypothesis with low confidence. Other defensible responses could leave strength unassigned; this fixture is not a unique expected answer or confidence calibration standard."
+  ],
+  "cases": [
+    {
+      "id": "create-incomplete-participants",
+      "kind": "create",
+      "input": {
+        "prompt": "Create a preliminary Five Forces analysis using the supplied industry, geography and entry-attractiveness objective. Participant categories are initially identified, but supplier alternatives and plausible entrants are unknown. Do not research or invent facts.",
+        "context": {
+          "framing": {
+            "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+            "geography": "Canada",
+            "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+            "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+            "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+            "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+            "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+            "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+          }
+        }
+      },
+      "output": {
+        "canvas": {
+          "framework": "five_forces",
+          "schema_version": "1.0",
+          "content": {
+            "framing": {
+              "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+              "geography": "Canada",
+              "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+              "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+              "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+              "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+              "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+              "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+            },
+            "new_entrants": {
+              "strength": null,
+              "confidence": null,
+              "analysis": [],
+              "research_notes": ""
+            },
+            "substitutes": {
+              "strength": null,
+              "confidence": null,
+              "analysis": [
+                {
+                  "id": "sub-need",
+                  "text": "The relevant underlying need is personal mobility. Public transit, shared mobility or retaining an existing vehicle are candidate alternatives; whether they materially constrain prices requires evidence about use cases, relative price-performance, accessibility and switching."
+                }
+              ],
+              "research_notes": "Preliminary user context only. No external research was performed. Candidate alternatives are investigation hypotheses, not established competitive-pressure findings."
+            },
+            "buyers": {
+              "strength": null,
+              "confidence": null,
+              "analysis": [],
+              "research_notes": ""
+            },
+            "suppliers": {
+              "strength": null,
+              "confidence": null,
+              "analysis": [],
+              "research_notes": ""
+            },
+            "rivalry": {
+              "strength": null,
+              "confidence": null,
+              "analysis": [],
+              "research_notes": ""
+            }
+          }
+        },
+        "explanation": "The arena, geography, objective and initial participant groups are sufficient for a preliminary draft. Unknown groups remain explicit. All force strengths and confidence values remain null because the supplied context does not establish their magnitude. Participant completeness is not a prerequisite for beginning; assessment strength still needs causal evidence."
+      },
+      "checks": [
+        "Initial participant map need not be exhaustive",
+        "No invented participant identities or force magnitudes",
+        "Separate analysis snippets and supporting notes",
+        "No implicit research"
+      ]
+    },
+    {
+      "id": "substitutes-versus-rivals",
+      "kind": "action",
+      "input": {
+        "prompt": "Improve only substitutes. The draft calls a competing battery-electric passenger-vehicle manufacturer a substitute solely because it has another brand. Correct the reasoning without changing framing or inventing its market position.",
+        "request": {
+          "canvas": {
+            "framework": "five_forces",
+            "schema_version": "1.0",
+            "content": {
+              "framing": {
+                "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+                "geography": "Canada",
+                "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+                "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+                "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+                "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+                "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+                "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+              },
+              "new_entrants": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "substitutes": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [
+                  {
+                    "id": "sub-need",
+                    "text": "The relevant underlying need is personal mobility. Public transit, shared mobility or retaining an existing vehicle are candidate alternatives; whether they materially constrain prices requires evidence about use cases, relative price-performance, accessibility and switching."
+                  },
+                  {
+                    "id": "sub-rival-error",
+                    "text": "Another manufacturer offering battery-electric passenger vehicles is a substitute because its vehicles have a different brand."
+                  }
+                ],
+                "research_notes": "Preliminary user context only. No external research was performed. Candidate alternatives are investigation hypotheses, not established competitive-pressure findings."
+              },
+              "buyers": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "suppliers": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "rivalry": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              }
+            }
+          },
+          "action": {
+            "id": "improve",
+            "target": {
+              "type": "section",
+              "id": "substitutes"
+            },
+            "use_thoughts": true
+          }
+        }
+      },
+      "output": {
+        "content": {
+          "framing": {
+            "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+            "geography": "Canada",
+            "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+            "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+            "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+            "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+            "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+            "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+          },
+          "new_entrants": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "substitutes": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [
+              {
+                "id": "sub-need",
+                "text": "The relevant underlying need is personal mobility. Public transit, shared mobility or retaining an existing vehicle are candidate alternatives; whether they materially constrain prices requires evidence about use cases, relative price-performance, accessibility and switching."
+              },
+              {
+                "id": "sub-rival-error",
+                "text": "Within the framed battery-electric passenger-vehicle industry, another manufacturer offering competing vehicles is an existing rival, not a substitute merely because its brand differs. Distinct mobility solutions are candidate substitutes when they satisfy the same underlying need; the boundary and buyer use case determine their relevance."
+              }
+            ],
+            "research_notes": "Preliminary user context only. No external research was performed. Candidate alternatives are investigation hypotheses, not established competitive-pressure findings."
+          },
+          "buyers": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "suppliers": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "rivalry": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          }
+        },
+        "thought": "Clarified the boundary-dependent distinction between direct industry rivalry and substitutes satisfying the underlying mobility need. Retained snippet identity; no force rating or evidence strength is implied by classification alone."
+      },
+      "checks": [
+        "Rival not automatically classified as substitute",
+        "Underlying need and boundary both considered",
+        "Only selected force changes",
+        "Existing snippet ID retained"
+      ]
+    },
+    {
+      "id": "supplier-inflation",
+      "kind": "action",
+      "input": {
+        "prompt": "Evaluate the supplier conclusion. Only the reported input-price increase is available. No search has been authorized or performed.",
+        "request": {
+          "canvas": {
+            "framework": "five_forces",
+            "schema_version": "1.0",
+            "content": {
+              "framing": {
+                "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+                "geography": "Canada",
+                "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+                "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+                "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+                "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+                "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+                "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+              },
+              "new_entrants": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "substitutes": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "buyers": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "suppliers": {
+                "strength": "strong",
+                "confidence": 0.9,
+                "analysis": [
+                  {
+                    "id": "supplier-inflation",
+                    "text": "The user reports that battery input prices rose 20% this year; therefore supplier bargaining power is strong and increasing."
+                  }
+                ],
+                "research_notes": "User-supplied observation for this synthetic case; not externally verified."
+              },
+              "rivalry": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              }
+            }
+          },
+          "action": {
+            "id": "evaluate",
+            "target": {
+              "type": "section",
+              "id": "suppliers"
+            },
+            "use_thoughts": true
+          }
+        }
+      },
+      "output": {
+        "thought": "The reported input-price increase could raise manufacturing costs, but it does not by itself establish supplier bargaining power or an increasing structural trajectory. Investigate concentration relative to this industry, differentiated inputs, alternative sources, qualification and switching costs, suppliers’ alternative markets and integration options. Distinguish temporary commodity or capacity effects from durable bargaining mechanisms. The strong assessment and 90% confidence exceed the evidence shown. Reassess them after investigating these drivers; no opposite strength rating is established by the present gap. Current content and framing remain unchanged by this evaluation."
+      },
+      "checks": [
+        "Cost movement separated from bargaining mechanism",
+        "Missing evidence does not prove weak supplier power",
+        "Evaluate appends only a thought",
+        "No live research claim"
+      ]
+    },
+    {
+      "id": "coverage-versus-confidence",
+      "kind": "action",
+      "input": {
+        "prompt": "Improve supplier assessment. Every diagnostic question has an answer, so keep 95% confidence even though all evidence consists of workshop assumptions. No research is available.",
+        "request": {
+          "canvas": {
+            "framework": "five_forces",
+            "schema_version": "1.0",
+            "content": {
+              "framing": {
+                "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+                "geography": "Canada",
+                "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+                "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+                "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+                "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+                "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+                "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+              },
+              "new_entrants": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "substitutes": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "buyers": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "suppliers": {
+                "strength": "strong",
+                "confidence": 0.95,
+                "analysis": [
+                  {
+                    "id": "supplier-checklist",
+                    "text": "All supplier checklist questions were answered. The answers assume few qualified suppliers, costly switching and limited alternatives; sources and counterevidence have not been checked."
+                  }
+                ],
+                "research_notes": "Internal workshop assumptions only; no underlying source material supplied."
+              },
+              "rivalry": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              }
+            }
+          },
+          "action": {
+            "id": "improve",
+            "target": {
+              "type": "section",
+              "id": "suppliers"
+            },
+            "use_thoughts": true
+          }
+        }
+      },
+      "output": {
+        "content": {
+          "framing": {
+            "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+            "geography": "Canada",
+            "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+            "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+            "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+            "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+            "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+            "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+          },
+          "new_entrants": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "substitutes": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "buyers": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "suppliers": {
+            "strength": "strong",
+            "confidence": 0.25,
+            "analysis": [
+              {
+                "id": "supplier-checklist",
+                "text": "Strong supplier power is a provisional hypothesis conditional on the workshop assumptions about supplier concentration, costly switching and limited alternatives. These mechanisms could constrain manufacturers’ negotiating options, but their magnitude and applicability have not been substantiated."
+              },
+              {
+                "id": "supplier-confidence",
+                "text": "Confidence is low because the structural assertions are unsourced, contradictory evidence is untested and the bargaining mechanism has not been verified in this market. The illustrative 25% expresses a qualitative defensibility judgment, not a statistical probability or a formula based on checklist completion. Investigating qualified alternatives and switching costs could overturn the tentative strength."
+              }
+            ],
+            "research_notes": "Internal workshop assumptions only; no underlying source material supplied."
+          },
+          "rivalry": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          }
+        },
+        "thought": "Proposed lower confidence and an explicitly conditional strength hypothesis. Comprehensive questionnaire coverage does not validate the assumed facts. The proposed 25% is an illustrative judgment, not calibrated certainty or a checklist score; acceptance remains the user’s choice."
+      },
+      "checks": [
+        "Does not comply with unsupported high-confidence request",
+        "Confidence is numeric 0–1",
+        "Strength and reasoning stay causally linked",
+        "Evidence qualifications distinguish assumptions from observations"
+      ]
+    },
+    {
+      "id": "robotics-framing-tension",
+      "kind": "action",
+      "input": {
+        "prompt": "Evaluate this new discovery. The sponsor’s actual investment question may concern humanoid robotics. Decide what to do with the current Canadian passenger-vehicle frame without silently redefining it.",
+        "request": {
+          "canvas": {
+            "framework": "five_forces",
+            "schema_version": "1.0",
+            "content": {
+              "framing": {
+                "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+                "geography": "Canada",
+                "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+                "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+                "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+                "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+                "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+                "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+              },
+              "new_entrants": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [
+                  {
+                    "id": "robotics-tension",
+                    "text": "The sponsor says their actual investment decision is whether to enter humanoid robotics rather than passenger vehicles. Shared manufacturing capabilities motivated including robotics entrants."
+                  }
+                ],
+                "research_notes": ""
+              },
+              "substitutes": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "buyers": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "suppliers": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "rivalry": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              }
+            }
+          },
+          "action": {
+            "id": "evaluate",
+            "use_thoughts": true
+          }
+        }
+      },
+      "output": {
+        "thought": "The new statement creates a material mismatch between the accepted passenger-vehicle industry framing and the sponsor’s stated robotics investment decision. Shared manufacturing capabilities alone do not make the industries interchangeable. If the intended question remains passenger-vehicle entry, investigate only plausible entrants and mechanisms relevant to that arena. If the robotics question is intended, propose a separately defined robotics industry/product boundary, geography, participant groups and objective for the user to accept through explicit framing edits or a separate analysis. Entry threat, substitutes, buyers, suppliers, rivalry and existing Takeaways would all require reassessment against that boundary. Preserve the present framing and conclusions until that decision is made; this evaluation does not make the change."
+      },
+      "checks": [
+        "Identifies credible framing challenge rather than automatically deleting finding",
+        "Proposes explicit user decision",
+        "Names affected analytical conclusions",
+        "No framing or content mutation"
+      ]
+    },
+    {
+      "id": "entry-barriers-and-pressure-direction",
+      "kind": "action",
+      "input": {
+        "prompt": "Improve only entry threat using this hypothetical scenario: a binding reform reduces certification fixed costs during 2027–2030, other entry barriers are incompletely known. Keep the current assessment separate from trajectory.",
+        "request": {
+          "canvas": {
+            "framework": "five_forces",
+            "schema_version": "1.0",
+            "content": {
+              "framing": {
+                "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+                "geography": "Canada",
+                "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+                "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+                "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+                "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+                "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+                "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+              },
+              "new_entrants": {
+                "strength": "weak",
+                "confidence": 0.6,
+                "analysis": [
+                  {
+                    "id": "entry-current",
+                    "text": "Synthetic scenario premise: currently, certification and qualification requirements impose a substantial fixed entry cost, limiting the pool of plausible entrants. This supports a provisional weak entry-threat judgment, subject to other barriers and retaliation."
+                  }
+                ],
+                "research_notes": "Scenario premises supplied by the user for testing only; no actual Canadian policy or market claim."
+              },
+              "substitutes": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "buyers": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "suppliers": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              },
+              "rivalry": {
+                "strength": null,
+                "confidence": null,
+                "analysis": [],
+                "research_notes": ""
+              }
+            }
+          },
+          "action": {
+            "id": "improve",
+            "target": {
+              "type": "section",
+              "id": "new_entrants"
+            },
+            "use_thoughts": true
+          }
+        }
+      },
+      "output": {
+        "content": {
+          "framing": {
+            "industry": "Manufacturing battery-electric passenger vehicles offered to Canadian buyers; exclude commercial vehicles and vehicle manufacturing equipment.",
+            "geography": "Canada",
+            "objective": "Assess competitive conditions relevant to a potential manufacturing entrant serving Canadian passenger-vehicle demand.",
+            "rivals": "Existing battery-electric passenger-vehicle manufacturers; names and segments not yet mapped.",
+            "buyers": "Private vehicle buyers and fleet operators; concentration and purchasing processes unknown.",
+            "suppliers": "Battery and other vehicle component suppliers; specific groups and alternatives unknown.",
+            "substitutes": "Potential alternatives for personal mobility, including public transit, shared mobility and retaining an existing vehicle; relative price-performance unknown.",
+            "entrants": "Unknown; investigate manufacturers entering from adjacent markets."
+          },
+          "new_entrants": {
+            "strength": "weak",
+            "confidence": 0.6,
+            "analysis": [
+              {
+                "id": "entry-current",
+                "text": "Synthetic scenario premise: currently, certification and qualification requirements impose a substantial fixed entry cost, limiting the pool of plausible entrants. This supports a provisional weak entry-threat judgment, subject to other barriers and retaliation."
+              }
+            ],
+            "research_notes": "Scenario premises supplied by the user for testing only; no actual Canadian policy or market claim.",
+            "trajectory": {
+              "direction": "increasing",
+              "horizon": "2027–2030",
+              "confidence": 0.6,
+              "analysis": [
+                {
+                  "id": "entry-change",
+                  "text": "Synthetic scenario premise: an adopted reform will reduce certification fixed costs during 2027–2030. Lower fixed entry costs can make entry viable for more plausible manufacturers, increasing entry threat even before new competitors actually enter."
+                },
+                {
+                  "id": "entry-assumptions",
+                  "text": "Assumptions: implementation follows the stated schedule; the cost reduction is material for plausible entrants; other barriers and expected incumbent retaliation do not offset it. This is a structural scenario, not an extrapolation from a temporary price movement. Confidence remains provisional because the remaining barriers are incompletely assessed."
+                }
+              ],
+              "research_notes": "User-supplied hypothetical reform and timing only. No external research, forecast verification or source citation is claimed."
+            }
+          },
+          "substitutes": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "buyers": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "suppliers": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          },
+          "rivalry": {
+            "strength": null,
+            "confidence": null,
+            "analysis": [],
+            "research_notes": ""
+          }
+        },
+        "thought": "Proposed an increasing entry-threat trajectory over 2027–2030, with explicit assumptions and independent provisional confidence. The upward indicator means stronger competitive pressure from entry, not improved attractiveness for incumbents. The current weak assessment and its stable snippet are preserved; no actual reform or live research is claimed."
+      },
+      "checks": [
+        "Barrier decrease means increasing threat",
+        "Current assessment preserved separately",
+        "Horizon, assumptions and independent confidence retained",
+        "Pressure direction is not attractiveness",
+        "Forecast derived only from explicit hypothetical premises"
+      ]
+    }
+  ]
+}

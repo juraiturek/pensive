@@ -1,5 +1,29 @@
 # Testing strategy
 
+## Five Forces — 2026-11-08
+
+Implemented the approved [plan](plans/2026-11-08-five-forces-implementation.md) with the user’s revised contract: nullable five-level strength, nullable finite 0–1 confidence displayed as percentage, stable analysis snippets and separate Markdown research notes. No legacy source was accessed. Source hierarchy and Pensive-specific choices are recorded in the framework methodology; the secondary chapter was represented by the supplied reference, not independently inspected book pages.
+
+Baseline full regression passed **230 tests**. New state and browser tests first failed because Five Forces was absent. Subsequent tests reproduced missing view steering, an invalid persisted Six Hats force target, a temporal overview that omitted trajectory detail, and analysis textarea clipping after narrow resize. Each was corrected and rerun. Review also exposed a Research candidate/manual-note identity collision; the composer now rejects it before pending review. Exact-text identity checks are scoped to the original force/perspective so distinct forces can legitimately use similar text.
+
+Final command from repository root:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright /Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test --test-concurrency=2 tests/*.test.mjs
+```
+
+**257 passed, zero failures/skips.** This includes 27 new Five Forces cases: 13 state/schema/packaging, 11 offline browser and three methodology/protocol checks. Coverage includes null and numeric values, stable snippets, separate research notes, optional trajectories, all substantive framing gates, scoped mutation, force/bulk acceptance, stale rejection, research report/candidate approval, Takeaways and section-targeted Hats, annotation locks and preservation, hostile text and invalid embedded state, safe exclusive CLI output, current/trajectory request steering, explicit arrow semantics, keyboard focus, narrow resizing, confirmed/cancelled JSON import, clipboard fallback and consecutive saved pending-review generations. Shared existing framework regressions passed after rebuilding all six framework HTML files. These are framework HTML builds, not distribution or Claude ZIP builds.
+
+Independent code review found the missing-perspective and invalid-Hat-target issues and confirmed their fixes with a fresh 16-case state/methodology run. A separate subagent applied the actual guidance to six retained full-input/output cases: incomplete participants, substitutes/rivals, supplier inflation, unsupported confidence, framing tension and entry-barrier trajectory. See [methodology record](../tests/methodology/five-forces.md) and its retained JSON. Runtime/protocol validity and these synthetic cases do not establish factual correctness, calibrated confidence or statistical model quality. No live Research, API, cross-model or customer evaluation was performed.
+
+Skill validator passed with temporary PyYAML dependencies; six manifests parsed, declared resources existed, and all **216** local skill Markdown links resolved. README matched Git (SHA-256 `9e5d9ae8ea53fde85c7c7724e8bf2e4774c600bc0647f6a0674ef068fb6322be`). Whitespace checks passed. Desktop and narrow Overview/Focus screenshots were visually inspected under ignored `test-results/`; the responsive regression verifies analysis text remains fully visible. Browser verification used offline Chromium with elevated macOS process access because the sandbox-only baseline could not launch Chromium (`bootstrap_check_in ... Permission denied`). Safari, Firefox, physical devices and live host integrations were not tested.
+
+A blank editable preview was packaged explicitly to ignored `outputs/five-forces-preview.html`. Temporary scripts, request/response state, formatter and validator dependencies were removed after verification. README, legacy code, remotes and distribution packages were not changed; no commit, push or publication was performed. The user subsequently approved this implementation as the MVP and authorized a local commit on `codex/five-forces`.
+
+
+MVP commit verification on 2026-11-08 reran the full command above: **257 passed, zero failures/skips**. Skill validation, six manifest/resource checks, 216 local skill Markdown links, deterministic comparison of all six framework HTML builders, README integrity and whitespace checks passed again. Recorded the requested evaluation-to-element conversation idea in the Five Forces backlog without implementing it. Generated analysis artifacts remain ignored under outputs/. No distribution build or push.
+
+
 ## VARS final pre-commit regression — 2026-11-07
 
 After all Focus interaction refinements, ran the full suite from the primary workspace:

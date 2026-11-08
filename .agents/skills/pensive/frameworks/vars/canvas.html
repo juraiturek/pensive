@@ -522,7 +522,7 @@ const ProposalReviewUI = (() => {
     if (text !== undefined) node.textContent = text;
     return node;
   }
-  function render({ state, core, panel, labels, title, onDecision, renderSupporting }) {
+  function render({ state, core, panel, labels, title, onDecision, renderSupporting, renderRecord }) {
     const expanded = !!panel.querySelector('details')?.open;
     const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
     panel.replaceChildren();
@@ -558,6 +558,13 @@ const ProposalReviewUI = (() => {
         controls.append(select, accept, reject); header.append(controls);
       } else header.append(element('span', `node-status ${status}`, status === 'accepted' ? 'Accepted' : 'Rejected'));
       diff.append(header);
+      if (renderRecord) {
+        for (const [columnLabel, content] of [[status === 'accepted' ? 'Original' : 'Current', status === 'accepted' ? proposal.base_content : state.content], ['Proposed', proposal.content]]) {
+          const column = element('div'); column.append(element('strong', '', columnLabel));
+          renderRecord(content, section, column); diff.append(column);
+        }
+        review.append(diff); continue;
+      }
       const original = core.collection({ content: proposal.base_content }, section);
       const before = status === 'accepted' ? original : core.collection(state, section);
       const after = core.collection({ content: proposal.content }, section);
@@ -603,7 +610,7 @@ const SixHats = (() => {
   const nonblank = value => typeof value === 'string' && !!value.trim();
   const validId = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value);
   const own = (object, key) => Object.hasOwn(object, key);
-  const itemTypes = framework => framework === 'swot' ? ['factor', 'strategy'] : framework === 'five_whys' ? ['node'] : ['item'];
+  const itemTypes = framework => framework === 'five_forces' ? ['section'] : framework === 'swot' ? ['factor', 'strategy'] : framework === 'five_whys' ? ['node'] : ['item'];
 
   function keys(value, required, optional, label) {
     if (!value || typeof value !== 'object' || Array.isArray(value) ||
@@ -619,7 +626,9 @@ const SixHats = (() => {
     const add = (type, item, section) => {
       if (nonblank(item.text)) choices.push({ type, id: item.id, label: item.text, section });
     };
-    if (framework === 'five_whys') {
+    if (framework === 'five_forces') {
+      for (const section of ['new_entrants', 'substitutes', 'buyers', 'suppliers', 'rivalry']) choices.push({type:'section', id:section, label:section.replaceAll('_', ' ')});
+    } else if (framework === 'five_whys') {
       const stack = [content.tree];
       while (stack.length) {
         const node = stack.pop();
@@ -934,8 +943,9 @@ const PensiveResearch = (() => {
     if (thought.kind !== 'research' || !nonblank(thought.text) || typeof thought.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(thought.id) || ids.has(thought.id)) throw new Error('Invalid Research thought or duplicate ID.');
     ids.add(thought.id);
   }
-  function create({ sections, validateContent, boundary, equivalent = Review.same, replaceSection }) {
+  function create({ sections, validateContent, boundary, equivalent = Review.same, replaceSection, listTargets }) {
     function targets(canvas) {
+      if (listTargets) return listTargets(canvas);
       const result = [{type:'canvas',label:'Full canvas'}];
       for (const section of sections) { result.push({type:'section',id:section,label:section}); for (const item of canvas.content[section]) result.push({type:'item',id:item.id,label:item.text || '(Blank statement)',section}); }
       return result;
@@ -1651,7 +1661,7 @@ const ResearchUI = (() => {
     if(sources.length)node.append(element('h4','Sources'),list);return node;
   }
   function thoughtCard(thought) { const card=element('article');card.className='thought';card.append(element('h3','Research findings'),report(document,thought.text,thought.sources));return card; }
-  function install({getState,core,labels,isLocked,copy,refresh,edited,currentTarget}) {
+  function install({getState,core,labels,isLocked,copy,refresh,edited,currentTarget,renderRecord}) {
     let trigger=document.getElementById('research');if(!trigger){trigger=element('button','Research');trigger.type='button';trigger.id='research';document.querySelector('.ai-actions').append(trigger);}
     const dialog=element('dialog');dialog.setAttribute('aria-labelledby','research-title');dialog.id='research-dialog';
     const form=element('form'),title=element('h2','Research'),note=element('p','Copy the request to your assistant with the Pensive skill. The host searches; findings return for review.');title.id='research-title';
@@ -1688,7 +1698,7 @@ const ResearchUI = (() => {
           if(ProposalReview.same(before,after))continue;
           diff.append(element('h4',labels[section]?.[0]||section));
           for(const [title,content]of[['Current',proposal.base_content],['Proposed',proposal.content]]){
-            diff.append(element('strong',title));const list=element('ul');for(const item of content[section]){const li=element('li',item.text||'(Blank statement)');if(item.details)li.append(PensiveMarkdown.render(document,item.details));list.append(li);}if(!content[section].length)list.append(element('li','(Empty)'));diff.append(list);if(content.details?.[section])diff.append(PensiveMarkdown.render(document,content.details[section]));
+            diff.append(element('strong',title));if(renderRecord){const column=element('div');renderRecord(content,section,column);diff.append(column);continue;}const list=element('ul');for(const item of content[section]){const li=element('li',item.text||'(Blank statement)');if(item.details)li.append(PensiveMarkdown.render(document,item.details));list.append(li);}if(!content[section].length)list.append(element('li','(Empty)'));diff.append(list);if(content.details?.[section])diff.append(PensiveMarkdown.render(document,content.details[section]));
           }
         }
         panel.append(diff);

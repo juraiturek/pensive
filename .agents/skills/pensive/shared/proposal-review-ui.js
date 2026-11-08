@@ -7,7 +7,7 @@ const ProposalReviewUI = (() => {
     if (text !== undefined) node.textContent = text;
     return node;
   }
-  function render({ state, core, panel, labels, title, onDecision, renderSupporting }) {
+  function render({ state, core, panel, labels, title, onDecision, renderSupporting, renderRecord }) {
     const expanded = !!panel.querySelector('details')?.open;
     const selected = new Set(Array.from(panel.querySelectorAll('input:checked')).map(n => n.value));
     panel.replaceChildren();
@@ -43,6 +43,13 @@ const ProposalReviewUI = (() => {
         controls.append(select, accept, reject); header.append(controls);
       } else header.append(element('span', `node-status ${status}`, status === 'accepted' ? 'Accepted' : 'Rejected'));
       diff.append(header);
+      if (renderRecord) {
+        for (const [columnLabel, content] of [[status === 'accepted' ? 'Original' : 'Current', status === 'accepted' ? proposal.base_content : state.content], ['Proposed', proposal.content]]) {
+          const column = element('div'); column.append(element('strong', '', columnLabel));
+          renderRecord(content, section, column); diff.append(column);
+        }
+        review.append(diff); continue;
+      }
       const original = core.collection({ content: proposal.base_content }, section);
       const before = status === 'accepted' ? original : core.collection(state, section);
       const after = core.collection({ content: proposal.content }, section);

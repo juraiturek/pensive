@@ -41,6 +41,6 @@ Return a new standalone HTML link. JSON import validates complete replacement an
 
 ## Portfolio and limits
 
-VARS examines an individual business model's economic and organizational mechanics. SWOT/TOWS can inform strategic conditions/options; VPC can deepen V; planned PESTEL and Five Forces can inform environmental/industry assumptions. These are optional methodological connections, not mandatory sequence, available new canvases or automatic transformations. VRI remains nested in A. Advanced revenue optimization, make-versus-buy methods, quantitative viability and persistent causality remain gaps for future research/usage refinement.
+VARS examines an individual business model's economic and organizational mechanics. SWOT/TOWS can inform strategic conditions/options; VPC can deepen V; planned PESTEL and available Five Forces can inform environmental/industry assumptions. These are optional methodological connections, not a mandatory sequence or automatic transformations. VRI remains nested in A. Advanced revenue optimization, make-versus-buy methods, quantitative viability and persistent causality remain gaps for future research/usage refinement.
 
 VARS is taught by Deepak Somaya in the University of Illinois [Business Strategy course](https://www.coursera.org/learn/strategy-business). This original expression adapts the user's seed brief and acknowledges resource-based-view origins in optional VRI guidance. It does not reproduce course text/examples or imply affiliation or endorsement.

@@ -16,8 +16,9 @@ const PensiveResearch = (() => {
     if (thought.kind !== 'research' || !nonblank(thought.text) || typeof thought.id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(thought.id) || ids.has(thought.id)) throw new Error('Invalid Research thought or duplicate ID.');
     ids.add(thought.id);
   }
-  function create({ sections, validateContent, boundary, equivalent = Review.same, replaceSection }) {
+  function create({ sections, validateContent, boundary, equivalent = Review.same, replaceSection, listTargets }) {
     function targets(canvas) {
+      if (listTargets) return listTargets(canvas);
       const result = [{type:'canvas',label:'Full canvas'}];
       for (const section of sections) { result.push({type:'section',id:section,label:section}); for (const item of canvas.content[section]) result.push({type:'item',id:item.id,label:item.text || '(Blank statement)',section}); }
       return result;

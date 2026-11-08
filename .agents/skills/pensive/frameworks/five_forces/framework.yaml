@@ -1,0 +1,41 @@
+id: five_forces
+name: Porter's Five Forces
+package_version: 0.1.0
+schema_version: '1.0'
+state_schema: canvas.schema.json
+canvas: canvas.html
+semantics:
+  framing: [industry, geography, objective, rivals, buyers, suppliers, substitutes, entrants]
+  forces: [new_entrants, substitutes, buyers, suppliers, rivalry]
+  assessment: Nullable qualitative strength, nullable numeric confidence, stable analysis snippets and separate Markdown research notes.
+  trajectory: Optional direction, horizon, confidence, analysis including assumptions and research notes; pressure direction is distinct from attractiveness.
+manual_capabilities: [edit_framing, overview_focus, current_trajectory, edit_force_assessment, edit_analysis_snippets, edit_research_notes, import_validated_json, export_complete_json, save_standalone_html]
+ai_actions:
+  create:
+    method: prompts/create.md
+    effect: Initialize a disclosed preliminary industry analysis.
+    required_context: Industry boundary, geography, objective and initial participants; blank manual canvas exempt.
+  evaluate:
+    method: prompts/evaluate.md
+    effect: Append internal/external consistency findings without content changes.
+  improve:
+    method: prompts/improve.md
+    effect: Propose scoped force revisions preserving framing.
+  research:
+    method: prompts/research.md
+    effect: Host-executed evidence investigation with atomic report/candidate approval.
+target_types: [canvas, section]
+action_compatibility:
+  create: new_canvas
+  evaluate: complete_canvas_with_framing
+  improve: complete_canvas_or_explicit_force_with_framing
+  research: explicit_canvas_or_force_with_framing
+quality_criteria:
+  - Explain observation, mechanism, competitive implication and assessment.
+  - Distinguish industry structure from company advantage and temporary from structural change.
+  - Prioritize controlling forces; confidence depends on evidence and reasoning, not checklist completion.
+  - Propose framing reconsideration explicitly, never apply it automatically.
+acceptance:
+  granularity: force_and_bulk
+  proposal_actions: [improve]
+  research: Atomic report, sources and permitted force changes.

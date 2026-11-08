@@ -9,3 +9,7 @@ The shared Thinking tools picker prepares the same `{canvas, action}` envelope o
 - The target determines the focus. Context includes all submitted analytical content and framing, optional `comment`, and additional information explicitly authorized by the user. Consult prior thoughts only when `use_thoughts: true`; the default is false. Prior reflections are perspectives, not additional factual evidence.
 - Return `{"observations":["..."]}` with optional `"suggestions":["..."]`. Use `node scripts/package-<framework>.mjs --result request.json response.json new-output.html` from the skill directory. The script suffixes are `swot`, `pages`, `vpc`, `five-whys` and `vars`. The composer appends one typed thought and preserves the rest of the submitted state.
 - Return the new HTML link. JSON export/import and HTML Save to File preserve reflections. Older artifacts can be updated by packaging their complete JSON through the current framework script. Captured target text remains visible even if the current item is edited or removed.
+
+## Five Forces targets
+
+Five Forces supports the canvas or a fixed force section (new_entrants, substitutes, buyers, suppliers, rivalry), not analysis-snippet items. Its framing readiness gate applies before Six Hats reasoning. Preserve both current/trajectory records and append observations only. Read its framework methodology and relevant force catalogue.

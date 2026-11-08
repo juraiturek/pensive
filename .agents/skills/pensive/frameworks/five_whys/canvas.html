@@ -929,7 +929,7 @@ const SixHats = (() => {
   const nonblank = value => typeof value === 'string' && !!value.trim();
   const validId = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value);
   const own = (object, key) => Object.hasOwn(object, key);
-  const itemTypes = framework => framework === 'swot' ? ['factor', 'strategy'] : framework === 'five_whys' ? ['node'] : ['item'];
+  const itemTypes = framework => framework === 'five_forces' ? ['section'] : framework === 'swot' ? ['factor', 'strategy'] : framework === 'five_whys' ? ['node'] : ['item'];
 
   function keys(value, required, optional, label) {
     if (!value || typeof value !== 'object' || Array.isArray(value) ||
@@ -945,7 +945,9 @@ const SixHats = (() => {
     const add = (type, item, section) => {
       if (nonblank(item.text)) choices.push({ type, id: item.id, label: item.text, section });
     };
-    if (framework === 'five_whys') {
+    if (framework === 'five_forces') {
+      for (const section of ['new_entrants', 'substitutes', 'buyers', 'suppliers', 'rivalry']) choices.push({type:'section', id:section, label:section.replaceAll('_', ' ')});
+    } else if (framework === 'five_whys') {
       const stack = [content.tree];
       while (stack.length) {
         const node = stack.pop();

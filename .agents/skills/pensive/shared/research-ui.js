@@ -9,7 +9,7 @@ const ResearchUI = (() => {
     if(sources.length)node.append(element('h4','Sources'),list);return node;
   }
   function thoughtCard(thought) { const card=element('article');card.className='thought';card.append(element('h3','Research findings'),report(document,thought.text,thought.sources));return card; }
-  function install({getState,core,labels,isLocked,copy,refresh,edited,currentTarget}) {
+  function install({getState,core,labels,isLocked,copy,refresh,edited,currentTarget,renderRecord}) {
     let trigger=document.getElementById('research');if(!trigger){trigger=element('button','Research');trigger.type='button';trigger.id='research';document.querySelector('.ai-actions').append(trigger);}
     const dialog=element('dialog');dialog.setAttribute('aria-labelledby','research-title');dialog.id='research-dialog';
     const form=element('form'),title=element('h2','Research'),note=element('p','Copy the request to your assistant with the Pensive skill. The host searches; findings return for review.');title.id='research-title';
@@ -46,7 +46,7 @@ const ResearchUI = (() => {
           if(ProposalReview.same(before,after))continue;
           diff.append(element('h4',labels[section]?.[0]||section));
           for(const [title,content]of[['Current',proposal.base_content],['Proposed',proposal.content]]){
-            diff.append(element('strong',title));const list=element('ul');for(const item of content[section]){const li=element('li',item.text||'(Blank statement)');if(item.details)li.append(PensiveMarkdown.render(document,item.details));list.append(li);}if(!content[section].length)list.append(element('li','(Empty)'));diff.append(list);if(content.details?.[section])diff.append(PensiveMarkdown.render(document,content.details[section]));
+            diff.append(element('strong',title));if(renderRecord){const column=element('div');renderRecord(content,section,column);diff.append(column);continue;}const list=element('ul');for(const item of content[section]){const li=element('li',item.text||'(Blank statement)');if(item.details)li.append(PensiveMarkdown.render(document,item.details));list.append(li);}if(!content[section].length)list.append(element('li','(Empty)'));diff.append(list);if(content.details?.[section])diff.append(PensiveMarkdown.render(document,content.details[section]));
           }
         }
         panel.append(diff);

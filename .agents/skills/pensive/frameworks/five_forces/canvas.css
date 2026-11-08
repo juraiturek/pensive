@@ -1,0 +1,328 @@
+/* Five Forces retains Pensive’s paper, ink and green palette. */
+input,
+select {
+  font: inherit;
+  color: var(--ink);
+  max-width: 100%;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.framing {
+  grid-template-columns: 1.5fr 0.75fr 1.2fr;
+}
+.framing details[open] {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.framing details summary,
+.framing details p {
+  grid-column: 1/-1;
+}
+.framing details label {
+  color: var(--ink);
+}
+#framing-reassessment {
+  grid-column: 1/-1;
+  padding: 0.75rem;
+  border-left: 3px solid var(--accent);
+  background: var(--green);
+  font-size: 0.85rem;
+}
+.view-controls {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 0.5rem;
+}
+.view-controls [aria-pressed='true'] {
+  color: white;
+  background: var(--accent);
+}
+#overview {
+  margin-left: auto;
+}
+.pressure-legend,
+.confidence-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0.6rem 0 1.2rem;
+}
+.force-overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas: '. entrants .' 'suppliers rivalry buyers' '. substitutes .';
+  gap: 1rem;
+  padding: 1rem 0 2rem;
+}
+.force-tile {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--accent);
+  padding: 1.2rem;
+  min-height: 170px;
+  position: relative;
+  min-width: 0;
+}
+.force-tile h2 {
+  font-family: 'Iowan Old Style', Baskerville, Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 0 0 1rem;
+}
+.force-tile p {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+.force-tile small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+.force-tile > button {
+  margin-top: 1rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.78rem;
+}
+.force-tile.selected {
+  background: var(--green);
+  border-color: var(--accent);
+}
+.force-tile[data-section='new_entrants'] {
+  grid-area: entrants;
+}
+.force-tile[data-section='substitutes'] {
+  grid-area: substitutes;
+}
+.force-tile[data-section='buyers'] {
+  grid-area: buyers;
+}
+.force-tile[data-section='suppliers'] {
+  grid-area: suppliers;
+}
+.force-tile[data-section='rivalry'] {
+  grid-area: rivalry;
+}
+.trajectory-indicator {
+  float: right;
+  margin-left: 0.5rem;
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: 1.2rem;
+}
+.trajectory-indicator[aria-label='Uncertain competitive pressure'] {
+  font-size: 0.72rem;
+  padding-top: 0.25rem;
+}
+#forces-workspace.focused {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.8fr);
+  gap: 2rem;
+  align-items: start;
+}
+.force-overview.compact {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+  gap: 0.5rem;
+}
+.compact .force-tile {
+  min-height: 0;
+  padding: 0.8rem;
+}
+.compact .force-tile h2 {
+  font-family: inherit;
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+.compact .force-tile p {
+  font-size: 0.8rem;
+}
+.compact .force-tile > button {
+  margin-top: 0.5rem;
+}
+#focus-pane {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 1.6rem;
+}
+#focus-title {
+  font-family: 'Iowan Old Style', Baskerville, Georgia, serif;
+  font-weight: 500;
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0.5rem 0 1.2rem;
+}
+#focus-pane h3 {
+  font-size: 1rem;
+  margin: 1.4rem 0 0.5rem;
+}
+#diagnostics {
+  font-size: 0.85rem;
+  background: var(--paper);
+  padding: 0.8rem 1rem;
+  margin-bottom: 1.2rem;
+}
+#diagnostics .markdown {
+  padding-top: 0.75rem;
+}
+.assessment-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.assessment-fields label,
+#horizon-field {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  font-weight: 600;
+  gap: 0.4rem;
+}
+#horizon-field {
+  margin-top: 0.8rem;
+}
+#analysis-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+#analysis-points {
+  padding-left: 1.2rem;
+}
+#analysis-points li {
+  padding-right: 2rem;
+  position: relative;
+  margin: 0.6rem 0;
+}
+#analysis-points textarea {
+  font-size: 0.95rem;
+}
+#analysis-points li button {
+  position: absolute;
+  right: -0.3rem;
+  top: 0.3rem;
+  padding: 0.1rem 0.45rem;
+}
+.notes-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.notes-heading button {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  margin-top: 1rem;
+}
+.detail-preview {
+  padding: 0.6rem 0;
+  min-height: 3rem;
+  overflow-wrap: anywhere;
+}
+.record-preview {
+  padding: 0.7rem 0;
+  overflow-wrap: anywhere;
+}
+.record-preview h5 {
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+.takeaways-prompts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+.markdown table {
+  max-width: 100%;
+}
+dialog textarea {
+  max-width: 100%;
+}
+@media (max-width: 800px) {
+  .framing {
+    grid-template-columns: 1fr;
+  }
+  .force-overview {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 'entrants substitutes' 'suppliers buyers' 'rivalry rivalry';
+  }
+  #forces-workspace.focused {
+    grid-template-columns: 1fr;
+  }
+  .force-overview.compact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  #overview {
+    margin-left: 0;
+  }
+  #focus-pane {
+    padding: 1rem;
+  }
+}
+@media (max-width: 500px) {
+  .shell {
+    width: calc(100% - 2rem);
+  }
+  .brand {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .toolbar {
+    align-items: flex-start;
+  }
+  .ai-actions,
+  .export-actions {
+    flex-wrap: wrap;
+  }
+  .framing details[open],
+  .assessment-fields,
+  .takeaways-prompts {
+    grid-template-columns: 1fr;
+  }
+  .force-tile {
+    padding: 0.8rem;
+    min-height: 160px;
+  }
+  .force-tile h2 {
+    font-size: 1.1rem;
+  }
+  .force-overview.compact .force-tile {
+    min-height: 0;
+  }
+  .view-controls button {
+    font-size: 0.75rem;
+  }
+  #focus-title {
+    font-size: 1.6rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+#analysis-points li {
+  list-style: none;
+}
+#analysis-points li::before {
+  content: '•';
+  position: absolute;
+  left: -1.1rem;
+  top: 0.55rem;
+}
+#analysis-points textarea {
+  display: block;
+}

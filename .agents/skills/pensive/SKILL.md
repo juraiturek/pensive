@@ -1,19 +1,19 @@
 ---
 name: pensive
-description: Use for Pensive canvas requests, SWOT/TOWS, PAGES, Value Proposition Canvas (VPC), 5 Whys causal investigation, VARS business models, scoped web research, framework selection, analytical actions on supplied canvas JSON, Six Thinking Hats, or exploring the assumptions and structure of a limiting perspective.
+description: Use for Pensive canvas requests, SWOT/TOWS, PAGES, Value Proposition Canvas (VPC), 5 Whys causal investigation, VARS business models, Porter’s Five Forces industry analysis, scoped web research, framework selection, analytical actions on supplied canvas JSON, Six Thinking Hats, or exploring the assumptions and structure of a limiting perspective.
 ---
 
 # Pensive
 
 ## Availability
 
-SWOT/TOWS supports creation, Strategize/Evaluate/Improve and manual editing. PAGES supports creation, Evaluate/Improve/Ripple with its persisted baseline. VPC supports creation and Evaluate/Improve. 5 Whys supports creation, Reflect and node-targeted Deepen/Branch proposals. VARS supports creation, Evaluate Consistency, Improve, explicit-change Ripple and Overview/Focus with quadrant/item Markdown. All five canvases support complete JSON import/export, standalone HTML saving, annotations, Takeaways and Six Thinking Hats. Static pages prepare full-state JSON requests; the host assistant performs inference and search, then returns newly packaged HTML. Research is supported only for VARS and SWOT; see its dedicated routing below. No history or rollback exists.
+SWOT/TOWS supports creation, Strategize/Evaluate/Improve and manual editing. PAGES supports creation, Evaluate/Improve/Ripple with its persisted baseline. VPC supports creation and Evaluate/Improve. 5 Whys supports creation, Reflect and node-targeted Deepen/Branch proposals. VARS supports creation, Evaluate Consistency, Improve, explicit-change Ripple and Overview/Focus with quadrant/item Markdown. All six canvases support complete JSON import/export, standalone HTML saving, annotations, Takeaways and Six Thinking Hats. Five Forces supports nullable qualitative force assessments, percentage confidence, analysis snippets, research notes, Overview/Focus and current/trajectory views with consistency evaluation. Static pages prepare full-state JSON requests; the host assistant performs inference and search, then returns newly packaged HTML. Research is supported for VARS, SWOT and Five Forces; see its dedicated routing below. No history or rollback exists.
 
 For context-based creation and existing-state analytical actions, read the shared [internal and external fit guidance](references/framing-content.md) with the selected framework method. Framework methodology and action boundaries remain authoritative; blank copying and JSON-only packaging need no analytical review.
 
 ## Takeaways
 
-All five canvases have a manually editable Takeaways body below the analysis. Preserve it during unrelated edits and AI actions. Route `formulate_takeaways` and `review_takeaways` before framework-specific action routing. Read the [Takeaways handoff](references/takeaways-workflow.md) for context selection, framework methodology, response validation and explicit whole-text review. Include relevant manual Thoughts only when the user opts in. A pending proposal never replaces the user's body until acceptance.
+All six canvases have a manually editable Takeaways body below the analysis. Preserve it during unrelated edits and AI actions. Route `formulate_takeaways` and `review_takeaways` before framework-specific action routing. Read the [Takeaways handoff](references/takeaways-workflow.md) for context selection, framework methodology, response validation and explicit whole-text review. Include relevant manual Thoughts only when the user opts in. A pending proposal never replaces the user's body until acceptance.
 
 ## Shared thinking tools
 
@@ -23,7 +23,7 @@ Route `action.id: "six_hats"` here before framework-specific action routing. Rea
 
 ## Manual annotations
 
-All five frameworks support whole-canvas thoughts. SWOT/TOWS, PAGES, VPC and VARS support collection and item thoughts. 5 Whys supports problem and cause thoughts. SWOT factor thoughts are also available in the TOWS context view. Edit Mode indicators open a read-only thought overlay. Annotation Mode pauses analytical edits and offers local note creation, editing and deletion. JSON export and HTML Save to File include notes. Notes whose targets disappear are retained under Unavailable targets.
+All six frameworks support whole-canvas thoughts. SWOT/TOWS, PAGES, VPC and VARS support collection and item thoughts. 5 Whys supports problem and cause thoughts. Five Forces supports fixed force-section thoughts. SWOT factor thoughts are also available in the TOWS context view. Edit Mode indicators open a read-only thought overlay. Annotation Mode pauses analytical edits and offers local note creation, editing and deletion. JSON export and HTML Save to File include notes. Notes whose targets disappear are retained under Unavailable targets.
 
 Preserve the complete submitted `annotations` collection through existing-state actions and packaging. Manual notes are supplemental interpretive context, not automatically validated analytical content. Existing `use_thoughts` flags apply to their documented AI thoughts only. Discuss manual notes as user-authored context when the user explicitly selects them, and preserve the distinction between questions, tentative interpretations and evidence.
 
@@ -35,7 +35,7 @@ SWOT, PAGES, VPC and VARS share hover/touch-revealed handles for within-collecti
 
 ## Select a framework without imposing one
 
-- Honor explicit framework choice. An explicit SWOT, 5 Whys, PAGES, VPC or VARS request needs no recommendation or framework-choice permission step; distinguish blank, context-driven creation and actions on existing state. Framework-specific sparse-draft agreement still applies.
+- Honor explicit framework choice. An explicit SWOT, 5 Whys, PAGES, VPC, VARS or Five Forces request needs no recommendation or framework-choice permission step; distinguish blank, context-driven creation and actions on existing state. Framework-specific sparse-draft agreement still applies.
 - SWOT can help when the user is weighing an entity's internal capabilities against external conditions to choose a strategic direction. When implicitly useful, offer it selectively with a concrete reason and wait for the user's choice; respect a decline. Once chosen, move toward a useful draft as soon as framing and evidence permit, rather than waiting for another generation command. Read [Create](frameworks/swot/prompts/create.md) for sparse-draft agreement and the question budget.
 - PAGES can help discover how a current perspective is composed, or shift a limiting lens: assumptions, interpretations, repeated conclusions, an impasse or an established viewpoint the user wants to question. Read its [semantics](frameworks/pages/framework.yaml). These are contextual opportunities, not automatic triggers.
 - When only implicitly relevant, normally offer it once as an option with a brief concrete reason: “We could map the parts, actions, goals, events and self-concepts behind this view, then test what changes when one premise shifts.” Wait for the user's choice before creating a canvas. Respect a decline; do not suggest it again unless the user reopens it or the situation materially changes.
@@ -45,9 +45,23 @@ SWOT, PAGES, VPC and VARS share hover/touch-revealed handles for within-collecti
 
 ## Shared host-executed Research
 
-Route `action.id: "research"` before framework-local actions. Read the [Research handoff](references/research-workflow.md), shared [research method](prompts/research.md) and selected [VARS](frameworks/vars/prompts/research.md) or [SWOT](frameworks/swot/prompts/research.md) guide. Only these two frameworks currently support Research. Use complete submitted state and the explicit canvas/section/item target. Context flags `use_thoughts` and `include_annotations` default false and refer to different sources. Load VRI guidance only for a selected VARS A item with `method: "vri"`.
+Route `action.id: "research"` before framework-local actions. Read the [Research handoff](references/research-workflow.md), shared [research method](prompts/research.md) and selected [VARS](frameworks/vars/prompts/research.md), [SWOT](frameworks/swot/prompts/research.md) or [Five Forces](frameworks/five_forces/prompts/research.md) guide. These three frameworks support Research. Use complete submitted state and the explicit canvas/section/item target. Context flags `use_thoughts` and `include_annotations` default false and refer to different sources. Load VRI guidance only for a selected VARS A item with `method: "vri"`.
 
 Search uses the host's available tools, never the HTML or a Pensive backend. If unavailable, say so rather than fabricate results. Return source-backed Markdown `report`, `sources: [{title,url}]`, and optional complete candidate `content` within target boundaries. The deterministic packager creates one pending batch: findings and edits require acceptance together. Preserve framing and distinguish researched evidence from local company facts. Competitor S/W findings require user confirmation of applicability before being proposed as organizational S/W.
+
+## Create, package or analyze Five Forces
+
+Read the [manifest](frameworks/five_forces/framework.yaml), [workflow](references/five-forces-workflow.md) and [methodology](frameworks/five_forces/methodology.md). Preserve the established [canvas](frameworks/five_forces/canvas.html).
+
+- Explicit blank: copy the empty canvas exclusively to a new destination; framing is not required for manual editing.
+- Context creation: follow [Create](frameworks/five_forces/prompts/create.md). Establish industry/product boundary, geography, objective and an initial participant map before substantive AI analysis. Explicit unknown participants are valid; do not fabricate exhaustive lists.
+- Complete JSON: `node scripts/package-five-forces.mjs state.json new-output.html` from the skill directory.
+- Existing state: validate complete `{canvas,action}` including the framing gate, then load selected [Evaluate](frameworks/five_forces/prompts/evaluate.md), [Improve](frameworks/five_forces/prompts/improve.md) or Research guidance. Use `--result` packaging. Resolve pending proposals first.
+- Evaluate appends findings only. Improve preserves framing and targets the canvas or one fixed force section; review is atomic per force including current/trajectory assessments, snippets and notes. Research uses shared atomic batch review.
+
+The same force-specific question catalogue informs browser guidance, AI analysis, Research and quality checks. Strength is a nullable five-level enum; confidence is a nullable 0–1 judgment displayed as percentage, not a calibrated probability or checklist formula. Separate stable analysis snippets from Markdown supporting research notes. Trajectory includes pressure direction, horizon, independent confidence and assumptions in analysis. Null remains unassigned; uncertain is distinct from stable. Arrows indicate stronger/weaker pressure, not attractiveness.
+
+Findings can propose reframing; only the user changes framing and requests reassessment. Do not silently alter conclusions or Takeaways. Use the [Five Forces Takeaways extension](frameworks/five_forces/prompts/takeaways.md) for flexible T1–T4 guidance. Return a new standalone HTML at an explicit destination, normally the host project’s outputs/. No causal graph, scoring, automatic search or history.
 
 ## Create, package or transform VARS
 
