@@ -1,5 +1,18 @@
 # Destination architecture
 
+## Kaizen default conversation canvases — 2026-11-14 correction
+
+The user's Raffin PAGES test exposed a scope/delivery gap in the optional SWOT pilot below: PAGES creation/Ripple still correctly followed the old instructions and generated another standalone HTML. The [correction plan](plans/2026-11-14-kaizen-conversation-defaults.md) makes conversation working folders the default across all six frameworks on writable local hosts, superseding the pilot's opt-in/SWOT-only defaults. Standalone packaging remains an explicit export or disclosed user-chosen fallback.
+
+`conversation.mjs create` uses exact originating chat identity (`CODEX_THREAD_ID` or explicit ID), records a conversation registry under the host's explicit outputs root, and initializes one framework-owned subfolder per analysis. Repeated lookup reuses the latest registered analysis; `--new` adds a distinct identity/history only for a separately requested analysis. Another framework shares the same chat folder. Registry locking, path/identity validation and orphan detection prevent silent replacement or hidden history after interrupted publication. A host-operated `launch` starts/reuses the existing loopback persistence service and returns a usable authorized browser URL; direct file URLs remain detached artifacts.
+
+Framework resolution is allowlisted and each store remains bound to its original framework. All six established renderers now bind to saved JSON, detach on standalone export and preserve explicit proposal review. PAGES source changes, Ripple baseline, partial decisions and baseline resets persist; Five Whys and VARS refuse revision/action saves while transient editor text is uncommitted. Reload detects edits made during its fetch, including transient input. Framework state/action schemas, reasoning methods and compositional boundaries are unchanged.
+
+Python history extraction validates each chain with its bound framework core. SWOT, PAGES, VPC and VARS collection projections use stable identity for edits/moves/reordering; tree and fixed-force representations retain deterministic recursive differences without claiming generalized tree move semantics. A history UI, branch/merge/restore UI, action-only transport and automatic model reflection remain outside scope. Full submitted state continues to inform analytical actions.
+
+The observed Raffin PAGES and SWOT generations and submitted requests were imported into a single originating-chat folder under ignored outputs, preserving pending proposals and original files. Imported revision times describe import, not invented original event times; migration records retain source hashes and observed file mtimes. README remains unchanged; no legacy access, distribution or publication is involved.
+
+
 ## Kaizen SWOT working folders — 2026-11-14
 
 The [Kaizen plan](plans/2026-11-14-kaizen-revisioned-canvas.md) introduces an optional SWOT pilot. A loopback-only Node service owns complete revision snapshots and atomically publishes `current.json`; immutable `history/` snapshots include the current head. One content-agnostic `canvas.html` loads authenticated state and stays byte-identical across iterations. The service performs no inference. Standalone mode and other frameworks retain their established packaging contracts.

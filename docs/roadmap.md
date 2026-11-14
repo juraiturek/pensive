@@ -1,5 +1,10 @@
 # Implementation roadmap
 
+## Kaizen delivery correction — 2026-11-14
+
+The user expected the stable-HTML workflow in ordinary PAGES usage, not an optional SWOT mode. The [correction](plans/2026-11-14-kaizen-conversation-defaults.md) therefore implements default conversation folders, shared chat grouping across frameworks, explicit separate-analysis identities, host-operated local launch, all-framework JSON persistence and PAGES Ripple/review/baseline events. This supersedes the narrower pilot boundary below. Existing standalone exports remain available; native host bridges, branch/merge/restore/history interfaces and automatic historical reasoning remain separate work.
+
+
 ## Kaizen SWOT persistence pilot — 2026-11-14
 
 The user approved implementation of the [Kaizen slice](plans/2026-11-14-kaizen-revisioned-canvas.md): stable working HTML, ordered complete JSON snapshots, explicit saves and review-event persistence, exact-state host handoffs, stale/duplicate protection and deterministic Python deltas. Scope is optional SWOT working folders served on loopback; full-state requests and standalone export remain the recovery path. This makes the local working-folder portion of H3/H4 concrete without asserting native host binding or action-only requests.

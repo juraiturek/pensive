@@ -1,5 +1,28 @@
 # Testing strategy
 
+## Kaizen conversation-default correction — 2026-11-14
+
+The user's real **Analyze Raffin with PAGES** chat reproduced the delivery gap: ordinary creation emitted `raffin-pages.html`, and Ripple emitted a timestamped second HTML because the previous implementation/instructions made live persistence an optional SWOT pilot. The [correction plan](plans/2026-11-14-kaizen-conversation-defaults.md) makes conversation folders/live JSON revisions the normal all-framework route on writable local hosts.
+
+Full regression from the isolated correction checkout:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright /Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test --test-concurrency=2 tests/*.test.mjs
+```
+
+**318 passed, zero failures/skips**: the preceding 289 checks plus **29 new tests** (five conversation registry/launch, nine framework-state/service, nine live browser and six framework-history checks). New tests observed failures before implementation. PAGES Ripple now demonstrably keeps byte-identical HTML through manual source save, exact saved request, AI proposal, partial accept/reject and baseline reset. All six frameworks load/save/reload, bind shared actions and export detached offline HTML. Five Whys/VARS draft tests reproduced silently unsaved transient text; save/action guards and reload/navigation protection now preserve it. The first full run passed 317/318 and caught a stale generated 5 Whys HTML after its last source edit; rebuilding all six restored deterministic parity and the final full pass.
+
+Conversation checks cover exact chat separation, multiple frameworks sharing one folder, repeated framework reuse without state replacement, explicit new-analysis identities, safe labels, host-operated service startup/reuse and unregistered canvas detection. Review reproduced interrupted-registry publication leaving an orphan analysis; lookup now stops for explicit recovery rather than returning an older canvas. Framework stores reject framework switching; PAGES baseline/reset rules remain framework-specific. Python validates all six bound schemas/cores and gives PAGES stable-item deltas; tree/fixed-force output remains exact recursive change data without a generalized tree-move claim.
+
+Skill validation passed using temporary PyYAML 6.0.3; all six manifests parsed and **234** local skill Markdown links resolved. All six deterministic HTML builders matched their generated output. Whitespace and unchanged README checks passed. Temporary pinned Prettier 3.6.2 formatted new/generalized utilities and tests without project dependency changes. Chromium tests require elevated macOS loopback/process access; sandbox-only HTTP tests fail with expected EPERM. PAGES desktop/mobile screenshots were inspected under ignored test-results.
+
+A fresh-agent guidance check followed actual SKILL routing for initial PAGES, live Ripple, SWOT in the same chat, explicit new PAGES, legacy raw requests and unavailable service. It selected JSON persistence and host launch without timestamped HTML fallback; a separate implementation review found no remaining important defect after orphan detection and separately passed 23 conversation/state/history checks. This is synthetic application/review, not a statistical model evaluation, native host certification or live analytical-model run.
+
+The existing Raffin PAGES and SWOT initial/request/result states were imported into the originating chat's ignored outputs folder, each with one HTML and three complete JSON snapshots. Full source state and pending proposals were preserved; original files were retained. Import timestamps are explicitly import times; migration records contain source hashes and observed file mtimes rather than invented original save events. No user analytical content was added to tracked fixtures.
+
+Limits: local writable-host/external-browser workflow; Chromium desktop/narrow only. Native viewers, Safari/Firefox, physical devices, live search/model APIs, generalized tree move inference, history/branch/merge/restore interfaces and automatic reflection remain untested or outside scope. README, legacy sources, dependencies and distribution packages were unchanged; no push/publication.
+
+
 ## Kaizen SWOT working folders — 2026-11-14
 
 Implemented the approved [Kaizen plan](plans/2026-11-14-kaizen-revisioned-canvas.md) in an isolated local worktree. Final full regression:

@@ -1,6 +1,9 @@
 # Shared Research handoff
 
-Research is host-executed inference and search, initiated by a complete JSON request from a standalone canvas. Supported frameworks are VARS, SWOT and Five Forces. Other canvases do not gain Research merely because these helpers exist.
+**Default delivery:** Follow [conversation working folders](working-folder-workflow.md) for creation and every iteration on writable local hosts: reuse the analysis HTML, save JSON revisions, and return its live browser URL. The analytical methods/contracts below are unchanged. `package-*.mjs` commands and new-HTML directions in this reference apply only to an explicit standalone export or a disclosed fallback chosen by the user; they are not the normal iteration path.
+
+
+Research is host-executed inference and search, initiated by a complete JSON request from a canvas. Supported frameworks are VARS, SWOT and Five Forces. Other canvases do not gain Research merely because these helpers exist.
 
 Read the [shared method](../prompts/research.md), then the selected framework guide: [VARS](../frameworks/vars/prompts/research.md), [SWOT](../frameworks/swot/prompts/research.md) or [Five Forces](../frameworks/five_forces/prompts/research.md). Deeper guidance is loaded only when the selected question needs it.
 
@@ -14,7 +17,7 @@ Optional action fields are `comment`, `use_thoughts`, `include_annotations` and 
 
 Response is exactly `{report,sources,content?}`. `report` is nonblank Markdown. `sources` is an array of `{title,url}` entries; use direct valid HTTP(S) URLs, with no extra evidence database fields. `content`, if present, is a complete candidate validated by the framework against immutable framing, stable identity and selected-target boundaries. A report-only response is valid when no edit is justified. Source syntax validation does not establish factual credibility.
 
-Write the original request unchanged and the model response separately in a unique OS temporary directory. From the skill directory use the selected framework command:
+Write the original request unchanged and the model response separately in a unique OS temporary directory. Commit through the conversation workflow. For explicit standalone export only, from the skill directory use the selected framework command:
 
 ```sh
 node scripts/package-vars.mjs --result request.json response.json new-output.html
@@ -28,4 +31,4 @@ Use only the relevant command and pass a new destination explicitly. The compose
 
 The preview exposes report, sources and any content differences before one Accept/Reject decision. Accept atomically applies permitted candidate changes and records the approved report/source links as a research thought. Report-only results also require acceptance before joining persisted analytical thoughts. Reject leaves accepted analysis unchanged.
 
-Acceptance checks current analytical content against the request snapshot, plus opted-in annotations/AI thoughts when used. Stale acceptance fails without mutation; rejection remains available after local edits. The report is not proof of business facts merely because it is accepted. JSON import/export and Save to File preserve pending/accepted results. No automatic search, background backend, source-management service, history or rollback is introduced. Each result is a new standalone HTML artifact.
+Acceptance checks current analytical content against the request snapshot, plus opted-in annotations/AI thoughts when used. Stale acceptance fails without mutation; rejection remains available after local edits. The report is not proof of business facts merely because it is accepted. JSON import/export and Save to File preserve pending/accepted results. No automatic search, inference backend, source-management service or rollback interface is introduced. The default result advances JSON in the same conversation canvas; a new standalone HTML is an explicit export only.

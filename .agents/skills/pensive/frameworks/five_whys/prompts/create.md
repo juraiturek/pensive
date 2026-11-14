@@ -1,6 +1,9 @@
 # Create a 5 Whys investigation
 
-Read the [manifest](../framework.yaml), [schema](../canvas.schema.json), [handoff](../../../references/five-whys-workflow.md) and shared [fit guidance](../../../references/framing-content.md). Use conversation and supplied material. Do not research by default. Explicit blank requests copy the established empty canvas without elicitation. Never generate replacement HTML/CSS/JS.
+Delivery follows the default [conversation working-folder workflow](../../../references/working-folder-workflow.md): initialize/reuse the analysis in its chat folder, let the host launch it, and return its live browser URL. A repeated iteration reuses its HTML and saves JSON. A separate canvas is for a newly requested analysis. Standalone packager commands below are for explicit export or a disclosed fallback chosen by the user. Analytical creation rules remain unchanged.
+
+
+Read the [manifest](../framework.yaml), [schema](../canvas.schema.json), [handoff](../../../references/five-whys-workflow.md) and shared [fit guidance](../../../references/framing-content.md). Use conversation and supplied material. Do not research by default. Explicit blank requests initialize empty state through the conversation workflow without elicitation. Never generate replacement HTML/CSS/JS.
 
 ## Extract framing before causes
 
@@ -22,4 +25,4 @@ Use supplied causal observations where available. Qualify `Hypothesis:` and `Inf
 
 For each meaningful link, check mechanism, time order, supporting/contrary evidence, alternatives, missing intermediates, repetition and circularity. Distinguish actionable contributing conditions from proven root causes. Then check the full investigation against root, system, scope and timeframe. Correct generated drift; preserve a credible discovery that challenges framing as a qualified reframing opportunity, explaining the tension rather than silently changing boundaries or discarding it. No numerical confidence or generic fit score.
 
-Validate/package complete state using the handoff. Return a new standalone HTML link as an initial AI-authored draft, noting material hypotheses and unanswered evidence questions. No proposal is needed for first creation. Keep unsupported branches empty rather than fabricate causal depth.
+Validate/package complete state using the handoff. Return the live canvas URL as an initial AI-authored draft, noting material hypotheses and unanswered evidence questions. No proposal is needed for first creation. Keep unsupported branches empty rather than fabricate causal depth.

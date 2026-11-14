@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read immutable SWOT snapshots; report observed changes, never inferred intent."""
+"""Read immutable framework snapshots; report observed changes, never inferred intent."""
 import argparse
 import json
 import math
@@ -43,7 +43,7 @@ def read_chain(folder):
         for field in ('revision_id', 'canvas_id', 'operation_id'):
             if not isinstance(record.get(field), str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', record[field]):
                 raise ValueError(f'Invalid {field}')
-        if record.get('storage_version') != '1.0' or (record.get('canvas') if isinstance(record.get('canvas'), dict) else {}).get('framework') != 'swot' or record['canvas'].get('schema_version') != '1.0':
+        if record.get('storage_version') != '1.0' or (record.get('canvas') if isinstance(record.get('canvas'), dict) else {}).get('framework') not in ('swot', 'pages', 'vpc', 'vars', 'five_whys', 'five_forces') or record['canvas'].get('schema_version') != '1.0':
             raise ValueError('Incompatible storage/framework/schema version')
         stamp = record.get('saved_at')
         if not isinstance(stamp, str) or not stamp.endswith('Z'):
@@ -61,6 +61,7 @@ def read_chain(folder):
         if (record['revision_number'] != index + 1
                 or record.get('parent_revision_id') != (previous['revision_id'] if previous else None)
                 or record['canvas_id'] != records[0]['canvas_id']
+                or record['canvas']['framework'] != records[0]['canvas']['framework']
                 or record['revision_id'] in seen_ids or record['operation_id'] in seen_operations):
             raise ValueError('Broken history parent/sequence/identity chain')
         seen_ids.add(record['revision_id'])
@@ -69,9 +70,9 @@ def read_chain(folder):
         raise ValueError('Current head differs from history; retry or inspect recovery')
     # Reuse the authoritative JS validator rather than implementing framework rules twice.
     validator = Path(__file__).resolve().parent / 'lib' / 'revision-store.mjs'
-    state = Path(__file__).resolve().parent.parent / 'frameworks' / 'swot' / 'state.js'
-    code = "import{createRequire}from'node:module';import{readFileSync}from'node:fs';const{validateEnvelope}=await import(process.argv[1]);const core=createRequire(import.meta.url)(process.argv[2]);for(const r of JSON.parse(readFileSync(0,'utf8')))validateEnvelope(r,core.validate);"
-    checked = subprocess.run(['node', '--input-type=module', '-e', code, validator.as_uri(), str(state)],
+    resolver = Path(__file__).resolve().parent / 'lib' / 'framework-core.mjs'
+    code = "import{readFileSync}from'node:fs';const{validateEnvelope}=await import(process.argv[1]);const{frameworkValidator}=await import(process.argv[2]);const rs=JSON.parse(readFileSync(0,'utf8'));const validate=frameworkValidator(rs[0].canvas.framework);for(const r of rs)validateEnvelope(r,validate);"
+    checked = subprocess.run(['node', '--input-type=module', '-e', code, validator.as_uri(), resolver.as_uri()],
                              input=json.dumps(records, ensure_ascii=False), text=True, capture_output=True)
     if checked.returncode:
         raise ValueError('Framework/revision validation failed: ' + checked.stderr.strip())
@@ -125,14 +126,25 @@ SECTIONS = ('strengths', 'weaknesses', 'opportunities', 'threats', 'so', 'st', '
 
 
 def canvas_delta(before, after):
-    # Flatten accepted SWOT analytical items only. Proposal candidates are separate state.
+    # Flatten accepted array-based collections; tree/fixed-force state uses exact recursive diffs.
+    framework = before['framework']
+    section_paths = {
+        'swot': [('content', key) for key in SECTIONS[:4]] + [('content', 'strategies', key) for key in SECTIONS[4:]],
+        'pages': [('content', key) for key in ('parts', 'actions', 'goals', 'events', 'self_concepts')],
+        'vpc': [('content', key) for key in ('jobs', 'pains', 'gains', 'products_services', 'pain_relievers', 'gain_creators')],
+        'vars': [('content', key) for key in ('v', 'a', 'r', 's')],
+    }.get(framework)
+    if section_paths is None:
+        return diff(before, after)
     def extract(state):
         state = json.loads(json.dumps(state))
         items, order = {}, {}
-        for section in SECTIONS:
-            collection = state['content'] if section in SECTIONS[:4] else state['content']['strategies']
-            path = '/content/' + ('' if section in SECTIONS[:4] else 'strategies/') + section
-            entries = collection.pop(section)
+        for keys in section_paths:
+            collection = state
+            for key in keys[:-1]:
+                collection = collection[key]
+            path = '/' + '/'.join(pointer(key) for key in keys)
+            entries = collection.pop(keys[-1])
             order[path] = [item['id'] for item in entries]
             for index, item in enumerate(entries):
                 items[item['id']] = (path, index, item)
@@ -179,7 +191,7 @@ def main():
     if not 1 <= args.start <= end <= len(records):
         raise ValueError('Invalid revision range')
     selected = records[args.start - 1:end]
-    output = {'canvas_id': selected[0]['canvas_id'], 'from_revision': args.start, 'to_revision': end,
+    output = {'framework': selected[0]['canvas']['framework'], 'canvas_id': selected[0]['canvas_id'], 'from_revision': args.start, 'to_revision': end,
               'omitted_before': args.start - 1, 'omitted_after': len(records) - end,
               'interpretation': 'Observed saved-state changes. Intent and causes require recorded evidence.',
               'transitions': []}

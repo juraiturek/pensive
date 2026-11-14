@@ -1556,8 +1556,8 @@ const AnnotationUI = (() => {
 })();
 </script>
 <script data-implementation>
-/* Local PAGES editing and explicit AI handoff. No network or storage service. */
-(() => {
+/* PAGES editing and AI handoff, with optional working-folder persistence. */
+(async () => {
   'use strict';
   const labels = {
     parts: ['Parts', 'P', 'People, objects, systems and other elements you notice.'],
@@ -1567,7 +1567,8 @@ const AnnotationUI = (() => {
     self_concepts: ['Self-concepts', 'S', 'Identity, roles and beliefs about who you are here.']
   };
   const $ = selector => document.querySelector(selector);
-  const source = '<!doctype html>\n' + document.documentElement.outerHTML;
+  const source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
+  let workingFolder;
   let state, requestedAction, annotations, renderTakeaways;
   const ordering = CanvasEditing.collectionOrdering({ core: Pages, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) {
@@ -1578,9 +1579,10 @@ const AnnotationUI = (() => {
   }
   function status(message, error = false) { $('#status').textContent = message; $('#status').classList.toggle('error', error); }
   function resize(input) { input.style.height = 'auto'; input.style.height = `${Math.max(input.scrollHeight, 30)}px`; }
-  function edited() {
+  function edited(event) {
+    workingFolder?.edited(event);
     $('#clipboard-fallback').hidden = true;
-    status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
+    status(workingFolder ? 'Unsaved changes. Save Revision to keep them in this working folder.' : 'Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
     renderChanges();
     annotations.refresh();
   }
@@ -1663,8 +1665,8 @@ const AnnotationUI = (() => {
       title: proposal?.action === 'ripple' ? 'Proposed Ripple implications' : 'Proposed improvements',
       onDecision: (selected, decision) => {
         if (annotations.isActive()) return;
-        Pages.resolveProposal(state, selected, decision); refresh(); edited();
-        status('Review decision saved in this tab. Export or save to keep it.');
+        Pages.resolveProposal(state, selected, decision); refresh(); edited({ kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', selection: selected ?? null });
+        if (!workingFolder) status('Review decision saved in this tab. Export or save to keep it.');
       }
     });
     if (annotations.isActive()) $('#proposal-panel').querySelectorAll('button, input').forEach(control => { control.disabled = true; });
@@ -1674,6 +1676,11 @@ const AnnotationUI = (() => {
     Pages.sections.forEach(renderSection); renderChanges(); renderAI(); annotations.refresh();
   }
   async function copyJson(json, message) {
+    const parsed = JSON.parse(json);
+    if (workingFolder && parsed.canvas && parsed.action) {
+      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
+      message = 'Copied AI request bound to the saved canvas revision.';
+    }
     try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status(message); }
     catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access blocked. Copy the selected JSON below.', true); }
   }
@@ -1711,6 +1718,11 @@ const AnnotationUI = (() => {
   }
   try {
     state = Pages.parseState($('#canvas-state').textContent);
+    if (typeof WorkingFolder !== 'undefined') {
+      document.body.inert = true;
+      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = Pages.parseState(JSON.stringify(next)); annotations?.reset(); }, refresh, status }); }
+      finally { document.body.inert = false; }
+    }
     annotations = AnnotationUI.install({
       getState: () => state, targetType: 'item', sections: Pages.sections,
       lookup: (id, type) => {
@@ -1749,7 +1761,7 @@ const AnnotationUI = (() => {
     $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });
     $('#reset-baseline').addEventListener('click', () => {
       if (confirm('Set the current core content as the Ripple baseline? This clears change markers. Previous changes will no longer be available to Ripple.')) {
-        try { Pages.resetBaseline(state); edited(); status('Ripple baseline set to current content. Save or export to keep it.'); } catch (e) { status(e.message, true); }
+        try { Pages.resetBaseline(state); edited({kind:'baseline_reset'}); if (!workingFolder) status('Ripple baseline set to current content. Save or export to keep it.'); } catch (e) { status(e.message, true); }
       }
     });
     $('#import').addEventListener('click', () => { $('#import-form').reset(); $('#import-error').textContent = ''; $('#import-dialog').showModal(); $('#import-json').focus(); });
@@ -1759,7 +1771,7 @@ const AnnotationUI = (() => {
       try {
         const next = Pages.parseState($('#import-json').value);
         if (!confirm('Replace the current canvas, including edits, annotations, thoughts, baseline and pending proposal? Save or export first if you want to keep it.')) return;
-        state = next; annotations.reset(); $('#import-dialog').close(); refresh(); edited(); status(next.ripple_baseline ? 'PAGES JSON imported. Save to keep this state.' : 'PAGES JSON imported without a baseline. Prior changes cannot be recovered; establish the current state explicitly.');
+        state = next; annotations.reset(); $('#import-dialog').close(); refresh(); edited({kind:'import'}); if (!workingFolder) status(next.ripple_baseline ? 'PAGES JSON imported. Save to keep this state.' : 'PAGES JSON imported without a baseline. Prior changes cannot be recovered; establish the current state explicitly.');
       } catch (err) { $('#import-error').textContent = err.message; }
     });
     $('details').addEventListener('toggle', () => resize($('#intuition')));

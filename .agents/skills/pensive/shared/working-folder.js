@@ -1,7 +1,14 @@
 /* Optional loopback binding. Removed entirely from portable HTML exports. */
 const WorkingFolder = (() => {
   "use strict";
-  async function connect({ getState, replaceState, refresh, status }) {
+  async function connect({
+    getState,
+    replaceState,
+    refresh,
+    status,
+    canSave = () => true,
+    hasUnsavedDraft = () => false,
+  }) {
     if (location.protocol !== "http:" || location.hostname !== "127.0.0.1")
       throw new Error(
         "Open this working folder using its local service launch URL.",
@@ -50,7 +57,12 @@ const WorkingFolder = (() => {
     indicator.setAttribute("aria-live", "polite");
     controls.append(save, reload, indicator);
     document.querySelector("#analysis-toolbar").before(controls);
-    const dirty = () => !!pending || JSON.stringify(getState()) !== baseline;
+    let mutationVersion = 0;
+    document.addEventListener("input", () => {
+      mutationVersion++;
+    });
+    const dirty = () =>
+      !!pending || hasUnsavedDraft() || JSON.stringify(getState()) !== baseline;
     const saved = () => {
       indicator.textContent = dirty()
         ? "Unsaved changes"
@@ -59,7 +71,9 @@ const WorkingFolder = (() => {
     function report(error) {
       indicator.textContent = `Unsaved changes: ${error.message}`;
       status(
-        `Revision not saved: ${error.message} Export your local canvas to keep it.`,
+        error.draft
+          ? error.message
+          : `Revision not saved: ${error.message} Export your local canvas to keep it.`,
         true,
       );
     }
@@ -81,6 +95,13 @@ const WorkingFolder = (() => {
       });
     }
     async function persistNow(captured, event) {
+      if (!canSave())
+        throw Object.assign(
+          new Error(
+            "Finish or cancel the open editor before saving or requesting AI; its draft text is not yet part of the canvas.",
+          ),
+          { draft: true },
+        );
       indicator.textContent = "Saving revision…";
       await retryPending();
       if (
@@ -111,6 +132,7 @@ const WorkingFolder = (() => {
     reload.addEventListener("click", () =>
       serial(async () => {
         const starting = JSON.stringify(getState());
+        const startingVersion = mutationVersion;
         if (
           dirty() &&
           !confirm(
@@ -120,7 +142,10 @@ const WorkingFolder = (() => {
           return;
         const latest = await api("/api/current");
         // Edits and review decisions can still happen while the fetch is in flight.
-        if (JSON.stringify(getState()) !== starting) {
+        if (
+          JSON.stringify(getState()) !== starting ||
+          mutationVersion !== startingVersion
+        ) {
           status(
             "Canvas changed during reload. Save or export your edits, then reload again.",
             true,
@@ -146,10 +171,16 @@ const WorkingFolder = (() => {
     saved();
     return {
       edited(event) {
+        mutationVersion++;
         saved();
         if (
           event &&
-          ["proposal_accept", "proposal_reject", "import"].includes(event.kind)
+          [
+            "proposal_accept",
+            "proposal_reject",
+            "import",
+            "baseline_reset",
+          ].includes(event.kind)
         )
           persist({ ...event, source: "browser" }).catch(report);
       },

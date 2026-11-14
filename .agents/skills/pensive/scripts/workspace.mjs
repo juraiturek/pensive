@@ -1,9 +1,8 @@
-// Optional SWOT working-folder service. No inference, remote binding or file browsing.
+// Framework-owned working-folder service. No inference, remote binding or file browsing.
 import { createServer } from "node:http";
 import { mkdir, readFile, writeFile, rm } from "node:fs/promises";
 import { join, resolve, dirname } from "node:path";
 import { pathToFileURL } from "node:url";
-import { createRequire } from "node:module";
 import {
   randomBytes,
   randomUUID,
@@ -12,16 +11,22 @@ import {
 } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import { openStore } from "./lib/revision-store.mjs";
-const Swot = createRequire(import.meta.url)("../frameworks/swot/state.js");
-const framework = new URL("../frameworks/swot/", import.meta.url);
+import {
+  getCore,
+  getFrameworkDirectory,
+  frameworkValidator,
+} from "./lib/framework-core.mjs";
 const limit = 2 * 1024 * 1024;
 export async function initialize(dir, canvas) {
-  Swot.validate(canvas);
+  const core = getCore(canvas?.framework);
+  const validate = frameworkValidator(canvas.framework);
+  validate(canvas);
+  const framework = getFrameworkDirectory(canvas.framework);
   await mkdir(dirname(resolve(dir)), { recursive: true });
   await mkdir(dir, { recursive: false });
   let store;
   try {
-    store = await openStore(dir, Swot.validate);
+    store = await openStore(dir, validate);
     const first = await store.initialize(canvas);
     let html = await readFile(new URL("canvas.html", framework), "utf8");
     const adapter = await readFile(
@@ -31,13 +36,15 @@ export async function initialize(dir, canvas) {
     if (adapter.toLowerCase().includes("</script"))
       throw new Error("Unsafe adapter source.");
     const offset = html.lastIndexOf("<script data-implementation");
+    if (offset < 0)
+      throw new Error("Established canvas runtime marker is missing.");
     html =
       html.slice(0, offset) +
       `<script data-working-folder>\n${adapter}\n</script>\n` +
       html.slice(offset);
     await writeFile(
       join(dir, "canvas.html"),
-      Swot.packageHtml(html, Swot.initialState()),
+      core.packageHtml(html, core.initialState()),
       { flag: "wx" },
     );
     return first;
@@ -70,7 +77,9 @@ async function body(req) {
 export async function serve(dir) {
   dir = resolve(dir);
   const html = await readFile(join(dir, "canvas.html"), "utf8");
-  const store = await openStore(dir, Swot.validate);
+  const saved = JSON.parse(await readFile(join(dir, "current.json"), "utf8"));
+  const framework = saved.canvas?.framework;
+  const store = await openStore(dir, frameworkValidator(framework));
   const token = randomBytes(32).toString("hex");
   let origin;
   const sameToken = (value) => {
@@ -125,6 +134,7 @@ export async function serve(dir) {
             "proposal_accept",
             "proposal_reject",
             "import",
+            ...(framework === "pages" ? ["baseline_reset"] : []),
           ].includes(input.event?.kind) ||
           input.event.source !== "browser"
         )
@@ -186,7 +196,7 @@ export async function prepareRequest(store, { parent_revision_id, action }) {
     canvas_id: head.canvas_id,
     revision_id: head.revision_id,
     request_id: randomUUID(),
-    request: Swot.buildRequest(head.canvas, action),
+    request: getCore(head.canvas.framework).buildRequest(head.canvas, action),
   };
 }
 const resultQueues = new WeakMap();
@@ -242,7 +252,10 @@ async function composeAndCommit(store, handoff, response) {
       throw new Error("Operation ID reuse with different result.");
     return prior;
   }
-  const canvas = Swot.composeResult(handoff.request, response);
+  const canvas = getCore(base.canvas.framework).composeResult(
+    handoff.request,
+    response,
+  );
   return store.commit({
     parent_revision_id: base.revision_id,
     operation_id: `result-${handoff.request_id}`,

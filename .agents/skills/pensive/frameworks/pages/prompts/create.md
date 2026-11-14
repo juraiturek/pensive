@@ -1,5 +1,8 @@
 # Create PAGES: discover a perspective or prepare a shift
 
+Delivery follows the default [conversation working-folder workflow](../../../references/working-folder-workflow.md): initialize/reuse the analysis in its chat folder, let the host launch it, and return its live browser URL. A repeated iteration reuses its HTML and saves JSON. A separate canvas is for a newly requested analysis. Standalone packager commands below are for explicit export or a disclosed fallback chosen by the user. Analytical creation rules remain unchanged.
+
+
 Read [semantics](../framework.yaml) and [handoff](../../../references/pages-workflow.md). Use available conversation and supplied material, not invented memory or external research. Explicit blank requests use the established blank canvas. Existing-canvas actions require the complete submitted state instead of creation.
 
 ## Understand and extract
@@ -26,4 +29,4 @@ Extract `what`, `why` and optional `intuition` before drafting the five dimensio
 - Check coverage, duplication, contradictions, scope and links across dimensions. Do not imply the five-band display is a necessary causal order. Discovery can uncover a coherent perspective without proving it true.
 - Preserve useful source attribution supplied by the user; never invent citations or historical PAGES authorship. Explain material limits in framing or the delivery.
 
-Initialize complete state using `Pages.initialState()` and stable item IDs; populate all five collections, allowing empties, and three framing strings. Call `Pages.resetBaseline(state)` after drafting so `ripple_baseline` exactly matches initialized core content. No thoughts/proposals are required for creation. Validate and package through the established two-argument CLI. Return a new HTML link as an AI-authored draft for review, with brief material caveats. No transformation acceptance is needed for initial creation.
+Initialize complete state using `Pages.initialState()` and stable item IDs; populate all five collections, allowing empties, and three framing strings. Call `Pages.resetBaseline(state)` after drafting so `ripple_baseline` exactly matches initialized core content. No thoughts/proposals are required for creation. Validate and initialize/reuse through the conversation workflow. Return the live canvas URL as an AI-authored draft for review, with brief material caveats. No transformation acceptance is needed for initial creation.

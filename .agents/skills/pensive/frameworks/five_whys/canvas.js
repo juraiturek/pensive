@@ -1,9 +1,10 @@
 /* Local tree UI. Strand, side doors, connector forms and overview preserve V2 geometry. */
-(() => {
+(async () => {
   'use strict';
   const W = FiveWhys,
     $ = (selector) => document.querySelector(selector),
-    source = '<!doctype html>\n' + document.documentElement.outerHTML;
+    source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
+  let workingFolder;
   let state, requestedAction, annotations, renderTakeaways;
   function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -22,14 +23,15 @@
     $('#status').textContent = text;
     $('#status').classList.toggle('error', error);
   }
-  function edited() {
+  function edited(event) {
+    workingFolder?.edited(event);
     $('#clipboard-fallback').hidden = true;
-    status('Unsaved edits in this tab. Export or save to keep this investigation.');
+    status(workingFolder ? 'Unsaved changes. Save Revision to keep this investigation.' : 'Unsaved edits in this tab. Export or save to keep this investigation.');
   }
-  function run(fn) {
+  function run(fn, event) {
     try {
       fn();
-      edited();
+      edited(event);
     } catch (e) {
       status(e.message, true);
     }
@@ -80,6 +82,7 @@
         if (done) return;
         done = true;
         form.remove();
+        workingFolder?.edited();
         heading.hidden = false;
         trigger.hidden = false;
         trigger.focus();
@@ -122,6 +125,7 @@
       );
       form.append(input, actions);
       wrap.append(form);
+      workingFolder?.edited();
       input.focus();
       input.select();
     }
@@ -344,6 +348,7 @@
       board.append(line);
     }
     annotations.refresh();
+    workingFolder?.edited();
   }
   function nodePath(id) {
     try { return W.find(state, id).path; }
@@ -460,7 +465,7 @@
           run(() => {
             W.resolveProposal(state, decision);
             refresh();
-          }),
+          }, {kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject'}),
         ),
       );
     if (annotations.isActive()) controls.querySelectorAll('button').forEach(control => { control.disabled = true; });
@@ -509,6 +514,11 @@
     renderProposal();
   }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
+    const parsed = JSON.parse(json);
+    if (workingFolder && parsed.canvas && parsed.action) {
+      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
+      message = 'Copied AI request bound to the saved canvas revision.';
+    }
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
@@ -551,7 +561,14 @@
         }
       });
     });
+    $('#tree-board').addEventListener('input', () => workingFolder?.edited());
+    $('#tree-board').addEventListener('focusin', () => workingFolder?.edited());
     state = W.parseState($('#canvas-state').textContent);
+    if (typeof WorkingFolder !== 'undefined') {
+      document.body.inert = true;
+      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = W.parseState(JSON.stringify(next)); annotations?.reset(); }, refresh, status, canSave: () => !document.querySelector('#tree-board form'), hasUnsavedDraft: () => !!document.querySelector('#tree-board form') }); }
+      finally { document.body.inert = false; }
+    }
     annotations = AnnotationUI.install({
       getState: () => state, targetType: 'node',
       lookup: id => {
@@ -654,7 +671,7 @@
         annotations.reset();
         $('#import-dialog').close();
         refresh();
-        edited();
+        edited({kind:'import'});
       } catch (err) {
         $('#import-error').textContent = err.message;
       }

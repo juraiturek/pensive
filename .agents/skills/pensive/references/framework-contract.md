@@ -46,7 +46,7 @@ VPC keeps five framing strings and six content collections; see its [manifest](.
 
 [VARS](vars-workflow.md) owns a fixed four-quadrant summary plus optional quadrant/item Markdown. Improve and explicit-change Ripple resolve quadrants atomically, including detail text; Ripple uses no saved baseline. Shared annotations, Six Hats and Takeaways retain their established boundaries.
 
-[Research](research-workflow.md) is host-executed and supported initially by VARS and SWOT. Full-state requests carry explicit targets and separate opt-in AI-thought/manual-annotation flags. A report, sources and optional target-scoped candidate form one pending batch. Acceptance checks submitted content and opted-in context, applies edits and records findings atomically. Research does not infer organizational facts from competitors or introduce an HTML search backend, history or rollback.
+[Research](research-workflow.md) is host-executed and supported initially by VARS and SWOT. Full-state requests carry explicit targets and separate opt-in AI-thought/manual-annotation flags. A report, sources and optional target-scoped candidate form one pending batch. Acceptance checks submitted content and opted-in context, applies edits and records findings atomically. Research does not infer organizational facts from competitors or introduce an HTML search backend or rollback interface; saved revision history belongs to conversation persistence.
 
 ## Five Forces specialization
 

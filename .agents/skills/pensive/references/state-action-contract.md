@@ -1,17 +1,20 @@
 # Shared state and action contract
 
+**Default delivery:** Follow [conversation working folders](working-folder-workflow.md) for creation and every iteration on writable local hosts: reuse the analysis HTML, save JSON revisions, and return its live browser URL. The analytical methods/contracts below are unchanged. `package-*.mjs` commands and new-HTML directions in this reference apply only to an explicit standalone export or a disclosed fallback chosen by the user; they are not the normal iteration path.
+
+
 Status: SWOT implements the complete-state request protocol, thoughts, and one whole-canvas proposal with deterministic validation and packaging. The README example remains illustrative, not the final SWOT schema.
 
 ## Request
 
 New SWOT creation initializes complete state directly without a request envelope or proposal acceptance. The following request/proposal rules apply to transformations of existing state.
 
-Retain exactly two top-level fields in the analytical request: `canvas` and `action`. The optional [SWOT working-folder transport](working-folder-workflow.md) wraps this unchanged request with revision metadata; storage metadata stays outside framework state.
+Retain exactly two top-level fields in the analytical request: `canvas` and `action`. The default [conversation working-folder transport](working-folder-workflow.md) wraps this unchanged request with revision metadata; storage metadata stays outside framework state.
 
 - `canvas` contains the complete current state: `framework`, `schema_version`, framework-specific `content`, and `proposals` when supported. Complete state includes pending proposals. Framework and version must be recognized by the selected package.
 - `action` contains a supported `id`, optional user `comment`, and an explicit `target` for node-level actions. The target contains both `type` and stable `id`, resolved against submitted state. Canvas-level actions may omit the target when declared by the package.
 
-Keep the envelope small. Concepts, relationships, and proposal payloads stay framework-specific. Do not normalize all frameworks into generic nodes/edges or add history, revisions, or server sessions to framework state. Optional SWOT persistence owns these separately.
+Keep the envelope small. Concepts, relationships, and proposal payloads stay framework-specific. Do not normalize all frameworks into generic nodes/edges or add history, revisions, or server sessions to framework state. Conversation persistence owns these separately.
 
 ## Identity and compatibility
 
@@ -53,7 +56,7 @@ The shared [Six Thinking Hats action](six-hats-workflow.md) uses this envelope a
 
 [VARS](vars-workflow.md) owns a fixed four-quadrant summary plus optional quadrant/item Markdown. Improve and explicit-change Ripple resolve quadrants atomically, including detail text; Ripple uses no saved baseline. Shared annotations, Six Hats and Takeaways retain their established boundaries.
 
-[Research](research-workflow.md) is host-executed and supported initially by VARS and SWOT. Full-state requests carry explicit targets and separate opt-in AI-thought/manual-annotation flags. A report, sources and optional target-scoped candidate form one pending batch. Acceptance checks submitted content and opted-in context, applies edits and records findings atomically. Research does not infer organizational facts from competitors or introduce an HTML search backend, history or rollback.
+[Research](research-workflow.md) is host-executed and supported initially by VARS and SWOT. Full-state requests carry explicit targets and separate opt-in AI-thought/manual-annotation flags. A report, sources and optional target-scoped candidate form one pending batch. Acceptance checks submitted content and opted-in context, applies edits and records findings atomically. Research does not infer organizational facts from competitors or introduce an HTML search backend or rollback interface; saved revision history belongs to conversation persistence.
 
 ## Five Forces specialization
 
