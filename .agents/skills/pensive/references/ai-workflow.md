@@ -1,5 +1,7 @@
 # SWOT AI request and result handoff
 
+For a revision handoff containing an inner `request`, follow [working-folder workflow](working-folder-workflow.md) for transport and commit. The analytical request, response shapes and action boundaries below remain unchanged; new-HTML instructions apply to standalone mode.
+
 The canvas prepares requests; Codex or ChatGPT with this skill performs reasoning. It never calls an API. A user pastes exactly `{canvas, action}`. `canvas` is the complete current state, including thoughts and any proposals. `action` has `id`, optional `comment`, `use_thoughts` (default true), plus `scope` for Evaluate (default `both`) or `mode` for Strategize (default `extend`). Unknown fields/actions/scopes are rejected. Resolve consequential ambiguity only; do not make a wizard mandatory when steering is sufficient.
 
 ## Validate and route
@@ -35,4 +37,4 @@ Use actual new input/output paths. The composer validates state and action bound
 
 Return the new standalone HTML link. Evaluate displays a new thought above the matrix with unchanged content. Strategize/Improve display a proposed thought and a before/after review; accepted content stays unchanged until the user accepts changed collections locally, individually or in bulk. Accept Selected leaves unchecked nodes pending. Reject All Remaining preserves prior acceptances and local edits. Unrelated manual edits make subsequent acceptance stale. See [proposal review](proposal-review.md) for persistence, subset validation and rationale handling; bullet-level acceptance is deferred.
 
-Every AI action produces a new artifact. Saving/exporting before or after review preserves all state, including pending proposals. Existing accepted thoughts are current annotations, not automatic revision history. The proposal base is a temporary concurrency guard discarded on acceptance/rejection. Clipboard request fallback is selectable JSON if browser permissions block copying. Import JSON validates complete pasted state and confirms replacement before applying it.
+In standalone mode, every AI action produces a new artifact. Saving/exporting before or after review preserves all state, including pending proposals. Existing accepted thoughts are current annotations, not automatic revision history. The proposal base is a temporary concurrency guard discarded on acceptance/rejection. Clipboard request fallback is selectable JSON if browser permissions block copying. Import JSON validates complete pasted state and confirms replacement before applying it.

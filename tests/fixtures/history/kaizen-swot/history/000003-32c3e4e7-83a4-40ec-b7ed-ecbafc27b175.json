@@ -1,0 +1,122 @@
+{
+  "storage_version": "1.0",
+  "canvas_id": "b4e25f1f-c63a-4a96-900d-aabd5e9032c8",
+  "revision_id": "32c3e4e7-83a4-40ec-b7ed-ecbafc27b175",
+  "parent_revision_id": "8971940f-1eb9-4565-8e94-dd18c6ad29a7",
+  "revision_number": 3,
+  "saved_at": "2026-11-14T21:04:47.021Z",
+  "operation_id": "result-2e0a9704-2885-464f-bc0c-18c3873abde6",
+  "event": {
+    "kind": "ai_result",
+    "source": "host",
+    "action_id": "improve",
+    "response_hash": "20242859b3c1d6df4b38b7e354b434d25cef290e880cfa9b84f7925940e64c2d"
+  },
+  "canvas": {
+    "framework": "swot",
+    "schema_version": "1.0",
+    "content": {
+      "framing": {
+        "focal_entity": "Synthetic workshop",
+        "objective": "Choose a next experiment",
+        "environment": "Illustrative local market"
+      },
+      "strengths": [
+        {
+          "id": "s1",
+          "text": "Repeat customers describe the service as reliable."
+        }
+      ],
+      "weaknesses": [
+        {
+          "id": "w1",
+          "text": "Demand evidence is limited to current customers."
+        }
+      ],
+      "opportunities": [],
+      "threats": [],
+      "strategies": {
+        "so": [],
+        "st": [],
+        "wo": [],
+        "wt": []
+      }
+    },
+    "annotations": [
+      {
+        "id": "note-1",
+        "target": {
+          "type": "canvas"
+        },
+        "target_label": "Whole canvas",
+        "text": "Synthetic example, not researched business evidence."
+      }
+    ],
+    "takeaways": "Test demand before increasing capacity.",
+    "proposals": [
+      {
+        "id": "proposal-77fd78a0-4e01-4537-bcf0-c3a39fdb17dc",
+        "action": "improve",
+        "base_content": {
+          "framing": {
+            "focal_entity": "Synthetic workshop",
+            "objective": "Choose a next experiment",
+            "environment": "Illustrative local market"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Repeat customers describe the service as reliable."
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "Demand evidence is limited to current customers."
+            }
+          ],
+          "opportunities": [],
+          "threats": [],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        },
+        "content": {
+          "framing": {
+            "focal_entity": "Synthetic workshop",
+            "objective": "Choose a next experiment",
+            "environment": "Illustrative local market"
+          },
+          "strengths": [
+            {
+              "id": "s1",
+              "text": "Existing customers report reliable service; broader demand is untested."
+            }
+          ],
+          "weaknesses": [
+            {
+              "id": "w1",
+              "text": "Demand outside the current customer base has not been tested."
+            }
+          ],
+          "opportunities": [],
+          "threats": [],
+          "strategies": {
+            "so": [],
+            "st": [],
+            "wo": [],
+            "wt": []
+          }
+        },
+        "thought": {
+          "id": "thought-914d0a6a-077d-4540-b589-714ac9094134",
+          "kind": "improvement",
+          "text": "Qualify the strength and make the evidence gap explicit; validate broader demand."
+        }
+      }
+    ]
+  }
+}

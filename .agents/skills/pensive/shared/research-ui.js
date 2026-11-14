@@ -52,7 +52,7 @@ const ResearchUI = (() => {
         panel.append(diff);
       }
       const error=element('p');error.className='error';error.setAttribute('role','alert');const actions=element('div');actions.className='proposal-actions';
-      for(const [label,decision]of[['Reject Research','reject'],['Accept Research','accept']]){const b=button(label,()=>{try{core.resolveProposal(state,undefined,decision);refresh();edited();}catch(e){error.textContent=e.message;}});b.disabled=isLocked();actions.append(b);}
+      for(const [label,decision]of[['Reject Research','reject'],['Accept Research','accept']]){const b=button(label,()=>{try{core.resolveProposal(state,undefined,decision);refresh();edited({kind:decision==='accept'?'proposal_accept':'proposal_reject',target:'research'});}catch(e){error.textContent=e.message;}});b.disabled=isLocked();actions.append(b);}
       panel.append(element('p','Accept applies this report and all proposed changes together.'),error,actions);return true;
     }
     return Object.freeze({renderProposal});

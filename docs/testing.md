@@ -1,5 +1,26 @@
 # Testing strategy
 
+## Kaizen SWOT working folders — 2026-11-14
+
+Implemented the approved [Kaizen plan](plans/2026-11-14-kaizen-revisioned-canvas.md) in an isolated local worktree. Final full regression:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright /Users/juraj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node --test --test-concurrency=2 tests/*.test.mjs
+```
+
+**289 passed, zero failures/skips**, including **32 new cases**: eight revision-storage, five service/CLI, three saved-action, seven browser and nine delta/history cases. Coverage includes exclusive immutable snapshots, full-state round-trip, ordered parents, duplicate/reused operations, simultaneous saves/results, invalid state, writer contention, injected failures before/after snapshot/current publication, orphan detection, safe loopback routes and authorization, bounded payloads, renderer privacy, actual host request/result CLIs, shutdown/restart ownership, unchanged HTML across saves, clean reload and conflicting tabs, edits during delayed reload, failed save retry, pre-action save failure, exact saved request binding, pending/partial decisions, Takeaways, annotations/import, detached offline export, stable-ID item changes, malformed/mixed/incompatible chains and a retained five-revision proposal lifecycle.
+
+Tests were written and observed failing before new behavior/fixes. Review found private initial state embedded in publicly served renderer HTML and a reload/save race; both were reproduced and fixed. Additional focused regressions caught simultaneous first-result retry composition, stale failure status after successful retry, inaccurate pre-action failure status and old-service cleanup deleting a new owner's rendezvous. The final full run includes these fixes. Initial baseline browser execution failed because the documented Chromium cache was absent; Chromium was installed in that cache. Loopback binding and Chromium launch required elevated execution outside the sandbox. An intermediate state-only run caught five stale generated HTML outputs after shared review-callback changes; all six were rebuilt, and full regression passed afterward.
+
+The skill validator passed with temporary PyYAML 6.0.3; six framework manifests parsed and all 219 local skill Markdown links resolved. All six deterministic HTML builders matched their generated files; whitespace checks and README integrity against Git passed. Pinned Prettier 3.6.2 was used temporarily for new JavaScript/tests, adding no repository dependency. Desktop and 390px screenshots were inspected under ignored `test-results/kaizen-*.png`. Successful retry now clears the prior error message. The existing renderer/styles and framework validators/composers remain authoritative; framework schemas are unchanged.
+
+Retained example: `tests/fixtures/history/kaizen-swot/` holds five complete snapshots and the current head: initialization → manual Takeaways save → Improve proposal → Strengths-only acceptance → rejection of the remainder. `tests/history-delta.test.mjs` validates the real Python CLI and these semantics. Canonical compact JSON comparison measured 5,719 UTF-8 bytes for the complete canvas sequence, 5,325 for the starting-state/delta packet, and 6,350 with the optional current-state copy. These are sample byte/character sizes, not tokenizer counts or general savings/quality evidence.
+
+Writing-skills application check: before the new guidance, an independent reader found no route for the outer revision handoff and would reject it or fall back to new HTML. With the new SKILL route and linked workflow, the reader found exact-state result commit, stale-result handling, failed-save/export recovery and full-state fallback. It ran a selected-range packet against the retained history, correctly distinguished proposed/partially accepted/rejected changes, and identified omitted ranges/current revision. This is a narrow synthetic routing/application check, not cross-model or live-user evidence. Independent final code review found no remaining important defect after the fixes; it separately ran 13 focused storage/action/delta tests.
+
+Limits: external browser on local loopback, SWOT pilot only, offline standalone recovery, Chromium desktop/narrow checks. No Safari/Firefox, physical devices, native host binding, live model API, live Research or statistical reasoning-quality/token evaluation. Full-state AI context remains required. No branch/merge/restore UI, history analytical action, automatic sync or power-loss durability guarantee. No legacy source, README edit, distribution build, remote addition, push or publication was part of this slice.
+
+
 ## Five Forces — 2026-11-08
 
 Implemented the approved [plan](plans/2026-11-08-five-forces-implementation.md) with the user’s revised contract: nullable five-level strength, nullable finite 0–1 confidence displayed as percentage, stable analysis snippets and separate Markdown research notes. No legacy source was accessed. Source hierarchy and Pensive-specific choices are recorded in the framework methodology; the secondary chapter was represented by the supplied reference, not independently inspected book pages.

@@ -1,5 +1,18 @@
 # Destination architecture
 
+## Kaizen SWOT working folders — 2026-11-14
+
+The [Kaizen plan](plans/2026-11-14-kaizen-revisioned-canvas.md) introduces an optional SWOT pilot. A loopback-only Node service owns complete revision snapshots and atomically publishes `current.json`; immutable `history/` snapshots include the current head. One content-agnostic `canvas.html` loads authenticated state and stays byte-identical across iterations. The service performs no inference. Standalone mode and other frameworks retain their established packaging contracts.
+
+A storage-versioned envelope contains stable canvas identity, revision/parent IDs, sequence, UTC save time, operation ID, observed event and unchanged framework-owned `canvas`. Framework schema 1.0 remains unchanged. A single writer lock, serialized operations, expected-parent checks and idempotent operation IDs prevent conflicting updates. Snapshot-first publication preserves a valid old head; startup rejects orphan/malformed chains for explicit recovery. This is process-interruption recovery, not a universal power-loss or multi-file transaction guarantee.
+
+Ordinary edits use explicit Save Revision. Import and proposal decisions save separately, including partial decisions, Research and Takeaways. Failed saves retain tab state and pending operation identity for retry. Reload shares the save/request queue and refuses replacement when new edits occur during its fetch. Full-state action handoffs retain the existing inner `{canvas,action}` plus transport identity; deterministic result composition checks the exact saved revision and rejects stale updates. Proposal creation remains distinct from user acceptance. Standalone exports detach the binding and keep complete current state without credentials/history.
+
+The loopback service requires scoped capability authorization for state access and same-origin writes, validates Host/Origin, bounds JSON bodies and serves only explicit routes. The launcher and private `.service.json` carry ephemeral access information; no API credentials, remote inference, directory browser or native host bridge is introduced. This optional local persistence layer is a scoped exception to earlier no-backend/no-history slice boundaries, not a change to the standalone runtime contract.
+
+Standard-library Python derives identity-aware SWOT deltas from ordered complete snapshots, reusing Node framework/revision validation. Moves, retained-item reordering, text/framing changes, notes, Takeaways, thoughts and proposal lifecycle remain distinguishable. JSON and Markdown reports and selected-range context packets are derived artifacts, not replay dependencies. Saved differences do not establish every intervening action or unrecorded intent. A history interface, history analytical action, branch/merge/restore interface, action-only transport and other-framework rollout remain deferred. Operational details live in the [working-folder handoff](../.agents/skills/pensive/references/working-folder-workflow.md).
+
+
 ## Five Forces — 2026-11-08
 
 The approved [plan](plans/2026-11-08-five-forces-implementation.md) adds a sixth framework without legacy extraction. Five Forces owns industry/product boundary, geography, objective and preliminary participant text, plus five fixed force sections. Current assessments contain nullable five-level strength, nullable finite 0–1 confidence displayed as percentage, stable `{id,text}` analysis snippets and separate Markdown research notes. Optional trajectory records contain nullable pressure direction, horizon, independent confidence, snippets including assumptions and research notes. No causal graph, coverage score or numeric force aggregation is introduced.

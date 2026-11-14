@@ -1,0 +1,55 @@
+{
+  "storage_version": "1.0",
+  "canvas_id": "b4e25f1f-c63a-4a96-900d-aabd5e9032c8",
+  "revision_id": "8971940f-1eb9-4565-8e94-dd18c6ad29a7",
+  "parent_revision_id": "358a9582-0cde-4889-a0e5-62ad6bb94c09",
+  "revision_number": 2,
+  "saved_at": "2026-11-14T21:04:47.007Z",
+  "operation_id": "example-manual",
+  "event": {
+    "kind": "manual_save",
+    "source": "browser"
+  },
+  "canvas": {
+    "framework": "swot",
+    "schema_version": "1.0",
+    "content": {
+      "framing": {
+        "focal_entity": "Synthetic workshop",
+        "objective": "Choose a next experiment",
+        "environment": "Illustrative local market"
+      },
+      "strengths": [
+        {
+          "id": "s1",
+          "text": "Repeat customers describe the service as reliable."
+        }
+      ],
+      "weaknesses": [
+        {
+          "id": "w1",
+          "text": "Demand evidence is limited to current customers."
+        }
+      ],
+      "opportunities": [],
+      "threats": [],
+      "strategies": {
+        "so": [],
+        "st": [],
+        "wo": [],
+        "wt": []
+      }
+    },
+    "annotations": [
+      {
+        "id": "note-1",
+        "target": {
+          "type": "canvas"
+        },
+        "target_label": "Whole canvas",
+        "text": "Synthetic example, not researched business evidence."
+      }
+    ],
+    "takeaways": "Test demand before increasing capacity."
+  }
+}

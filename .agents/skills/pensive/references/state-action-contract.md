@@ -6,12 +6,12 @@ Status: SWOT implements the complete-state request protocol, thoughts, and one w
 
 New SWOT creation initializes complete state directly without a request envelope or proposal acceptance. The following request/proposal rules apply to transformations of existing state.
 
-Retain exactly two top-level fields: `canvas` and `action`.
+Retain exactly two top-level fields in the analytical request: `canvas` and `action`. The optional [SWOT working-folder transport](working-folder-workflow.md) wraps this unchanged request with revision metadata; storage metadata stays outside framework state.
 
 - `canvas` contains the complete current state: `framework`, `schema_version`, framework-specific `content`, and `proposals` when supported. Complete state includes pending proposals. Framework and version must be recognized by the selected package.
 - `action` contains a supported `id`, optional user `comment`, and an explicit `target` for node-level actions. The target contains both `type` and stable `id`, resolved against submitted state. Canvas-level actions may omit the target when declared by the package.
 
-Keep the envelope small. Concepts, relationships, and proposal payloads stay framework-specific. Do not normalize all frameworks into generic nodes/edges or introduce history, revisions, or server sessions.
+Keep the envelope small. Concepts, relationships, and proposal payloads stay framework-specific. Do not normalize all frameworks into generic nodes/edges or add history, revisions, or server sessions to framework state. Optional SWOT persistence owns these separately.
 
 ## Identity and compatibility
 
@@ -29,7 +29,7 @@ Authoritative JSON must round-trip without losing supported state. Parse imports
 
 A deterministic packager embeds serialized state in a designated slot in the tested canvas. JSON serialization alone does not make HTML embedding safe: neutralize HTML parser termination sequences including `</script>` and verify adversarial strings round-trip without execution. Preserve established HTML/CSS/JS outside the state slot. Artifacts work through `file://` without network dependencies or a server.
 
-Each AI transformation writes a new standalone HTML artifact without overwriting the submitted artifact or depending on hidden conversation state.
+In standalone mode, each AI transformation writes a new standalone HTML artifact without overwriting the submitted artifact or depending on hidden conversation state.
 
 ## Implemented SWOT action extension
 
@@ -39,7 +39,7 @@ Version-1.0 state accepts optional top-level `thoughts` and `proposals`. Existin
 - A current thought is `{id, kind, text}`, with kind `evaluation`, `improvement`, or `strategize`. IDs are unique across current items, annotations, and proposal metadata. Thoughts are user-visible current annotations, not revision snapshots.
 - At most one pending proposal is supported: `{id, action, base_content, content, thought}`, optionally with local `resolutions` metadata. `base_content` is a temporary concurrency guard, `content` the complete candidate. It is not an accepted revision. Pending proposals survive export/save; new action requests are blocked until resolved.
 - Evaluate accepts only a thought response; analytical content is unchanged. Strategize preserves framing and all SWOT arrays; extend mode preserves every existing strategy unchanged. Improve preserves framing and retains identities for retained concepts. Exact-text item re-identification is rejected deterministically; semantic identity across rewrites also requires methodological judgment.
-- Collection-level acceptance checks current content against the original `base_content` plus previously accepted collections and validates the entire mixed resulting state atomically. Unrelated local edits make further acceptance stale; rejection preserves those edits and earlier acceptances. Decisions persist until all changed collections are resolved. Completion clears the proposal and, if any content was accepted, appends the original rationale with explicit accepted/rejected node names. Bullet-level controls and history remain absent.
+- Collection-level acceptance checks current content against the original `base_content` plus previously accepted collections and validates the entire mixed resulting state atomically. Unrelated local edits make further acceptance stale; rejection preserves those edits and earlier acceptances. Decisions persist until all changed collections are resolved. Completion clears the proposal and, if any content was accepted, appends the original rationale with explicit accepted/rejected node names. Bullet-level controls remain absent; saved working-folder history is separate from proposal state.
 
 The shared Node/browser `state.js` enforces structural and cross-field rules beyond JSON Schema. The result packager composes the outcome from the original request and model response; the model does not supply arbitrary proposal metadata. See [AI handoff](ai-workflow.md) for commands and exact response shapes.
 

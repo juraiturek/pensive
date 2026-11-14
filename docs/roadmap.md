@@ -1,5 +1,12 @@
 # Implementation roadmap
 
+## Kaizen SWOT persistence pilot — 2026-11-14
+
+The user approved implementation of the [Kaizen slice](plans/2026-11-14-kaizen-revisioned-canvas.md): stable working HTML, ordered complete JSON snapshots, explicit saves and review-event persistence, exact-state host handoffs, stale/duplicate protection and deterministic Python deltas. Scope is optional SWOT working folders served on loopback; full-state requests and standalone export remain the recovery path. This makes the local working-folder portion of H3/H4 concrete without asserting native host binding or action-only requests.
+
+After pilot feedback, separately scope other-framework adapters and identity-aware delta semantics (especially 5 Whys trees and Five Forces records), PAGES baseline events, history browsing/restoration, and a reviewable history-reflection action if useful. Do not infer branch/merge, automatic synchronization, native host support or distribution/publication authorization. Evaluate data-preparation size on actual histories before claiming token savings.
+
+
 ## Five Forces MVP — 2026-11-08
 
 Implemented the approved [three-phase plan](plans/2026-11-08-five-forces-implementation.md), including the user’s revised contract: nullable qualitative strength, nullable numeric confidence shown as percentage, stable reasoning snippets and separate supporting research notes. The framework includes Porter-based shared diagnostic guidance, framing prerequisites, consistency evaluation, scoped Improve/Research, force-level review, Overview/Focus, current/trajectory views and flexible T1–T4 Takeaways. No causal graph or scoring formula.

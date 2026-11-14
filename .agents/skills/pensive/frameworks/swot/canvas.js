@@ -1,5 +1,5 @@
-/* UI for this SWOT/TOWS canvas only. No storage or network operations. */
-(() => {
+/* SWOT/TOWS UI. Optional working-folder persistence is supplied separately. */
+(async () => {
   'use strict';
   const labels = {
     strengths: ['Strengths', 'S', 'Internal advantages you can build on.'],
@@ -15,8 +15,8 @@
   const itemType = section => Swot.factors.includes(section) ? 'factor' : 'strategy';
   const $ = selector => document.querySelector(selector);
   // Capture before rendering. Exports reuse this pristine implementation, never the edited DOM.
-  const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let researchUI;
+  const source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
+  let researchUI, workingFolder;
   let state, annotations, renderTakeaways;
   let mode = 'swot';
   let requestedAction = null;
@@ -43,9 +43,10 @@
     indicator.title = count ? `${count} ${count === 1 ? 'strategy' : 'strategies'} in TOWS` : 'No strategies yet';
     indicator.setAttribute('aria-label', indicator.title);
   }
-  function edited() {
+  function edited(event) {
+    workingFolder?.edited(event);
     $('#clipboard-fallback').hidden = true;
-    status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
+    status(workingFolder ? 'Unsaved changes. Save Revision to keep them in this working folder.' : 'Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
     countStrategies();
     annotations.refresh();
   }
@@ -142,6 +143,12 @@
     document.querySelectorAll(`#${mode}-view textarea`).forEach(resize);
   }
   async function copyJson(json, message, actionRequest = false) {
+    const parsed = JSON.parse(json);
+    if (workingFolder && parsed.canvas && parsed.action) {
+      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
+      actionRequest = true;
+      message = 'Copied AI request bound to the saved canvas revision.';
+    }
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
@@ -213,7 +220,8 @@
         if (annotations.isActive()) return;
         Swot.resolveProposal(state, selected, decision); refreshCanvas();
         $('#clipboard-fallback').hidden = true;
-        status('Review decision saved in this tab. Export or save to keep it.');
+        edited({ kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', selection: selected ?? null });
+        if (!workingFolder) status('Review decision saved in this tab. Export or save to keep it.');
       }
     });
     if (annotations.isActive()) $('#proposal-panel').querySelectorAll('button, input').forEach(control => { control.disabled = true; });
@@ -234,6 +242,11 @@
   }
   try {
     state = Swot.parseState($('#canvas-state').textContent);
+    if (typeof WorkingFolder !== 'undefined') {
+      document.body.inert = true;
+      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = Swot.parseState(JSON.stringify(next)); annotations?.reset(); }, refresh: refreshCanvas, status }); }
+      finally { document.body.inert = false; }
+    }
     annotations = AnnotationUI.install({
       getState: () => state, targetType: ['factor', 'strategy'], sections,
       lookup: (id, type) => {
@@ -297,8 +310,8 @@
       state = next; annotations.reset();
       $('#import-dialog').close();
       refreshCanvas();
-      edited();
-      status('SWOT JSON imported. Save to keep this state.');
+      edited({kind:'import'});
+      if (!workingFolder) status('SWOT JSON imported. Save to keep this state.');
     });
     $('#copy').addEventListener('click', copyState);
     $('#save').addEventListener('click', saveFile);
