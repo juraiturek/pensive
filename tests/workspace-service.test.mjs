@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 const Swot = createRequire(import.meta.url)(
   "../.agents/skills/pensive/frameworks/swot/state.js",
@@ -146,10 +147,12 @@ test("actual host CLI prepares full request and commits through the running owne
   const { promisify } = await import("node:util");
   const { writeFile } = await import("node:fs/promises");
   const execute = promisify(execFile);
-  const script = new URL(
-    "../.agents/skills/pensive/scripts/workspace.mjs",
-    import.meta.url,
-  ).pathname;
+  const script = fileURLToPath(
+    new URL(
+      "../.agents/skills/pensive/scripts/workspace.mjs",
+      import.meta.url,
+    ),
+  );
   const action = join(dir, "action-input.json"),
     handoffFile = join(dir, "handoff-output.json"),
     response = join(dir, "response-input.json");

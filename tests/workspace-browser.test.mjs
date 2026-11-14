@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { chromium } from "playwright";
 import {
@@ -237,8 +238,9 @@ test("failed save retains edits and retry publishes once; screenshots cover desk
     recursive: true,
   });
   await page.screenshot({
-    path: new URL("../test-results/kaizen-desktop.png", import.meta.url)
-      .pathname,
+    path: fileURLToPath(
+      new URL("../test-results/kaizen-desktop.png", import.meta.url),
+    ),
     fullPage: true,
   });
   await page.setViewportSize({ width: 390, height: 844 });
@@ -248,8 +250,9 @@ test("failed save retains edits and retry publishes once; screenshots cover desk
     ),
   );
   await page.screenshot({
-    path: new URL("../test-results/kaizen-narrow.png", import.meta.url)
-      .pathname,
+    path: fileURLToPath(
+      new URL("../test-results/kaizen-narrow.png", import.meta.url),
+    ),
     fullPage: true,
   });
 });
