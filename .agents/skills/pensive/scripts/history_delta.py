@@ -43,7 +43,7 @@ def read_chain(folder):
         for field in ('revision_id', 'canvas_id', 'operation_id'):
             if not isinstance(record.get(field), str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', record[field]):
                 raise ValueError(f'Invalid {field}')
-        if record.get('storage_version') != '1.0' or (record.get('canvas') if isinstance(record.get('canvas'), dict) else {}).get('framework') not in ('swot', 'pages', 'vpc', 'vars', 'five_whys', 'five_forces') or record['canvas'].get('schema_version') != '1.0':
+        if record.get('storage_version') != '1.0' or (record.get('canvas') if isinstance(record.get('canvas'), dict) else {}).get('framework') not in ('swot', 'pages', 'vpc', 'vars', 'five_whys', 'five_forces', 'issue_tree') or record['canvas'].get('schema_version') != '1.0':
             raise ValueError('Incompatible storage/framework/schema version')
         stamp = record.get('saved_at')
         if not isinstance(stamp, str) or not stamp.endswith('Z'):
@@ -66,8 +66,11 @@ def read_chain(folder):
             raise ValueError('Broken history parent/sequence/identity chain')
         seen_ids.add(record['revision_id'])
         seen_operations.add(record['operation_id'])
-    if load(folder / 'current.json') != records[-1]:
+    head_path = folder / 'head.json'
+    if load(head_path if head_path.exists() else folder / 'current.json') != records[-1]:
         raise ValueError('Current head differs from history; retry or inspect recovery')
+    if head_path.exists() and load(folder / 'current.json') != records[-1]['canvas']:
+        raise ValueError('Portable current differs from history')
     # Reuse the authoritative JS validator rather than implementing framework rules twice.
     validator = Path(__file__).resolve().parent / 'lib' / 'revision-store.mjs'
     resolver = Path(__file__).resolve().parent / 'lib' / 'framework-core.mjs'

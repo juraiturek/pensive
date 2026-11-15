@@ -1,5 +1,8 @@
 # Minimal framework package contract
 
+**Default delivery:** Follow the [server-free paired-file workflow](working-folder-workflow.md). Create one HTML and importable current JSON per analysis; later turns update JSON and synchronize the embedded state in the same HTML file. Refresh the existing page to see saved updates; export manual/review changes for the next turn. Packager commands and new-HTML directions below apply only to initial/explicit standalone exports, not normal iterations. No browser server or automatic neighboring-file access is required.
+
+
 Status: the SWOT/TOWS package implements this contract for manual capabilities, AI-assisted creation, and guided existing-canvas actions. Explicitly version breaking contract changes.
 
 PAGES also implements this contract with five explicit dimensions and Evaluate/Improve/Ripple. See its [manifest](../frameworks/pages/framework.yaml) and [handoff](pages-workflow.md). Its artifact-persisted Ripple baseline is a single comparison snapshot, not revision history. Framework-specific validation owns its action boundaries; identical action names alone do not select a handoff.
@@ -46,7 +49,7 @@ VPC keeps five framing strings and six content collections; see its [manifest](.
 
 [VARS](vars-workflow.md) owns a fixed four-quadrant summary plus optional quadrant/item Markdown. Improve and explicit-change Ripple resolve quadrants atomically, including detail text; Ripple uses no saved baseline. Shared annotations, Six Hats and Takeaways retain their established boundaries.
 
-[Research](research-workflow.md) is host-executed and supported initially by VARS and SWOT. Full-state requests carry explicit targets and separate opt-in AI-thought/manual-annotation flags. A report, sources and optional target-scoped candidate form one pending batch. Acceptance checks submitted content and opted-in context, applies edits and records findings atomically. Research does not infer organizational facts from competitors or introduce an HTML search backend or rollback interface; saved revision history belongs to conversation persistence.
+[Research](research-workflow.md) is host-executed and supported initially by VARS and SWOT. Full-state requests carry explicit targets and separate opt-in AI-thought/manual-annotation flags. A report, sources and optional target-scoped candidate form one pending batch. Acceptance checks submitted content and opted-in context, applies edits and records findings atomically. Research does not infer organizational facts from competitors or introduce an HTML search backend, history or rollback.
 
 ## Five Forces specialization
 

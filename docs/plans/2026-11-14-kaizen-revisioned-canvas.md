@@ -1,5 +1,7 @@
 # Kaizen: revisioned canvas working folders — implementation plan
 
+> Superseded by [server-free canvas cleanup](2026-11-14-server-free-canvas-cleanup.md). Retained as historical design context; its server/launch instructions are not current operational guidance.
+
 > Execution: use the executing-plans skill to implement this plan task by task. This document authorizes no implementation, distribution build, publication or README edit by itself.
 
 **Goal:** Keep one stable canvas interface per working folder, persist complete ordered revisions, and derive compact, deterministic change reports for later reflection.

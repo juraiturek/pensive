@@ -6,7 +6,6 @@ import { join } from "node:path";
 import { createRequire } from "node:module";
 import {
   initialize,
-  serve,
   prepareRequest,
   applyResult,
 } from "../.agents/skills/pensive/scripts/workspace.mjs";
@@ -34,15 +33,16 @@ function initial(id) {
 async function folder(t, id) {
   const temp = await mkdtemp(join(tmpdir(), "pensive-framework-")),
     dir = join(temp, "canvas");
-  let service;
+  let store;
   t.after(async () => {
-    await service?.close();
+    await store?.close();
     await rm(temp, { recursive: true, force: true });
   });
   const canvas = initial(id);
   await initialize(dir, canvas);
-  service = await serve(dir);
-  return { dir, service, canvas };
+  const { openStore } = await import("../.agents/skills/pensive/scripts/lib/revision-store.mjs");
+  store = await openStore(dir, core(id).validate);
+  return { dir, service: {store}, canvas };
 }
 for (const id of ids)
   test(`${id}: working folder uses framework-owned initialization and evaluation`, async (t) => {
@@ -53,8 +53,8 @@ for (const id of ids)
     const slot = html.match(
       /<script id="canvas-state" type="application\/json">([\s\S]*?)<\/script>/,
     );
-    assert.deepEqual(JSON.parse(slot[1]), core(id).initialState());
-    assert.ok(!html.includes(`Private ${id} takeaway`));
+    assert.deepEqual(JSON.parse(slot[1]), canvas);
+    assert.ok(html.includes(`Private ${id} takeaway`));
     const handoff = await prepareRequest(service.store, {
       parent_revision_id: first.revision_id,
       action: { id: "evaluate" },
@@ -145,32 +145,4 @@ test("working folders reject replacing their framework and cross-framework resul
     /exact|revision/i,
   );
   assert.deepEqual(await service.store.current(), head);
-});
-test("baseline reset is an allowed browser event only for a PAGES working folder", async (t) => {
-  for (const id of ["pages", "swot"]) {
-    const { service } = await folder(t, id);
-    const head = await service.store.current();
-    const canvas = structuredClone(head.canvas);
-    if (id === "pages") {
-      canvas.content.parts = [{ id: "p1", text: "Changed premise" }];
-      core(id).resetBaseline(canvas);
-    }
-    const response = await fetch(service.origin + "/api/revisions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${service.token}`,
-        Origin: service.origin,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        parent_revision_id: head.revision_id,
-        operation_id: "reset",
-        event: { kind: "baseline_reset", source: "browser" },
-        canvas,
-      }),
-    });
-    assert.equal(response.status, id === "pages" ? 200 : 400);
-    if (id === "pages")
-      assert.equal((await response.json()).event.kind, "baseline_reset");
-  }
 });

@@ -1,6 +1,6 @@
 # Five Forces handoff
 
-**Default delivery:** Follow [conversation working folders](working-folder-workflow.md) for creation and every iteration on writable local hosts: reuse the analysis HTML, save JSON revisions, and return its live browser URL. The analytical methods/contracts below are unchanged. `package-*.mjs` commands and new-HTML directions in this reference apply only to an explicit standalone export or a disclosed fallback chosen by the user; they are not the normal iteration path.
+**Default delivery:** Follow the [server-free paired-file workflow](working-folder-workflow.md). Create one HTML and importable current JSON per analysis; later turns update JSON and synchronize the embedded state in the same HTML file. Refresh the existing page to see saved updates; export manual/review changes for the next turn. Packager commands and new-HTML directions below apply only to initial/explicit standalone exports, not normal iterations. No browser server or automatic neighboring-file access is required.
 
 
 Read the [manifest](../frameworks/five_forces/framework.yaml), [methodology](../frameworks/five_forces/methodology.md) and only the selected prompt/force guides. Use the established canvas; do not regenerate HTML/CSS/JS. No legacy source or backend is needed.
@@ -19,11 +19,11 @@ Complete `{canvas,action}` is authoritative. Validate with the framework state.j
 
 Research uses the shared protocol, canvas/force-section targets and independent use_thoughts/include_annotations flags defaulting false. It returns report/sources/optional complete candidate, with one atomic decision. Six Hats supports canvas/force-section targets; observations append without content changes. Takeaways uses the shared single-body whole-text proposal; guided T1–T4 remains flexible. Annotations target canvas/force sections and remain separate from AI thoughts.
 
-For explicit standalone export, from the skill directory:
+From skill directory:
 
 ```
 node scripts/package-five-forces.mjs state.json new-output.html
 node scripts/package-five-forces.mjs --result request.json response.json new-output.html
 ```
 
-Use a unique OS temporary directory for request/response JSON and remove it afterward. Pass a new explicit output path, normally the host project’s outputs/. Never silently overwrite. Import validates complete state then confirms replacement; Export copies complete JSON with fallback; Save preserves the standalone implementation and pending decisions. Updates stay in the tab until saved/exported. Conversation working folders retain complete saved revisions; no automatic sync/research, AI API client or automatic framing rewrite is introduced.
+Use a unique OS temporary directory for request/response JSON and remove it afterward. Pass a new explicit output path, normally the host project’s outputs/. Never silently overwrite. Import validates complete state then confirms replacement; Export copies complete JSON with fallback; Save preserves the standalone implementation and pending decisions. Updates stay in the tab until saved/exported. No history, automatic sync/research, API client or automatic framing rewrite.

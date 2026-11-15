@@ -10,11 +10,9 @@ import {
   lstat,
   realpath,
 } from "node:fs/promises";
-import { openSync, closeSync } from "node:fs";
 import { join, resolve, basename } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { randomUUID, createHash } from "node:crypto";
-import { spawn } from "node:child_process";
 import { initialize } from "./workspace.mjs";
 import { getCore, supportedFrameworks } from "./lib/framework-core.mjs";
 const id = (value) =>
@@ -77,7 +75,7 @@ async function verifyCanvas(folder, row) {
     !(await realpath(path)).startsWith((await realpath(folder)) + "/")
   )
     throw new Error("Canvas folder must remain inside its conversation.");
-  const head = await readJson(join(path, "current.json"));
+  const head = await readJson(join(path, "head.json"));
   if (
     head.canvas_id !== row.canvas_id ||
     head.canvas?.framework !== row.framework
@@ -213,97 +211,10 @@ export async function createCanvas(
     await rm(lock, { force: true });
   }
 }
-async function runningService(folder) {
-  const info = await readJson(join(folder, ".service.json"));
-  const url = new URL(info.origin);
-  if (
-    url.protocol !== "http:" ||
-    url.hostname !== "127.0.0.1" ||
-    url.pathname !== "/" ||
-    url.username ||
-    url.password ||
-    !url.port ||
-    !/^[a-f0-9]{64}$/.test(info.token || "")
-  )
-    throw new Error("Invalid service rendezvous.");
-  const response = await fetch(info.origin + "/api/current", {
-    redirect: "error",
-    signal: AbortSignal.timeout(1500),
-    headers: { Authorization: `Bearer ${info.token}` },
-  });
-  if (!response.ok)
-    throw new Error("Saved service rendezvous is not authorized.");
-  const head = await response.json(),
-    current = await readJson(join(folder, "current.json"));
-  if (head.canvas_id !== current.canvas_id)
-    throw new Error("Service canvas identity does not match working folder.");
-  const owner = await readJson(join(folder, ".writer-lock"));
-  return {
-    url: `${info.origin}/canvas.html#${info.token}`,
-    folder,
-    pid: owner.pid,
-    reused: true,
-  };
-}
-export async function launch(folder) {
-  folder = resolve(folder);
-  const head = await readJson(join(folder, "current.json"));
-  getCore(head.canvas?.framework).validate(head.canvas);
-  try {
-    return await runningService(folder);
-  } catch (e) {
-    try {
-      await lstat(join(folder, ".writer-lock"));
-      throw new Error(
-        "Existing service is unavailable but its writer lock remains. Inspect owner/recovery; do not start a second writer.",
-      );
-    } catch (lockError) {
-      if (lockError.code !== "ENOENT") throw lockError;
-    }
-  }
-  // This log is private because the service's launch URL contains an ephemeral capability.
-  const fd = openSync(join(folder, ".service.log"), "a", 0o600);
-  let child, spawnError;
-  try {
-    child = spawn(
-      process.execPath,
-      [
-        fileURLToPath(new URL("./workspace.mjs", import.meta.url)),
-        "serve",
-        folder,
-      ],
-      { detached: true, stdio: ["ignore", fd, fd] },
-    );
-    child.once("error", (error) => {
-      spawnError = error;
-    });
-    child.unref();
-  } finally {
-    closeSync(fd);
-  }
-  for (let attempt = 0; attempt < 100; attempt++) {
-    if (spawnError) throw spawnError;
-    try {
-      return { ...(await runningService(folder)), reused: false };
-    } catch {}
-    if (child.exitCode !== null && child.exitCode !== undefined)
-      throw new Error(
-        "Local service exited. Inspect the private .service.log and writer recovery.",
-      );
-    await new Promise((resolve) => setTimeout(resolve, 50));
-  }
-  throw new Error(
-    "Local service did not become ready; inspect its log and writer lock before retrying.",
-  );
-}
 async function main(args) {
-  if (args[0] === "launch" && args.length === 2) {
-    console.log(JSON.stringify(await launch(args[1])));
-    return;
-  }
   if (args[0] !== "create" || args.length < 3)
     throw new Error(
-      "Usage: conversation.mjs create state.json outputs-root [--conversation id] [--title topic] [--new] | launch canvas-folder",
+      "Usage: conversation.mjs create state.json outputs-root [--conversation id] [--title topic] [--new]",
     );
   const options = {};
   for (let i = 3; i < args.length; i++) {

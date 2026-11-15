@@ -1,10 +1,9 @@
 /* Local tree UI. Strand, side doors, connector forms and overview preserve V2 geometry. */
-(async () => {
+(() => {
   'use strict';
   const W = FiveWhys,
     $ = (selector) => document.querySelector(selector),
-    source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
-  let workingFolder;
+    source = '<!doctype html>\n' + document.documentElement.outerHTML;
   let state, requestedAction, annotations, renderTakeaways;
   function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -23,15 +22,14 @@
     $('#status').textContent = text;
     $('#status').classList.toggle('error', error);
   }
-  function edited(event) {
-    workingFolder?.edited(event);
+  function edited() {
     $('#clipboard-fallback').hidden = true;
-    status(workingFolder ? 'Unsaved changes. Save Revision to keep this investigation.' : 'Unsaved edits in this tab. Export or save to keep this investigation.');
+    status('Unsaved edits in this tab. Export or save to keep this investigation.');
   }
-  function run(fn, event) {
+  function run(fn) {
     try {
       fn();
-      edited(event);
+      edited();
     } catch (e) {
       status(e.message, true);
     }
@@ -82,7 +80,6 @@
         if (done) return;
         done = true;
         form.remove();
-        workingFolder?.edited();
         heading.hidden = false;
         trigger.hidden = false;
         trigger.focus();
@@ -125,7 +122,6 @@
       );
       form.append(input, actions);
       wrap.append(form);
-      workingFolder?.edited();
       input.focus();
       input.select();
     }
@@ -348,7 +344,6 @@
       board.append(line);
     }
     annotations.refresh();
-    workingFolder?.edited();
   }
   function nodePath(id) {
     try { return W.find(state, id).path; }
@@ -465,7 +460,7 @@
           run(() => {
             W.resolveProposal(state, decision);
             refresh();
-          }, {kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject'}),
+          }),
         ),
       );
     if (annotations.isActive()) controls.querySelectorAll('button').forEach(control => { control.disabled = true; });
@@ -514,11 +509,7 @@
     renderProposal();
   }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
-    const parsed = JSON.parse(json);
-    if (workingFolder && parsed.canvas && parsed.action) {
-      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
-      message = 'Copied AI request bound to the saved canvas revision.';
-    }
+    if (document.querySelector('#tree-board form')) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
@@ -561,14 +552,8 @@
         }
       });
     });
-    $('#tree-board').addEventListener('input', () => workingFolder?.edited());
-    $('#tree-board').addEventListener('focusin', () => workingFolder?.edited());
     state = W.parseState($('#canvas-state').textContent);
-    if (typeof WorkingFolder !== 'undefined') {
-      document.body.inert = true;
-      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = W.parseState(JSON.stringify(next)); annotations?.reset(); }, refresh, status, canSave: () => !document.querySelector('#tree-board form'), hasUnsavedDraft: () => !!document.querySelector('#tree-board form') }); }
-      finally { document.body.inert = false; }
-    }
+    JsonFiles.install({ getState: () => state, validate: W.validate, status, canExport: () => !document.querySelector('#tree-board form') });
     annotations = AnnotationUI.install({
       getState: () => state, targetType: 'node',
       lookup: id => {
@@ -629,16 +614,16 @@
     });
     $('#overview-close').addEventListener('click', () => $('#overview-dialog').close());
     $('#overview-backdrop').addEventListener('click', () => $('#overview-dialog').close());
-    $('#copy').addEventListener('click', () =>
-      run(() => {
-        copyJson(JSON.stringify(W.validate(state), null, 2));
-      }),
-    );
+    $('#copy').addEventListener('click', () => {
+      try { copyJson(JSON.stringify(W.validate(state), null, 2)); }
+      catch (error) { status(error.message, true); }
+    });
     $('#close-copy').addEventListener('click', () => {
       $('#clipboard-fallback').hidden = true;
       $('#copy').focus();
     });
     $('#save').addEventListener('click', () => {
+      if (document.querySelector('#tree-board form')) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }
       try {
         const url = URL.createObjectURL(
             new Blob([W.packageHtml(source, state)], { type: 'text/html;charset=utf-8' }),
@@ -671,7 +656,7 @@
         annotations.reset();
         $('#import-dialog').close();
         refresh();
-        edited({kind:'import'});
+        edited();
       } catch (err) {
         $('#import-error').textContent = err.message;
       }

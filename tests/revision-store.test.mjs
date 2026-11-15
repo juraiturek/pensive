@@ -42,7 +42,7 @@ test("complete snapshots are ordered, immutable and retries are idempotent", asy
   );
   assert.equal((await readdir(join(dir, "history"))).length, 2);
   assert.deepEqual(
-    JSON.parse(await readFile(join(dir, "current.json"), "utf8")),
+    JSON.parse(await readFile(join(dir, "head.json"), "utf8")),
     second,
   );
   const snapshots = await readdir(join(dir, "history"));
@@ -68,7 +68,7 @@ test("invalid states and concurrent owners cannot change the head", async (t) =>
 test("interrupted publication retains valid head and exposes orphan on reopen", async (t) => {
   const { store, dir, openStore } = await setup(t);
   const first = await store.initialize(Swot.initialState());
-  const original = await readFile(join(dir, "current.json"), "utf8");
+  const original = await readFile(join(dir, "head.json"), "utf8");
   const { writeFile } = await import("node:fs/promises");
   const orphan = {
     ...first,
@@ -82,7 +82,7 @@ test("interrupted publication retains valid head and exposes orphan on reopen", 
   );
   await store.close();
   await assert.rejects(openStore(dir, Swot.validate), /orphan|history/i);
-  assert.equal(await readFile(join(dir, "current.json"), "utf8"), original);
+  assert.equal(await readFile(join(dir, "head.json"), "utf8"), original);
 });
 test("simultaneous saves serialize and only one expected parent wins", async (t) => {
   const { store } = await setup(t);
@@ -124,7 +124,7 @@ for (const stage of [
       }),
       /injected/,
     );
-    const head = JSON.parse(await readFile(join(dir, "current.json"), "utf8"));
+    const head = JSON.parse(await readFile(join(dir, "head.json"), "utf8"));
     assert.equal(head.revision_number, stage === "after_replace" ? 2 : 1);
     await failing.close();
     if (["after_snapshot", "before_replace"].includes(stage))

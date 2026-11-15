@@ -946,7 +946,7 @@ const TakeawaysUI = (() => {
         if (state.framework === 'five_whys') core.resolveProposal(state, decision);
         else core.resolveProposal(state, undefined, decision);
         refresh();
-        edited({kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', target: 'takeaways'});
+        edited();
         input.focus();
       } catch (failure) {
         error.textContent = failure.message;
@@ -1780,7 +1780,7 @@ const ResearchUI = (() => {
         panel.append(diff);
       }
       const error=element('p');error.className='error';error.setAttribute('role','alert');const actions=element('div');actions.className='proposal-actions';
-      for(const [label,decision]of[['Reject Research','reject'],['Accept Research','accept']]){const b=button(label,()=>{try{core.resolveProposal(state,undefined,decision);refresh();edited({kind:decision==='accept'?'proposal_accept':'proposal_reject',target:'research'});}catch(e){error.textContent=e.message;}});b.disabled=isLocked();actions.append(b);}
+      for(const [label,decision]of[['Reject Research','reject'],['Accept Research','accept']]){const b=button(label,()=>{try{core.resolveProposal(state,undefined,decision);refresh();edited();}catch(e){error.textContent=e.message;}});b.disabled=isLocked();actions.append(b);}
       panel.append(element('p','Accept applies this report and all proposed changes together.'),error,actions);return true;
     }
     return Object.freeze({renderProposal});
@@ -1789,8 +1789,47 @@ const ResearchUI = (() => {
 })();
 </script>
 <script data-implementation>
-/* SWOT/TOWS UI. Optional working-folder persistence is supplied separately. */
-(async () => {
+/* Portable JSON files. No network or persistent filesystem permission is required. */
+const JsonFiles = (() => {
+  'use strict';
+  function install({getState, validate, status, canExport = () => true}) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.id = 'import-file'; input.accept = '.json,application/json';
+    const label = document.createElement('label'); label.textContent = 'Load JSON file'; label.append(input);
+    document.querySelector('#import-json').before(label);
+    let generation = 0;
+    input.addEventListener('change', async () => {
+      const current = ++generation, file = input.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        if (current !== generation || !document.querySelector('#import-dialog').open) return;
+        document.querySelector('#import-json').value = text;
+        document.querySelector('#import-error').textContent = '';
+      } catch (error) { document.querySelector('#import-error').textContent = `Could not read JSON: ${error.message}`; }
+      finally { if (current === generation) input.value = ''; }
+    });
+    document.querySelector('#import-dialog').addEventListener('close', () => { generation++; input.value = ''; });
+    const download = document.createElement('button');
+    download.type = 'button'; download.id = 'download-json'; download.textContent = 'Download JSON';
+    document.querySelector('#copy').after(download);
+    download.addEventListener('click', () => {
+      try {
+        if (!canExport()) throw new Error('Finish or cancel the open editor before exporting JSON.');
+        const state = getState(); validate(state);
+        const url = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2) + '\n'], {type:'application/json'}));
+        const link = document.createElement('a'); link.href = url; link.download = 'current.json';
+        document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        status('JSON download started. Keep it for your next assistant turn or load it into this HTML.');
+      } catch (error) { status(`Could not export JSON: ${error.message}`, true); }
+    });
+  }
+  return {install};
+})();
+</script>
+<script data-implementation>
+/* UI for this SWOT/TOWS canvas only. No storage or network operations. */
+(() => {
   'use strict';
   const labels = {
     strengths: ['Strengths', 'S', 'Internal advantages you can build on.'],
@@ -1806,8 +1845,8 @@ const ResearchUI = (() => {
   const itemType = section => Swot.factors.includes(section) ? 'factor' : 'strategy';
   const $ = selector => document.querySelector(selector);
   // Capture before rendering. Exports reuse this pristine implementation, never the edited DOM.
-  const source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
-  let researchUI, workingFolder;
+  const source = '<!doctype html>\n' + document.documentElement.outerHTML;
+  let researchUI;
   let state, annotations, renderTakeaways;
   let mode = 'swot';
   let requestedAction = null;
@@ -1834,10 +1873,9 @@ const ResearchUI = (() => {
     indicator.title = count ? `${count} ${count === 1 ? 'strategy' : 'strategies'} in TOWS` : 'No strategies yet';
     indicator.setAttribute('aria-label', indicator.title);
   }
-  function edited(event) {
-    workingFolder?.edited(event);
+  function edited() {
     $('#clipboard-fallback').hidden = true;
-    status(workingFolder ? 'Unsaved changes. Save Revision to keep them in this working folder.' : 'Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
+    status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.');
     countStrategies();
     annotations.refresh();
   }
@@ -1934,12 +1972,6 @@ const ResearchUI = (() => {
     document.querySelectorAll(`#${mode}-view textarea`).forEach(resize);
   }
   async function copyJson(json, message, actionRequest = false) {
-    const parsed = JSON.parse(json);
-    if (workingFolder && parsed.canvas && parsed.action) {
-      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
-      actionRequest = true;
-      message = 'Copied AI request bound to the saved canvas revision.';
-    }
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
@@ -2011,8 +2043,7 @@ const ResearchUI = (() => {
         if (annotations.isActive()) return;
         Swot.resolveProposal(state, selected, decision); refreshCanvas();
         $('#clipboard-fallback').hidden = true;
-        edited({ kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', selection: selected ?? null });
-        if (!workingFolder) status('Review decision saved in this tab. Export or save to keep it.');
+        status('Review decision saved in this tab. Export or save to keep it.');
       }
     });
     if (annotations.isActive()) $('#proposal-panel').querySelectorAll('button, input').forEach(control => { control.disabled = true; });
@@ -2033,11 +2064,7 @@ const ResearchUI = (() => {
   }
   try {
     state = Swot.parseState($('#canvas-state').textContent);
-    if (typeof WorkingFolder !== 'undefined') {
-      document.body.inert = true;
-      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = Swot.parseState(JSON.stringify(next)); annotations?.reset(); }, refresh: refreshCanvas, status }); }
-      finally { document.body.inert = false; }
-    }
+    JsonFiles.install({ getState: () => state, validate: Swot.validate, status });
     annotations = AnnotationUI.install({
       getState: () => state, targetType: ['factor', 'strategy'], sections,
       lookup: (id, type) => {
@@ -2101,8 +2128,8 @@ const ResearchUI = (() => {
       state = next; annotations.reset();
       $('#import-dialog').close();
       refreshCanvas();
-      edited({kind:'import'});
-      if (!workingFolder) status('SWOT JSON imported. Save to keep this state.');
+      edited();
+      status('SWOT JSON imported. Save to keep this state.');
     });
     $('#copy').addEventListener('click', copyState);
     $('#save').addEventListener('click', saveFile);

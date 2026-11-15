@@ -2,7 +2,7 @@
   "name": "pensive",
   "private": true,
   "scripts": {
-    "build": "node .agents/skills/pensive/scripts/package-swot.mjs && node .agents/skills/pensive/scripts/package-pages.mjs && node .agents/skills/pensive/scripts/package-vpc.mjs && node .agents/skills/pensive/scripts/package-five-whys.mjs && node .agents/skills/pensive/scripts/package-vars.mjs && node .agents/skills/pensive/scripts/package-five-forces.mjs",
+    "build": "node .agents/skills/pensive/scripts/package-swot.mjs && node .agents/skills/pensive/scripts/package-pages.mjs && node .agents/skills/pensive/scripts/package-vpc.mjs && node .agents/skills/pensive/scripts/package-five-whys.mjs && node .agents/skills/pensive/scripts/package-vars.mjs && node .agents/skills/pensive/scripts/package-five-forces.mjs && node .agents/skills/pensive/scripts/package-issue-tree.mjs",
     "build:pages": "node .agents/skills/pensive/scripts/package-pages.mjs",
     "test": "node --test tests/*.test.mjs",
     "test:state": "node --test tests/*-state.test.mjs",
@@ -10,7 +10,8 @@
     "build:vpc": "node .agents/skills/pensive/scripts/package-vpc.mjs",
     "build:five-whys": "node .agents/skills/pensive/scripts/package-five-whys.mjs",
     "build:vars": "node .agents/skills/pensive/scripts/package-vars.mjs",
-    "build:five-forces": "node .agents/skills/pensive/scripts/package-five-forces.mjs"
+    "build:five-forces": "node .agents/skills/pensive/scripts/package-five-forces.mjs",
+    "build:issue-tree": "node .agents/skills/pensive/scripts/package-issue-tree.mjs"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

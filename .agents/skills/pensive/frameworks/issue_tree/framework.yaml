@@ -1,0 +1,30 @@
+id: issue_tree
+name: Issue Tree
+package_version: 0.1.0
+schema_version: '1.0'
+state_schema: canvas.schema.json
+canvas: canvas.html
+semantics:
+  framing: Single editable text, independent of the governing root title.
+  root: Governing problem, question or opportunity.
+  children: Exploratory factors, components, drivers, subquestions or options.
+  notes: Substantive node content, not annotations or AI feedback.
+  prioritization: Independent user judgments; false means not marked high, including unassessed.
+manual_capabilities: [edit_framing, edit_nodes, edit_notes, add_child, delete_subtree, select_node, prioritize, import_validated_json, export_complete_json, save_standalone_html]
+ai_actions:
+  create:
+    method: prompts/create.md
+    effect: Initialize a provisional factor/component hierarchy.
+  evaluate:
+    method: prompts/evaluate.md
+    target_scope: canvas
+    effect: Append specific advisory feedback without rewriting content.
+  alternative:
+    method: prompts/alternative.md
+    target_scope: canvas
+    effect: Propose a complete alternative tree under a different organizing principle.
+target_types: [canvas]
+acceptance:
+  granularity: whole_canvas
+  proposal_actions: [alternative]
+  stale_guard: complete_analytical_content_excluding_cursor

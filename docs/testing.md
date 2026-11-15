@@ -1,6 +1,47 @@
 # Testing strategy
 
-## Kaizen conversation-default correction — 2026-11-14
+## Issue Tree MVP — 2026-11-15
+
+Implemented and tested in a writable temporary mirror of the current checkout because this session cannot write `.agents`. A patch is supplied for application to the original checkout; no feature source was installed there. README and existing framework renderers remain unchanged. No distribution build, commit, remote, push or publication occurred.
+
+All non-browser suites passed **205 tests, zero failures/skips**, including 11 new Issue Tree state/schema/packaging/persistence tests and existing Five Whys/file-workspace/history regressions. The generic history test now uses an Issue Tree framing edit instead of assuming all registered frameworks expose Takeaways. New checks cover recursive editing, all Boolean combinations, ID/selection validity, subtree removal, wide/deep geometry, exact JSON round trips, safe deterministic HTML embedding, append-only Evaluate, atomic Alternative accept/reject, stale guards, user-priority protection and saved-state synchronization into the same HTML.
+
+Five new offline Chromium tests were added for actual editing/selection/notes, all four priority styles, confirmed subtree deletion, JSON/HTML persistence, requests, whole proposal review and wide/deep/narrow layouts. **No browser assertions ran**: Chromium was blocked at launch by macOS `MachPortRendezvousServer` permission denial. Rendered layout, keyboard behavior, interactive controls and screenshots remain unverified and must be checked before calling this MVP complete. Existing browser suites were not rerun under the same known blocker.
+
+The requested skill validator was attempted but could not load PyYAML; installing that dependency failed because package-network access is unavailable. Ruby YAML parsed the framework manifest successfully; 77 local Markdown links across the edited/new skill guidance resolved. Those checks do not replace the standard validator. No Safari/Firefox, physical-device, native host, live-model or analytical-quality benchmark is claimed.
+
+
+## Same-page refresh correction — 2026-11-14
+
+The user clarified that preserving one HTML means preserving its path and renderer, not freezing its embedded state. Six new file-turn assertions reproduced stale HTML after saved JSON updates. A separate offline VPC test reproduced normal refresh failing to display a saved proposal. Workspace file operations now synchronize the existing HTML state slot from validated current JSON while holding the short-lived lock. Renderer/style/script bytes stay unchanged. Explicit `workspace.mjs sync folder` repairs an older HTML projection without changing saved analysis/history; retries synchronize the actual latest head. No server or browser file-fetch was reintroduced.
+
+All six file-turn cases and the offline refresh regression passed after the change. Final full regression passed **311 tests, zero failures/skips**; skill validation and whitespace checks passed. Independent review found no blocking issue and separately passed the seven file-workspace tests. Existing Raffin PAGES, SWOT, 5 Whys and VPC HTML files were synchronized to their saved revisions. The VPC now embeds revision 3’s pending Improve proposal, so refreshing the same local page displays it without JSON import. Earlier byte-identical-HTML/manual-import records below describe the superseded contract.
+
+
+## Server-free paired-file cleanup — 2026-11-14
+
+Implemented the [cleanup plan](plans/2026-11-14-server-free-canvas-cleanup.md). Baseline full regression passed **318 tests**. The first seven file-workspace tests failed on envelope-only current JSON and ignored submitted edits; six offline file-control tests failed on missing file inputs. The initial server-free full run passed 308 tests. Review then reproduced transient VARS/Five Whys draft omission in clipboard/HTML exports. Guards now cover JSON download, clipboard/full-state requests and HTML snapshots; ordinary Five Whys text edits continue committing on blur, while uncommitted cause drafts block exports.
+
+Final complete regression command:
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright node --test --test-concurrency=2 tests/*.test.mjs
+```
+
+**310 passed, zero failures/skips.** Server-specific suites were removed; useful file-state/history protections remain tested. New coverage runs two file-based assistant turns across all six frameworks with byte-identical HTML, directly importable JSON, short-lived lock release and idempotent result retries. Offline Chromium coverage includes JSON file selection, confirmed/cancelled/invalid import, downloads, repeated imports and pending PAGES proposal/baseline round-trip. Existing framework/proposal, annotations, Takeaways, Research, Six Hats, packaging parity and history regressions passed.
+
+A separate review passed 33 focused file/state/history tests, independently confirmed both draft guards, and checked creation, raw edited Ripple and saved SWOT handoff routing. The missing top-level paired-file route found during review was restored and rechecked. This is narrow code/protocol review, not a cross-model quality benchmark.
+
+The old Raffin PAGES/SWOT folders were backed up under ignored `outputs/backups/raffin-before-server-removal-4e996l5_/`. Only their verified service PIDs were stopped. Migration preserved PAGES revision 4 (one pending proposal) and SWOT revision 7 (review decisions already saved). Complete saved envelopes, imported/embedded framework state and every history file were checked for exact equality with backup; service metadata is absent afterward. No old browser tab was reloaded or closed, so browser-only unsaved edits remain separate and must be exported by the user.
+
+The shared JSON file helper is embedded into each established framework build. Runtime source audit found no old HTTP server, loopback launcher, service token/rendezvous or WorkingFolder binding. Desktop/mobile screenshots of migrated offline Raffin SWOT were inspected under ignored `test-results/server-free-raffin-*.png`.
+
+Skill validation passed using temporary PyYAML, and all 234 local skill Markdown links resolve. README SHA-256 remains `9e5d9ae8ea53fde85c7c7724e8bf2e4774c600bc0647f6a0674ef068fb6322be`; whitespace verification passed. No README change, legacy access, distribution build, commit, remote, push or publication occurred.
+
+Limits: local Chromium and host Node file operations only; no Safari/Firefox, physical-device or native Claude artifact execution. Portable viewing/editing needs no server or Node. Workspace update tools still use short-lived Node processes. Plain browser JSON has no saved revision identity; host capture requires an intended known parent and must resolve conflicting newer work. Multi-file publication interruption is detected for explicit recovery, not claimed as a power-loss transaction.
+
+
+## Historical: superseded Kaizen conversation-default correction — 2026-11-14
 
 The user's real **Analyze Raffin with PAGES** chat reproduced the delivery gap: ordinary creation emitted `raffin-pages.html`, and Ripple emitted a timestamped second HTML because the previous implementation/instructions made live persistence an optional SWOT pilot. The [correction plan](plans/2026-11-14-kaizen-conversation-defaults.md) makes conversation folders/live JSON revisions the normal all-framework route on writable local hosts.
 
@@ -23,7 +64,7 @@ The existing Raffin PAGES and SWOT initial/request/result states were imported i
 Limits: local writable-host/external-browser workflow; Chromium desktop/narrow only. Native viewers, Safari/Firefox, physical devices, live search/model APIs, generalized tree move inference, history/branch/merge/restore interfaces and automatic reflection remain untested or outside scope. README, legacy sources, dependencies and distribution packages were unchanged; no push/publication.
 
 
-## Kaizen SWOT working folders — 2026-11-14
+## Historical: superseded Kaizen SWOT working folders — 2026-11-14
 
 Implemented the approved [Kaizen plan](plans/2026-11-14-kaizen-revisioned-canvas.md) in an isolated local worktree. Final full regression:
 

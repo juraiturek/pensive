@@ -21,6 +21,7 @@ export async function buildCanvas(state = Pages.initialState()) {
     ['<!--pensive-six-hats-->', await readFile(new URL('../../shared/six-hats.js', framework), 'utf8'), 'script'],
     ['<!--pensive-six-hats-ui-->', await readFile(new URL('../../shared/six-hats-ui.js', framework), 'utf8'), 'script'],
     ['<!--pensive-editing-->', await readFile(new URL('../../shared/canvas-editing.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-json-files-->', await readFile(new URL('../../shared/json-files.js', framework), 'utf8'), 'script'],
     ['<!--pensive-runtime-->', await readFile(new URL('canvas.js', framework), 'utf8'), 'script']
   ];
   for (const [marker, source, tag] of resources) {

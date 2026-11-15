@@ -1295,7 +1295,7 @@ const TakeawaysUI = (() => {
         if (state.framework === 'five_whys') core.resolveProposal(state, decision);
         else core.resolveProposal(state, undefined, decision);
         refresh();
-        edited({kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', target: 'takeaways'});
+        edited();
         input.focus();
       } catch (failure) {
         error.textContent = failure.message;
@@ -2297,13 +2297,51 @@ const AnnotationUI = (() => {
 })();
 </script>
 <script data-implementation>
+/* Portable JSON files. No network or persistent filesystem permission is required. */
+const JsonFiles = (() => {
+  'use strict';
+  function install({getState, validate, status, canExport = () => true}) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.id = 'import-file'; input.accept = '.json,application/json';
+    const label = document.createElement('label'); label.textContent = 'Load JSON file'; label.append(input);
+    document.querySelector('#import-json').before(label);
+    let generation = 0;
+    input.addEventListener('change', async () => {
+      const current = ++generation, file = input.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        if (current !== generation || !document.querySelector('#import-dialog').open) return;
+        document.querySelector('#import-json').value = text;
+        document.querySelector('#import-error').textContent = '';
+      } catch (error) { document.querySelector('#import-error').textContent = `Could not read JSON: ${error.message}`; }
+      finally { if (current === generation) input.value = ''; }
+    });
+    document.querySelector('#import-dialog').addEventListener('close', () => { generation++; input.value = ''; });
+    const download = document.createElement('button');
+    download.type = 'button'; download.id = 'download-json'; download.textContent = 'Download JSON';
+    document.querySelector('#copy').after(download);
+    download.addEventListener('click', () => {
+      try {
+        if (!canExport()) throw new Error('Finish or cancel the open editor before exporting JSON.');
+        const state = getState(); validate(state);
+        const url = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2) + '\n'], {type:'application/json'}));
+        const link = document.createElement('a'); link.href = url; link.download = 'current.json';
+        document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        status('JSON download started. Keep it for your next assistant turn or load it into this HTML.');
+      } catch (error) { status(`Could not export JSON: ${error.message}`, true); }
+    });
+  }
+  return {install};
+})();
+</script>
+<script data-implementation>
 /* Local tree UI. Strand, side doors, connector forms and overview preserve V2 geometry. */
-(async () => {
+(() => {
   'use strict';
   const W = FiveWhys,
     $ = (selector) => document.querySelector(selector),
-    source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
-  let workingFolder;
+    source = '<!doctype html>\n' + document.documentElement.outerHTML;
   let state, requestedAction, annotations, renderTakeaways;
   function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -2322,15 +2360,14 @@ const AnnotationUI = (() => {
     $('#status').textContent = text;
     $('#status').classList.toggle('error', error);
   }
-  function edited(event) {
-    workingFolder?.edited(event);
+  function edited() {
     $('#clipboard-fallback').hidden = true;
-    status(workingFolder ? 'Unsaved changes. Save Revision to keep this investigation.' : 'Unsaved edits in this tab. Export or save to keep this investigation.');
+    status('Unsaved edits in this tab. Export or save to keep this investigation.');
   }
-  function run(fn, event) {
+  function run(fn) {
     try {
       fn();
-      edited(event);
+      edited();
     } catch (e) {
       status(e.message, true);
     }
@@ -2381,7 +2418,6 @@ const AnnotationUI = (() => {
         if (done) return;
         done = true;
         form.remove();
-        workingFolder?.edited();
         heading.hidden = false;
         trigger.hidden = false;
         trigger.focus();
@@ -2424,7 +2460,6 @@ const AnnotationUI = (() => {
       );
       form.append(input, actions);
       wrap.append(form);
-      workingFolder?.edited();
       input.focus();
       input.select();
     }
@@ -2647,7 +2682,6 @@ const AnnotationUI = (() => {
       board.append(line);
     }
     annotations.refresh();
-    workingFolder?.edited();
   }
   function nodePath(id) {
     try { return W.find(state, id).path; }
@@ -2764,7 +2798,7 @@ const AnnotationUI = (() => {
           run(() => {
             W.resolveProposal(state, decision);
             refresh();
-          }, {kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject'}),
+          }),
         ),
       );
     if (annotations.isActive()) controls.querySelectorAll('button').forEach(control => { control.disabled = true; });
@@ -2813,11 +2847,7 @@ const AnnotationUI = (() => {
     renderProposal();
   }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
-    const parsed = JSON.parse(json);
-    if (workingFolder && parsed.canvas && parsed.action) {
-      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
-      message = 'Copied AI request bound to the saved canvas revision.';
-    }
+    if (document.querySelector('#tree-board form')) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
@@ -2860,14 +2890,8 @@ const AnnotationUI = (() => {
         }
       });
     });
-    $('#tree-board').addEventListener('input', () => workingFolder?.edited());
-    $('#tree-board').addEventListener('focusin', () => workingFolder?.edited());
     state = W.parseState($('#canvas-state').textContent);
-    if (typeof WorkingFolder !== 'undefined') {
-      document.body.inert = true;
-      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = W.parseState(JSON.stringify(next)); annotations?.reset(); }, refresh, status, canSave: () => !document.querySelector('#tree-board form'), hasUnsavedDraft: () => !!document.querySelector('#tree-board form') }); }
-      finally { document.body.inert = false; }
-    }
+    JsonFiles.install({ getState: () => state, validate: W.validate, status, canExport: () => !document.querySelector('#tree-board form') });
     annotations = AnnotationUI.install({
       getState: () => state, targetType: 'node',
       lookup: id => {
@@ -2928,16 +2952,16 @@ const AnnotationUI = (() => {
     });
     $('#overview-close').addEventListener('click', () => $('#overview-dialog').close());
     $('#overview-backdrop').addEventListener('click', () => $('#overview-dialog').close());
-    $('#copy').addEventListener('click', () =>
-      run(() => {
-        copyJson(JSON.stringify(W.validate(state), null, 2));
-      }),
-    );
+    $('#copy').addEventListener('click', () => {
+      try { copyJson(JSON.stringify(W.validate(state), null, 2)); }
+      catch (error) { status(error.message, true); }
+    });
     $('#close-copy').addEventListener('click', () => {
       $('#clipboard-fallback').hidden = true;
       $('#copy').focus();
     });
     $('#save').addEventListener('click', () => {
+      if (document.querySelector('#tree-board form')) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }
       try {
         const url = URL.createObjectURL(
             new Blob([W.packageHtml(source, state)], { type: 'text/html;charset=utf-8' }),
@@ -2970,7 +2994,7 @@ const AnnotationUI = (() => {
         annotations.reset();
         $('#import-dialog').close();
         refresh();
-        edited({kind:'import'});
+        edited();
       } catch (err) {
         $('#import-error').textContent = err.message;
       }

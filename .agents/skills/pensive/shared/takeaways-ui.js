@@ -73,7 +73,7 @@ const TakeawaysUI = (() => {
         if (state.framework === 'five_whys') core.resolveProposal(state, decision);
         else core.resolveProposal(state, undefined, decision);
         refresh();
-        edited({kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', target: 'takeaways'});
+        edited();
         input.focus();
       } catch (failure) {
         error.textContent = failure.message;

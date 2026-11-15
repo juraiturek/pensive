@@ -1237,7 +1237,7 @@ const TakeawaysUI = (() => {
         if (state.framework === 'five_whys') core.resolveProposal(state, decision);
         else core.resolveProposal(state, undefined, decision);
         refresh();
-        edited({kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', target: 'takeaways'});
+        edited();
         input.focus();
       } catch (failure) {
         error.textContent = failure.message;
@@ -2419,7 +2419,7 @@ const ResearchUI = (() => {
         panel.append(diff);
       }
       const error=element('p');error.className='error';error.setAttribute('role','alert');const actions=element('div');actions.className='proposal-actions';
-      for(const [label,decision]of[['Reject Research','reject'],['Accept Research','accept']]){const b=button(label,()=>{try{core.resolveProposal(state,undefined,decision);refresh();edited({kind:decision==='accept'?'proposal_accept':'proposal_reject',target:'research'});}catch(e){error.textContent=e.message;}});b.disabled=isLocked();actions.append(b);}
+      for(const [label,decision]of[['Reject Research','reject'],['Accept Research','accept']]){const b=button(label,()=>{try{core.resolveProposal(state,undefined,decision);refresh();edited();}catch(e){error.textContent=e.message;}});b.disabled=isLocked();actions.append(b);}
       panel.append(element('p','Accept applies this report and all proposed changes together.'),error,actions);return true;
     }
     return Object.freeze({renderProposal});
@@ -2429,8 +2429,47 @@ const ResearchUI = (() => {
 </script>
 <script id="force-guidance" type="application/json">{"new_entrants":"# Threat of new entrants\n\n- Which plausible entrants could overcome supply-side economies of scale and demand-side scale benefits?\n- How do customer switching costs, capital requirements and distribution access affect entry economics?\n- Which incumbency advantages are independent of scale: proprietary know-how, locations, licenses, brands or accumulated experience?\n- How do government restrictions change access, and what retaliation could incumbents credibly sustain?\n- Does the threat constrain prices or require investment even without actual recent entry?\n- Are industry returns attracting entrants, and do barriers differ by entrant capabilities?\n\nHigh barriers tend to weaken entry threat; their effect depends on plausible entrants. Few recent entrants do not establish weak threat.\n\n## Use these questions selectively\n\nThis catalogue guides manual analysis, AI interpretation, host Research and quality evaluation. It is not a required questionnaire or scoring formula. Explain observations → structural mechanism → competitive implication → force judgment, considering counterevidence. Confidence reflects relevant coverage, evidence reliability, causal specificity and unresolved assumptions; high coverage alone does not justify high confidence.\n\nFor structural trajectory, identify changing drivers, temporary/cyclical versus structural effects, a meaningful horizon, assumptions, confidence and implications. Direction refers to competitive pressure, not attractiveness. Unknown direction remains null; an assessed but indeterminate outlook is uncertain, never stable by default.\n\nSource hierarchy: Porter (2008) establishes the mechanisms; the supplied Assen/van den Berg/Pietersma chapter summary supplements operational questions. See [methodology](../methodology.md) for provenance and boundaries.\n","substitutes":"# Threat of substitutes\n\n- What underlying customer need is served, and which different products, services or activities could satisfy it?\n- Could buyers self-provide, defer the purchase, do without it or adopt a different technology?\n- How do alternatives compare in price and performance, accessibility and willingness to switch?\n- What switching costs inhibit adoption, and are innovation or behavior changes altering the trade-off?\n\nDistinguish substitutes from rivals inside the framed industry. An alternative’s relevance depends on need and boundary, not merely whether it uses different technology.\n\n## Use these questions selectively\n\nThis catalogue guides manual analysis, AI interpretation, host Research and quality evaluation. It is not a required questionnaire or scoring formula. Explain observations → structural mechanism → competitive implication → force judgment, considering counterevidence. Confidence reflects relevant coverage, evidence reliability, causal specificity and unresolved assumptions; high coverage alone does not justify high confidence.\n\nFor structural trajectory, identify changing drivers, temporary/cyclical versus structural effects, a meaningful horizon, assumptions, confidence and implications. Direction refers to competitive pressure, not attractiveness. Unknown direction remains null; an assessed but indeterminate outlook is uncertain, never stable by default.\n\nSource hierarchy: Porter (2008) establishes the mechanisms; the supplied Assen/van den Berg/Pietersma chapter summary supplements operational questions. See [methodology](../methodology.md) for provenance and boundaries.\n","buyers":"# Bargaining power of buyers\n\n- Which buyer groups differ in concentration, purchasing volume and leverage relative to sellers?\n- Can buyers compare undifferentiated offers, change providers or credibly integrate backward?\n- Does partial internal production reveal supplier costs or improve negotiating options?\n- How do switching costs and access to information affect bargaining leverage?\n- How important is this purchase to buyer costs, quality and performance? Do low buyer margins increase price sensitivity?\n- Are intermediaries or channels influencing downstream choices?\n\nSeparate leverage from incentives to exercise it. Large buyers are not automatically powerful; explain the mechanism. Differences between buyer groups may justify qualified assessments or reconsidering the boundary.\n\n## Use these questions selectively\n\nThis catalogue guides manual analysis, AI interpretation, host Research and quality evaluation. It is not a required questionnaire or scoring formula. Explain observations → structural mechanism → competitive implication → force judgment, considering counterevidence. Confidence reflects relevant coverage, evidence reliability, causal specificity and unresolved assumptions; high coverage alone does not justify high confidence.\n\nFor structural trajectory, identify changing drivers, temporary/cyclical versus structural effects, a meaningful horizon, assumptions, confidence and implications. Direction refers to competitive pressure, not attractiveness. Unknown direction remains null; an assessed but indeterminate outlook is uncertain, never stable by default.\n\nSource hierarchy: Porter (2008) establishes the mechanisms; the supplied Assen/van den Berg/Pietersma chapter summary supplements operational questions. See [methodology](../methodology.md) for provenance and boundaries.\n","suppliers":"# Bargaining power of suppliers\n\n- Are critical inputs, including specialized labor where relevant, concentrated among suppliers relative to this industry?\n- Are substitute inputs or alternative sources available, differentiated and accessible?\n- How costly is switching, including asset specificity or assets that lose value on switching?\n- How dependent are suppliers on this industry compared with their alternative markets?\n- How critical are inputs to quality, operations and buyer performance?\n- Could suppliers credibly integrate forward and capture more value?\n\nRising input prices alone do not establish supplier power. Investigate concentration, alternatives, switching, dependence and bargaining mechanisms before interpreting inflation as a structural change.\n\n## Use these questions selectively\n\nThis catalogue guides manual analysis, AI interpretation, host Research and quality evaluation. It is not a required questionnaire or scoring formula. Explain observations → structural mechanism → competitive implication → force judgment, considering counterevidence. Confidence reflects relevant coverage, evidence reliability, causal specificity and unresolved assumptions; high coverage alone does not justify high confidence.\n\nFor structural trajectory, identify changing drivers, temporary/cyclical versus structural effects, a meaningful horizon, assumptions, confidence and implications. Direction refers to competitive pressure, not attractiveness. Unknown direction remains null; an assessed but indeterminate outlook is uncertain, never stable by default.\n\nSource hierarchy: Porter (2008) establishes the mechanisms; the supplied Assen/van den Berg/Pietersma chapter summary supplements operational questions. See [methodology](../methodology.md) for provenance and boundaries.\n","rivalry":"# Rivalry among existing competitors\n\n- How do the number, relative strength, objectives and commitment of rivals affect competition?\n- Is slow growth driving share competition? Do high fixed costs, perishability or excess capacity encourage price cutting?\n- Do undifferentiated offerings and low switching costs make price the main basis of rivalry?\n- Are capacity additions lumpy, competitors strategically diverse, or stakes high enough to sustain losses?\n- What specialized assets, contractual obligations or other exit barriers keep weak competitors active?\n- Does competition destroy value through price wars, or expand value through differentiation and new demand?\n\nDo not infer intensity solely from competitor count or equate all rivalry with price competition. Assess the economic mechanism and consequential interactions with other forces.\n\n## Use these questions selectively\n\nThis catalogue guides manual analysis, AI interpretation, host Research and quality evaluation. It is not a required questionnaire or scoring formula. Explain observations → structural mechanism → competitive implication → force judgment, considering counterevidence. Confidence reflects relevant coverage, evidence reliability, causal specificity and unresolved assumptions; high coverage alone does not justify high confidence.\n\nFor structural trajectory, identify changing drivers, temporary/cyclical versus structural effects, a meaningful horizon, assumptions, confidence and implications. Direction refers to competitive pressure, not attractiveness. Unknown direction remains null; an assessed but indeterminate outlook is uncertain, never stable by default.\n\nSource hierarchy: Porter (2008) establishes the mechanisms; the supplied Assen/van den Berg/Pietersma chapter summary supplements operational questions. See [methodology](../methodology.md) for provenance and boundaries.\n"}</script>
 <script data-implementation>
+/* Portable JSON files. No network or persistent filesystem permission is required. */
+const JsonFiles = (() => {
+  'use strict';
+  function install({getState, validate, status, canExport = () => true}) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.id = 'import-file'; input.accept = '.json,application/json';
+    const label = document.createElement('label'); label.textContent = 'Load JSON file'; label.append(input);
+    document.querySelector('#import-json').before(label);
+    let generation = 0;
+    input.addEventListener('change', async () => {
+      const current = ++generation, file = input.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        if (current !== generation || !document.querySelector('#import-dialog').open) return;
+        document.querySelector('#import-json').value = text;
+        document.querySelector('#import-error').textContent = '';
+      } catch (error) { document.querySelector('#import-error').textContent = `Could not read JSON: ${error.message}`; }
+      finally { if (current === generation) input.value = ''; }
+    });
+    document.querySelector('#import-dialog').addEventListener('close', () => { generation++; input.value = ''; });
+    const download = document.createElement('button');
+    download.type = 'button'; download.id = 'download-json'; download.textContent = 'Download JSON';
+    document.querySelector('#copy').after(download);
+    download.addEventListener('click', () => {
+      try {
+        if (!canExport()) throw new Error('Finish or cancel the open editor before exporting JSON.');
+        const state = getState(); validate(state);
+        const url = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2) + '\n'], {type:'application/json'}));
+        const link = document.createElement('a'); link.href = url; link.download = 'current.json';
+        document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        status('JSON download started. Keep it for your next assistant turn or load it into this HTML.');
+      } catch (error) { status(`Could not export JSON: ${error.message}`, true); }
+    });
+  }
+  return {install};
+})();
+</script>
+<script data-implementation>
 /* Framework-local presentation; no inference or search runs in this page. */
-(async () => {
+(() => {
   'use strict';
   const Core = FiveForces;
   const labels = {
@@ -2441,7 +2480,7 @@ const ResearchUI = (() => {
     rivalry: ['Rivalry among existing competitors'],
   };
   const $ = (s) => document.querySelector(s),
-    source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
+    source = '<!doctype html>\n' + document.documentElement.outerHTML;
   const guidance = JSON.parse($('#force-guidance').textContent);
   let state,
     focused = null,
@@ -2450,8 +2489,7 @@ const ResearchUI = (() => {
     annotations,
     renderTakeaways,
     researchUI,
-    requestedAction,
-    workingFolder;
+    requestedAction;
   const el = (tag, text) => {
     const n = document.createElement(tag);
     if (text !== undefined) n.textContent = text;
@@ -2469,12 +2507,11 @@ const ResearchUI = (() => {
     n.style.height = 'auto';
     n.style.height = Math.max(n.scrollHeight + 2, 35) + 'px';
   }
-  function edited(event) {
-    workingFolder?.edited(event);
+  function edited() {
     annotations.refresh();
     $('#clipboard-fallback').hidden = true;
     status(
-      workingFolder ? 'Unsaved changes. Save Revision to keep them in this working folder.' : 'Unsaved edits in this tab. Save to File to keep an editable HTML copy.',
+      'Unsaved edits in this tab. Save to File to keep an editable HTML copy.',
     );
   }
   const perspectiveSteering = (comment) =>
@@ -2743,7 +2780,7 @@ const ResearchUI = (() => {
       onDecision: (selected, decision) => {
         Core.resolveProposal(state, selected, decision);
         refresh();
-        edited({ kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', selection: selected ?? null });
+        edited();
       },
     });
     if (annotations.isActive())
@@ -2768,11 +2805,6 @@ const ResearchUI = (() => {
     json,
     message = 'Copied complete canvas JSON to clipboard.',
   ) {
-    const parsed = JSON.parse(json);
-    if (workingFolder && parsed.canvas && parsed.action) {
-      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
-      message = 'Copied AI request bound to the saved canvas revision.';
-    }
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
@@ -2808,11 +2840,7 @@ const ResearchUI = (() => {
   }
   try {
     state = Core.parseState($('#canvas-state').textContent);
-    if (typeof WorkingFolder !== 'undefined') {
-      document.body.inert = true;
-      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = Core.parseState(JSON.stringify(next)); focused = null; temporal = false; notesEditing = false; annotations?.reset(); }, refresh, status }); }
-      finally { document.body.inert = false; }
-    }
+    JsonFiles.install({ getState: () => state, validate: Core.validate, status });
     annotations = AnnotationUI.install({
       getState: () => state,
       targetType: [],
@@ -3006,7 +3034,7 @@ const ResearchUI = (() => {
         $('#framing-reassessment').hidden = true;
         $('#import-dialog').close();
         refresh();
-        edited({kind:'import'});
+        edited();
       } catch (err) {
         $('#import-error').textContent = err.message;
       }

@@ -32,7 +32,8 @@ for (const framework of supportedFrameworks)
     }
     const first = await store.initialize(canvas);
     const changed = structuredClone(canvas);
-    changed.takeaways = "A saved reflection";
+    if (framework === "issue_tree") changed.content.framing = "A saved framing edit";
+    else changed.takeaways = "A saved reflection";
     if (framework === "pages") {
       changed.content.parts[0].text = "Lifecycle partner";
     }
@@ -50,7 +51,7 @@ for (const framework of supportedFrameworks)
     assert.equal(packet.framework, framework);
     assert.deepEqual(packet.starting_state, canvas);
     assert.ok(
-      packet.transitions[0].changes.some((c) => c.path === "/takeaways"),
+      packet.transitions[0].changes.some((c) => c.path === (framework === "issue_tree" ? "/content/framing" : "/takeaways")),
     );
     if (framework === "pages")
       assert.ok(

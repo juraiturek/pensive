@@ -1,12 +1,11 @@
-/* VARS editing with optional working-folder persistence. */
-(async () => {
+/* Local VARS editing. No network or persistence service. */
+(() => {
   'use strict';
   const labels = { v: ['Value Proposition','V'], a: ['Activities, Resources & Capabilities','A'], r: ['Realization of Value','R'], s: ['Scope of Enterprise','S'] };
   const questions = { v: 'What value is created, for whom, and how does the offering increase economic value?', a: 'What activities, resources and capabilities are required? Which are critical, scarce or hard to imitate?', r: 'How does the business capture part of the value it creates? Who pays, for what, and under which assumptions?', s: 'Which customers, offerings and activities are within the enterprise’s scope, and which are excluded or external?' };
   let focused = null, selectedItem = null, editingDetails = null, newStatement = null;
   const $ = selector => document.querySelector(selector);
-  const source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
-  let workingFolder;
+  const source = '<!doctype html>\n' + document.documentElement.outerHTML;
   let state, requestedAction, annotations, renderTakeaways, researchUI;
   const ordering = CanvasEditing.collectionOrdering({ core: Vars, getState: () => state, renderSection, edited, status });
   function element(tag, className, text) { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; }
@@ -23,8 +22,7 @@
   }
   function status(message, error = false) { $('#status').textContent = message; $('#status').classList.toggle('error', error); }
   function resize(input) { input.style.height = 'auto'; input.style.height = `${Math.max(input.scrollHeight + input.offsetHeight - input.clientHeight, 30)}px`; }
-  function edited(event) {
-    workingFolder?.edited(event); annotations.refresh(); $('#clipboard-fallback').hidden = true; status(workingFolder ? 'Unsaved changes. Save Revision to keep them in this working folder.' : 'Unsaved edits in this tab. Save to File to keep an editable HTML copy.'); }
+  function edited() { annotations.refresh(); $('#clipboard-fallback').hidden = true; status('Unsaved edits in this tab. Save to File to keep an editable HTML copy.'); }
   function renderSection(section) {
     const container = $(`[data-section="${section}"]`), [label, symbol] = labels[section];
     const heading = element('div', 'vars-heading'); heading.append(element('span', 'cell-symbol', symbol), element('h3', '', label), annotations.badge(section, 'section'));
@@ -75,14 +73,14 @@
     const panel = element('div', 'focus-composer');
     const locked = () => annotations.isActive() || Vars.proposalSections(state).some(entry => entry.section === section && entry.status === 'pending');
     function restoreAdd() {
-      newStatement = null; renderSection(section); workingFolder?.edited();
+      newStatement = null; renderSection(section);
       $(`[data-section="${section}"] .focus-add`)?.focus();
     }
     if (newStatement?.section !== section) {
       const add = element('button', 'focus-add', '+ Add'); add.type = 'button'; add.disabled = locked();
       add.addEventListener('click', () => {
         if (locked() || focused !== section) return;
-        newStatement = { section, text: '' }; renderSection(section); workingFolder?.edited();
+        newStatement = { section, text: '' }; renderSection(section);
         $(`[data-section="${section}"] .new-statement`).focus();
       });
       panel.append(add); return panel;
@@ -107,7 +105,7 @@
     panel.append(input, save, cancel); return panel;
   }
   function setFocus(section) {
-    focused = section; selectedItem = null; editingDetails = null; newStatement = null; refresh(); workingFolder?.edited();
+    focused = section; selectedItem = null; editingDetails = null; newStatement = null; refresh();
     if (section) $('#focus-title').focus(); else $(`[data-section] .focus-quadrant`).focus();
   }
   function renderFocus() {
@@ -168,33 +166,26 @@
       renderSupporting: (content, section, column) => { const detail = content.details?.[section] || ''; if (detail) column.append(PensiveMarkdown.render(document, detail)); for (const item of content[section]) if (item.details) { column.append(element('h5','',item.text || 'Blank statement'), PensiveMarkdown.render(document,item.details)); } },
       onDecision: (selected, decision) => {
         if (annotations.isActive()) return;
-        Vars.resolveProposal(state, selected, decision); refresh(); edited({ kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', selection: selected ?? null });
-        if (!workingFolder) status('Review decision saved in this tab. Export or save to keep it.');
+        Vars.resolveProposal(state, selected, decision); refresh(); edited();
+        status('Review decision saved in this tab. Export or save to keep it.');
       }
     });
     if (annotations.isActive()) $('#proposal-panel').querySelectorAll('button, input').forEach(control => { control.disabled = true; });
   }
   function refresh() { for (const field of Vars.framing) { const input = $(`[data-framing="${field}"]`); input.readOnly = annotations.isActive(); input.value = state.content.framing[field]; resize(input); } Vars.sections.forEach(renderSection); renderThoughts(); renderProposal(); annotations.refresh(); renderFocus(); }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
-    const parsed = JSON.parse(json);
-    if (workingFolder && parsed.canvas && parsed.action) {
-      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
-      message = 'Copied AI request bound to the saved canvas revision.';
-    }
+    if (newStatement) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }
     try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status(message); }
     catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access blocked. Copy the selected JSON below.', true); }
   }
   function save() {
+    if (newStatement) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }
     try { const url = URL.createObjectURL(new Blob([Vars.packageHtml(source, state)], { type: 'text/html;charset=utf-8' })); const link = element('a'); link.href = url; link.download = 'pensive-vars.html'; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); status('HTML download started. Keep the downloaded file to preserve your work.'); }
     catch (e) { status(`Could not save: ${e.message}`, true); }
   }
   try {
     state = Vars.parseState($('#canvas-state').textContent);
-    if (typeof WorkingFolder !== 'undefined') {
-      document.body.inert = true;
-      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = Vars.parseState(JSON.stringify(next)); focused = null; selectedItem = null; editingDetails = null; newStatement = null; annotations?.reset(); }, refresh, status, canSave: () => !newStatement, hasUnsavedDraft: () => !!newStatement }); }
-      finally { document.body.inert = false; }
-    }
+    JsonFiles.install({ getState: () => state, validate: Vars.validate, status, canExport: () => !newStatement });
     annotations = AnnotationUI.install({
       getState: () => state, targetType: 'item', sections: Vars.sections,
       lookup: (id, type) => {
@@ -253,7 +244,7 @@
     $('#close-copy').addEventListener('click', () => { $('#clipboard-fallback').hidden = true; $('#copy').focus(); });
     $('#import').addEventListener('click', () => { $('#import-form').reset(); $('#import-error').textContent = ''; $('#import-dialog').showModal(); $('#import-json').focus(); });
     $('#cancel-import').addEventListener('click', () => $('#import-dialog').close());
-    $('#import-form').addEventListener('submit', e => { e.preventDefault(); try { const next = Vars.parseState($('#import-json').value); if (!confirm('Replace the current canvas, including annotations? Save or export first if you want to keep it.')) return; state = next; editingDetails = null; newStatement = null; annotations.reset(); $('#import-dialog').close(); refresh(); edited({kind:'import'}); if (!workingFolder) status('VARS JSON imported. Save to keep this state.'); } catch (err) { $('#import-error').textContent = err.message; } });
+    $('#import-form').addEventListener('submit', e => { e.preventDefault(); try { const next = Vars.parseState($('#import-json').value); if (!confirm('Replace the current canvas, including annotations? Save or export first if you want to keep it.')) return; state = next; editingDetails = null; newStatement = null; annotations.reset(); $('#import-dialog').close(); refresh(); edited(); status('VARS JSON imported. Save to keep this state.'); } catch (err) { $('#import-error').textContent = err.message; } });
     window.addEventListener('resize', () => document.querySelectorAll('[data-framing], .vpc-cell textarea').forEach(resize));
     $('details').addEventListener('toggle', () => { for (const input of document.querySelectorAll('details textarea')) resize(input); });
   } catch (err) { document.querySelectorAll('button, textarea, input').forEach(n => { n.disabled = true; }); status(`Invalid canvas: ${err.message} Embedded state has not been changed.`, true); }

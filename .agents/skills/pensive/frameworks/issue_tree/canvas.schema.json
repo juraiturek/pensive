@@ -1,0 +1,149 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "framework",
+    "schema_version",
+    "content",
+    "cursor"
+  ],
+  "properties": {
+    "framework": {
+      "const": "issue_tree"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "content": {
+      "$ref": "#/$defs/content"
+    },
+    "cursor": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+      }
+    },
+    "thoughts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/thought"
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "action",
+          "base_content",
+          "tree",
+          "thought"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+          },
+          "action": {
+            "const": "alternative"
+          },
+          "base_content": {
+            "$ref": "#/$defs/content"
+          },
+          "tree": {
+            "$ref": "#/$defs/node"
+          },
+          "thought": {
+            "$ref": "#/$defs/thought"
+          }
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pensive Issue Tree",
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "notes",
+        "highImpact",
+        "highInfluence",
+        "children"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "highImpact": {
+          "type": "boolean"
+        },
+        "highInfluence": {
+          "type": "boolean"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "framing",
+        "tree"
+      ],
+      "properties": {
+        "framing": {
+          "type": "string"
+        },
+        "tree": {
+          "$ref": "#/$defs/node"
+        }
+      }
+    },
+    "thought": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"
+        },
+        "kind": {
+          "enum": [
+            "evaluation",
+            "alternative"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    }
+  }
+}

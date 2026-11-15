@@ -108,6 +108,7 @@ export async function buildCanvas(state = FiveForces.initialState()) {
       ),
       'script',
     ],
+    ['<!--pensive-json-files-->', await readFile(new URL('../../shared/json-files.js', framework), 'utf8'), 'script'],
     [
       '<!--pensive-runtime-->',
       await readFile(new URL('canvas.js', framework), 'utf8'),

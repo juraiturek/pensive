@@ -1,5 +1,7 @@
 # Kaizen correction: conversation folders and reusable canvases
 
+> Superseded by [server-free canvas cleanup](2026-11-14-server-free-canvas-cleanup.md). Retained as historical design context; its server/launch instructions are not current operational guidance.
+
 **Goal:** Make the user's expected one-chat-folder, one-HTML-per-analysis workflow the default for all six frameworks in writable local hosts.
 
 **Reason:** The initial optional SWOT pilot left ordinary PAGES creation and Ripple on the old versioned-HTML route. The Raffin test reproduced that gap. Its two standalone files are evidence and must be preserved during migration.

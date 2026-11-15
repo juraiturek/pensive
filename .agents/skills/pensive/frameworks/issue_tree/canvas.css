@@ -1,0 +1,38 @@
+/* Tree geometry follows the existing Five Whys full-tree org chart. */
+.shell { width: calc(100% - 3rem); max-width: none; }
+.issue-framing { padding: 1rem 0; }
+.issue-framing label, #node-details label { display: block; font-size: .8rem; font-weight: 600; }
+.toolbar, .ai-actions, .export-actions { flex-wrap: wrap; }
+.ai-actions { display: flex; gap: .5rem; }
+.tree-guide { font-size: .8rem; color: var(--muted); margin-bottom: .8rem; }
+.issue-workspace { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 1fr); min-height: 520px; border: 1px solid var(--line); }
+.issue-tree-scroll { overflow: auto; min-width: 0; height: min(75vh, 900px); min-height: 520px; background: #fffdf8; }
+.issue-tree-board { position: relative; }
+.issue-tree-edges { position: absolute; inset: 0; pointer-events: none; }
+.issue-tree-edges path { fill: none; stroke: #a7afa4; stroke-width: 1.5; }
+.issue-node { position: absolute; width: 208px; height: 86px; transform: translate(-50%, -50%); background: var(--surface); border: 1px solid #8d9789; border-radius: 7px; }
+.issue-node.high-impact { border-width: 4px; }
+.issue-node.high-influence { background: #dbe8d3; }
+.issue-node.selected { outline: 3px solid #476da0; outline-offset: 4px; }
+.issue-node-select { border: 0; background: transparent; width: 100%; padding: .5rem .6rem; height: 47px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; text-align: center; line-height: 1.25; overflow-wrap: anywhere; font-size: .84rem; }
+.issue-node-select:hover { background: #00000006; }
+.issue-node-controls { display: flex; justify-content: center; gap: .4rem; padding-bottom: .3rem; }
+.issue-node-controls button { padding: 0 .5rem; line-height: 1.5; font-size: .8rem; }
+#node-details { min-width: 0; padding: .8rem; border-left: 1px solid var(--line); overflow-wrap: anywhere; }
+#node-details h2 { font-size: 1rem; margin: 0 0 1rem; }
+#node-details textarea { display: block; font-size: .9rem; margin-bottom: 1rem; }
+#node-details .checkbox-label { font-weight: 400; margin: .7rem 0; }
+#node-details input { accent-color: var(--accent); }
+.issue-thought, .proposal-panel { white-space: pre-wrap; overflow-wrap: anywhere; }
+.issue-thought { border-bottom: 1px solid var(--line); padding: 1rem 0; }
+.issue-proposal-tree { max-height: 400px; overflow: auto; background: var(--surface); padding: 1rem; }
+.issue-proposal-tree ul { padding-left: 1.4rem; }
+.issue-proposal-tree li { margin: .4rem 0; }
+.issue-proposal-notes { font-size: .85rem; color: var(--muted); }
+@media (max-width: 700px) {
+  .shell { width: calc(100% - 1.5rem); }
+  .issue-workspace { grid-template-columns: minmax(0, 1fr); }
+  #node-details { border-left: 0; border-top: 1px solid var(--line); }
+  .issue-tree-scroll { min-height: 400px; height: 60vh; }
+  .brand { flex-wrap: wrap; gap: .4rem; }
+}

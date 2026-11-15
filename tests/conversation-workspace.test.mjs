@@ -29,7 +29,7 @@ test("one chat folder groups frameworks and repeated creation reuses one HTML", 
   const head = JSON.parse(
     await readFile(join(pages.folder, "current.json"), "utf8"),
   );
-  assert.equal(head.canvas.takeaways, undefined);
+  assert.equal(head.takeaways, undefined);
   const swot = await api.createCanvas(output, Swot.initialState(), options);
   assert.equal(swot.conversation_folder, pages.conversation_folder);
   assert.notEqual(swot.folder, pages.folder);
@@ -87,46 +87,6 @@ test("conversation identity is required and hostile labels cannot escape outputs
   });
   assert.ok(canvas.folder.startsWith(output + "/"));
   assert.ok(!canvas.conversation_folder.slice(output.length + 1).includes("/"));
-});
-test("host launch starts and reuses one authorized service without user server setup", async (t) => {
-  const { createCanvas, launch } = await import(
-    "../.agents/skills/pensive/scripts/conversation.mjs"
-  );
-  const root = await mkdtemp(join(tmpdir(), "pensive-launch-"));
-  let running;
-  t.after(async () => {
-    if (running) {
-      process.kill(running.pid, "SIGTERM");
-      for (let n = 0; n < 100; n++) {
-        try {
-          await readFile(join(running.folder, ".writer-lock"));
-          await new Promise((r) => setTimeout(r, 25));
-        } catch (e) {
-          if (e.code === "ENOENT") break;
-          throw e;
-        }
-      }
-    }
-    await rm(root, { recursive: true, force: true });
-  });
-  const canvas = await createCanvas(root, Pages.initialState(), {
-    conversation: "launch-chat",
-    title: "Raffin",
-  });
-  running = await launch(canvas.folder);
-  assert.equal(running.reused, false);
-  assert.ok(running.url.startsWith("http://127.0.0.1:"));
-  const again = await launch(canvas.folder);
-  assert.equal(again.reused, true);
-  assert.equal(again.url, running.url);
-  assert.equal(again.pid, running.pid);
-  const url = new URL(running.url),
-    token = url.hash.slice(1);
-  const response = await fetch(url.origin + "/api/current", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  assert.equal(response.status, 200);
-  assert.equal((await response.json()).canvas_id, canvas.canvas_id);
 });
 test("unregistered canvas left by interrupted registry publication blocks reuse instead of hiding history", async (t) => {
   const { api, output } = await fixture(t);

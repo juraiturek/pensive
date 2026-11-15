@@ -1,5 +1,5 @@
 /* Framework-local presentation; no inference or search runs in this page. */
-(async () => {
+(() => {
   'use strict';
   const Core = FiveForces;
   const labels = {
@@ -10,7 +10,7 @@
     rivalry: ['Rivalry among existing competitors'],
   };
   const $ = (s) => document.querySelector(s),
-    source = '<!doctype html>\n' + document.documentElement.outerHTML.replace(/<script data-working-folder(?:="")?>[\s\S]*?<\/script>\s*/g, '');
+    source = '<!doctype html>\n' + document.documentElement.outerHTML;
   const guidance = JSON.parse($('#force-guidance').textContent);
   let state,
     focused = null,
@@ -19,8 +19,7 @@
     annotations,
     renderTakeaways,
     researchUI,
-    requestedAction,
-    workingFolder;
+    requestedAction;
   const el = (tag, text) => {
     const n = document.createElement(tag);
     if (text !== undefined) n.textContent = text;
@@ -38,12 +37,11 @@
     n.style.height = 'auto';
     n.style.height = Math.max(n.scrollHeight + 2, 35) + 'px';
   }
-  function edited(event) {
-    workingFolder?.edited(event);
+  function edited() {
     annotations.refresh();
     $('#clipboard-fallback').hidden = true;
     status(
-      workingFolder ? 'Unsaved changes. Save Revision to keep them in this working folder.' : 'Unsaved edits in this tab. Save to File to keep an editable HTML copy.',
+      'Unsaved edits in this tab. Save to File to keep an editable HTML copy.',
     );
   }
   const perspectiveSteering = (comment) =>
@@ -312,7 +310,7 @@
       onDecision: (selected, decision) => {
         Core.resolveProposal(state, selected, decision);
         refresh();
-        edited({ kind: decision === 'accept' ? 'proposal_accept' : 'proposal_reject', selection: selected ?? null });
+        edited();
       },
     });
     if (annotations.isActive())
@@ -337,11 +335,6 @@
     json,
     message = 'Copied complete canvas JSON to clipboard.',
   ) {
-    const parsed = JSON.parse(json);
-    if (workingFolder && parsed.canvas && parsed.action) {
-      json = JSON.stringify(await workingFolder.request(parsed.action), null, 2);
-      message = 'Copied AI request bound to the saved canvas revision.';
-    }
     try {
       await navigator.clipboard.writeText(json);
       $('#clipboard-fallback').hidden = true;
@@ -377,11 +370,7 @@
   }
   try {
     state = Core.parseState($('#canvas-state').textContent);
-    if (typeof WorkingFolder !== 'undefined') {
-      document.body.inert = true;
-      try { workingFolder = await WorkingFolder.connect({ getState: () => state, replaceState: next => { state = Core.parseState(JSON.stringify(next)); focused = null; temporal = false; notesEditing = false; annotations?.reset(); }, refresh, status }); }
-      finally { document.body.inert = false; }
-    }
+    JsonFiles.install({ getState: () => state, validate: Core.validate, status });
     annotations = AnnotationUI.install({
       getState: () => state,
       targetType: [],
@@ -575,7 +564,7 @@
         $('#framing-reassessment').hidden = true;
         $('#import-dialog').close();
         refresh();
-        edited({kind:'import'});
+        edited();
       } catch (err) {
         $('#import-error').textContent = err.message;
       }

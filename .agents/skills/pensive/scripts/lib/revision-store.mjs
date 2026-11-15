@@ -1,4 +1,4 @@
-// Complete snapshots are authoritative; current.json is the atomically published head.
+// Snapshots and head.json retain metadata; current.json is portable framework state.
 import {
   mkdir,
   open,
@@ -86,7 +86,7 @@ export async function openStore(
   const load = async (path) =>
     validateEnvelope(JSON.parse(await readFile(path, "utf8")), validate);
   async function current() {
-    return load(join(dir, "current.json"));
+    return load(join(dir, "head.json"));
   }
   async function history() {
     await mkdir(join(dir, "history"), { recursive: true });
@@ -130,8 +130,12 @@ export async function openStore(
     }
     if (records.length && !isDeepStrictEqual(head, records.at(-1)))
       throw new Error(
-        "Orphan or inconsistent history: inspect snapshots and explicitly recover current.json.",
+        "Orphan or inconsistent history: inspect snapshots and explicitly recover head.json and current.json.",
       );
+    if (head) {
+      const portable = JSON.parse(await readFile(join(dir, 'current.json'), 'utf8'));
+      if (!isDeepStrictEqual(portable, head.canvas)) throw new Error('Portable current.json differs from head; inspect recovery.');
+    }
     if (head && !records.length)
       throw new Error("Current revision is missing its history snapshot.");
   } catch (e) {
@@ -151,20 +155,24 @@ export async function openStore(
     return result;
   }
   async function publish(r) {
-    const temp = join(dir, `.current-${randomUUID()}.tmp`);
+    const temp = join(dir, `.head-${randomUUID()}.tmp`);
+    const portable = join(dir, `.current-${randomUUID()}.tmp`);
     try {
       await fault("before_snapshot");
       await exclusive(join(dir, "history", filename(r)), r);
       await fault("after_snapshot");
       await exclusive(temp, r);
       await fault("before_replace");
-      await rename(temp, join(dir, "current.json"));
+      await rename(temp, join(dir, "head.json"));
+      await exclusive(portable, r.canvas);
+      await rename(portable, join(dir, 'current.json'));
       await fault("after_replace");
       return structuredClone(r);
     } catch (e) {
       poisoned = true;
       throw e;
     } finally {
+      await unlink(portable).catch(e => { if (e.code !== "ENOENT") throw e; });
       await unlink(temp).catch((e) => {
         if (e.code !== "ENOENT") throw e;
       });

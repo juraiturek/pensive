@@ -1,27 +1,19 @@
 # Canvas workflow
 
-The selected framework owns its state, analytical methods, validation and review semantics. [Conversation working folders](working-folder-workflow.md) own default local delivery and persistence across all six frameworks. Read that route before creation or action processing.
+Use the [server-free paired-file workflow](working-folder-workflow.md) for all six frameworks. Framework methods own analysis, validation and review; file utilities own saved state and identity.
 
-## Initialize or reuse
+## Initialize
 
-Use the selected framework's schema-valid complete state and established renderer. Locate the originating conversation registry/current analysis before generating another draft. Reuse its current canvas unless the user requests a separate new analysis. A genuinely new analysis uses `conversation.mjs create`, with an explicit host outputs root, originating conversation identity and readable title. The host runs `launch` and returns its live browser URL. Framework blank creation initializes empty state through this same route.
-
-AI-assisted SWOT initialization follows [create.md](../frameworks/swot/prompts/create.md); other frameworks follow their own Create method. Initial drafting creates reviewable content without pretending that a prior version or accepted proposal exists. PAGES initializes its Ripple baseline only after genuinely new content is generated.
+Use the selected framework’s established renderer and validated complete state. SWOT follows [Create](../frameworks/swot/prompts/create.md); other frameworks follow their own methods. Reuse the registered analysis unless the user requests a separate one. New analyses return one portable HTML and current JSON, grouped in the originating conversation folder. PAGES initializes its baseline only for genuinely new content.
 
 ## Transform
 
-Validate the complete request, schema version, action compatibility and target before reasoning. Preserve outer saved-revision metadata and use the full inner `{canvas,action}`. Missing state or invalid targets must not be reconstructed from conversation history. Direct chat actions and legacy standalone requests use exact binding/adoption from the working-folder workflow, not content-similarity matching.
+Validate the complete request and selected target. Preserve saved handoff metadata; raw browser requests must capture complete submitted state against the intended saved identity before reasoning. Never reconstruct local edits from memory. Use the selected method and deterministic framework composer. Commit updated JSON with `workspace.mjs result`, which synchronizes the same HTML’s state slot, and return the existing page link for refresh. No ordinary iteration creates another HTML file. Its embedded state slot is synchronized from current JSON so normal refresh works.
 
-Read the selected method and relevant framework semantics and quality criteria. Evaluate appends a thought without changing analytical content. Improvement/strategy actions create reviewable proposals under their own boundaries. Resolve pending proposals before new actions, preserve stable identities and respect framework-specific source/baseline rules.
+## Review
 
-Write response data and commit through `workspace.mjs result` against its exact saved revision. Return the existing live canvas URL and saved revision, never a timestamped new HTML for an iteration. Do not regenerate renderer HTML/CSS/JS with the model.
+Evaluate adds a thought; transformation actions propose changes. Opening a result never accepts it. Users accept/reject locally under [proposal review](proposal-review.md), then export complete state for the next turn. Preserve stable IDs, annotations, Takeaways and framework-specific baseline/detail fields. Invalid or stale acceptance leaves state unchanged.
 
-## Review and acceptance
+## Exports
 
-Users accept or reject proposals locally. Acceptance validates references, framework rules and complete resulting state atomically; stale acceptance leaves state unchanged. Saving a result or opening the canvas never implies acceptance. See [proposal review](proposal-review.md) for collection/bulk controls and partial review. Review decisions and PAGES baseline reset persist as separate saved events.
-
-## Explicit export and limitations
-
-For an explicit standalone HTML export, the deterministic framework packager embeds complete JSON into the established renderer and exclusively creates a new file. Such a detached file opens offline through `file://` without the working-folder service. JSON import validates complete state and confirms replacement. JSON export retains full state; neither export automatically includes the revision archive.
-
-Explain concrete host/runtime/storage failures and preserve existing state. If default local persistence is unavailable, offer standalone HTML/JSON as a disclosed fallback and wait for the user's choice unless already authorized. Do not silently produce versioned HTML or claim a fallback export updated the live canvas. Never label a partially valid artifact or failed save complete.
+JSON file import and paste import validate before confirmed replacement. Download JSON and clipboard export include complete state. Save to File is an explicit portable HTML snapshot. Normal browser operation needs no server, Node, neighboring-file access or network. Packager commands in framework handoffs are available for explicit standalone exports and development rebuilds, not ordinary turns, which synchronize the existing HTML state slot.

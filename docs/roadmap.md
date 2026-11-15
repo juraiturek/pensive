@@ -1,16 +1,25 @@
 # Implementation roadmap
 
-## Kaizen delivery correction — 2026-11-14
+## Issue Tree user validation and follow-ups — 2026-11-15
 
-The user expected the stable-HTML workflow in ordinary PAGES usage, not an optional SWOT mode. The [correction](plans/2026-11-14-kaizen-conversation-defaults.md) therefore implements default conversation folders, shared chat grouping across frameworks, explicit separate-analysis identities, host-operated local launch, all-framework JSON persistence and PAGES Ripple/review/baseline events. This supersedes the narrower pilot boundary below. Existing standalone exports remain available; native host bridges, branch/merge/restore/history interfaces and automatic historical reasoning remain separate work.
+The user tested the Issue Tree in a separate conversation and confirmed that the main implementation works. Retain two UI improvements as follow-up work: align Evaluation presentation with the other canvases, and add inline node-title editing through the existing small pencil-control convention. These are not part of the consolidation commit; existing detail-panel editing remains available.
 
 
-## Kaizen SWOT persistence pilot — 2026-11-14
+## Issue Tree MVP — 2026-11-15
 
-The user approved implementation of the [Kaizen slice](plans/2026-11-14-kaizen-revisioned-canvas.md): stable working HTML, ordered complete JSON snapshots, explicit saves and review-event persistence, exact-state host handoffs, stale/duplicate protection and deterministic Python deltas. Scope is optional SWOT working folders served on loopback; full-state requests and standalone export remain the recovery path. This makes the local working-folder portion of H3/H4 concrete without asserting native host binding or action-only requests.
+Feature implementation is prepared as a patch because `.agents` is read-only in this session. Includes exploratory factor/component decomposition, full-tree editing, node notes, independent impact/influence markings, persistence, Evaluate and a whole-tree Alternative proposal. Non-browser regressions pass; browser execution and the standard skill validator remain blocked by environment restrictions. Apply the patch and finish those checks before marking the MVP complete. Hypothesis Trees, advanced prioritization, collapse/comparison and cross-framework transfer remain deferred.
 
-After pilot feedback, separately scope other-framework adapters and identity-aware delta semantics (especially 5 Whys trees and Five Forces records), PAGES baseline events, history browsing/restoration, and a reviewable history-reflection action if useful. Do not infer branch/merge, automatic synchronization, native host support or distribution/publication authorization. Evaluate data-preparation size on actual histories before claiming token savings.
 
+## Refresh correction — 2026-11-14
+
+The user clarified that ordinary refresh must display the latest saved state. Keep the same HTML path and existing renderer, but synchronize its embedded JSON from `current.json` after every workspace request/result operation. `workspace.mjs sync folder` repairs an out-of-date HTML projection without changing analysis/history. Normal turns update JSON and the same HTML state slot, not a new HTML file. Browser import remains a transfer/recovery option; local viewing still requires no webserver. Renderer/style/script bytes remain unchanged. A save does not force-refresh a live tab or accept a proposal; export unsaved browser work before refreshing. This supersedes earlier byte-identical-HTML/manual-import statements below.
+
+
+## Server-free delivery cleanup — 2026-11-14
+
+Supersedes the two Kaizen server slices. Keep one portable HTML/current JSON pair per analysis across all frameworks, conversation grouping and file-based validation/history. Assistant turns replace JSON and synchronize the same HTML state slot; browser users refresh for updates and export their edits/review decisions. No local webserver, launch step, token or background process is part of normal delivery. See the [cleanup plan](plans/2026-11-14-server-free-canvas-cleanup.md).
+
+Native artifact registration, direct filesystem handles, automatic viewer refresh and history/restore UI remain separately scoped host integration work. No cross-host compatibility claim follows from local Chromium verification. README and distribution builds are outside this cleanup.
 
 ## Five Forces MVP — 2026-11-08
 

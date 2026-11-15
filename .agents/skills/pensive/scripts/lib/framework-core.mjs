@@ -8,6 +8,7 @@ export const supportedFrameworks = Object.freeze([
   "vars",
   "five_whys",
   "five_forces",
+  "issue_tree",
 ]);
 export function getCore(id) {
   if (!supportedFrameworks.includes(id))
