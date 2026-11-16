@@ -18,7 +18,7 @@ Some thoughts need time. Save a question alongside the item that raised it, or k
 
 Pensive works as a Skill within your AI conversation. Start in chat and open a standalone HTML canvas when the work needs a place of its own.
 
-Edit the canvas in your browser. When you want the model’s help, choose an action and paste the request into the chat. The clipboard carries the complete current canvas and the action you chose as JSON. The Skill returns a new editable HTML file containing the assessment or proposal. You can continue editing locally, review suggested changes, and save the result when you’re ready.
+Edit the canvas in your browser. When you want the model’s help, choose an action and paste the request into the chat. The clipboard carries the complete current canvas and the action you chose as JSON. On a writable local host, the Skill updates the saved JSON and the same HTML file with the assessment or proposal; refresh the page to see the result. Export browser edits with the next request so they are preserved. You can continue editing locally, review suggested changes, and save the result when you’re ready.
 
 Save the editable HTML to revisit the analysis, or exchange its complete JSON with someone using a compatible Pensive canvas for the same framework. They can import it and continue the work without the original conversation.
 
@@ -47,9 +47,9 @@ To use Pensive with AI, install or enable the Pensive Skill in your assistant. T
 
 To preview the interface before setting up the Skill, download the [blank SWOT/TOWS canvas](.agents/skills/pensive/frameworks/swot/canvas.html) using GitHub’s raw download control and open the file in your browser. You can edit the canvas and add annotations locally. Use **Save to File** to download an editable copy and reopen that copy to continue. Changes in the tab need an explicit save or export.
 
-You can also try the [blank VARS business-model canvas](.agents/skills/pensive/frameworks/vars/canvas.html), with Overview and Focus views.
+You can also try the [blank VARS business-model canvas](.agents/skills/pensive/frameworks/vars/canvas.html), with Overview and Focus views, or the [blank Issue Tree canvas](.agents/skills/pensive/frameworks/issue_tree/canvas.html) for problem decomposition.
 
-**Export to clipboard** copies complete canvas JSON for reuse or transfer. **Import JSON** validates pasted state for the same framework and asks before replacing the current canvas. An AI action copies a separate request containing the canvas state and action settings. Processing that request requires an assistant with the Pensive Skill installed and available. The HTML file alone supports local editing, annotations, and saving.
+**Export to clipboard** copies complete canvas JSON for reuse or transfer. **Import JSON** validates pasted state for the same framework and asks before replacing the current canvas. An AI action copies a separate request containing the canvas state and action settings. Processing that request requires an assistant with the Pensive Skill installed and available. The HTML file alone supports local editing and saving.
 
 ### Codex
 
@@ -57,7 +57,7 @@ The repository includes the Pensive Skill at `.agents/skills/pensive/`. Open a l
 
 1. Start a Codex chat in the checkout and try: “`$pensive` Create a blank SWOT canvas for a neighborhood repair shop evaluating pickup and delivery.”
 2. Open the returned HTML in your browser and enter your framing and factors.
-3. Choose **Evaluate**, copy the request, and paste it into the chat. Open the new HTML to read the assessment. Try **Strategize** to see a proposal you can accept or reject.
+3. Choose **Evaluate**, copy the request, and paste it into the chat. Refresh the returned HTML page to read the assessment. Try **Strategize** to see a proposal you can accept or reject.
 4. Use **Save to File** after editing or reviewing, then reopen the saved file to continue.
 
 See [Codex skill discovery](https://learn.chatgpt.com/docs/build-skills) for project setup and the [testing guide](docs/testing.md) for contributor dependencies. The local canvas and packaging flows have regression coverage. A clean Codex installation walkthrough is pending for public release.
@@ -74,7 +74,7 @@ Pensive is available as an experimental Skill package for Claude.
 
 This is an experimental distribution. Compatibility has been tested in a limited environment, and additional validation is planned.
 
-The linked release predates VARS and shared Research support; those capabilities are available in the current repository checkout.
+The linked release predates VARS, Issue Tree and shared Research support; those capabilities are available in the current repository checkout.
 
 See [all releases](https://github.com/juraiturek/pensive/releases) for future versions.
 
@@ -87,14 +87,23 @@ See [all releases](https://github.com/juraiturek/pensive/releases) for future ve
 | **Value Proposition Canvas** | How does an offering fit a particular customer segment’s jobs, pains, and gains? | Evaluate, Improve |
 | **5 Whys** | What might explain a recurring problem, and where should you investigate competing causes? | Reflect, Expand a causal branch |
 | **VARS Business Model** | How do value proposition, activities/resources/capabilities, realization of value, and enterprise scope work together? | Evaluate Consistency, Improve, Ripple, Research |
+| **Issue Tree (MVP)** | How can a problem, opportunity or option be broken into useful factors, components and subquestions? | Evaluate Decomposition, MECE Evaluation, Alternative Decomposition |
 
-All five canvases support **Six Thinking Hats** for exploring one perspective at a time, **Annotation Mode** for keeping notes alongside the analysis, and **Takeaways** for recording what to carry forward. You can write Takeaways yourself or ask AI to formulate or review the text. The proposed text stays separate until you accept it.
+SWOT/TOWS, PAGES, Value Proposition Canvas, 5 Whys and VARS support **Six Thinking Hats** for exploring one perspective at a time, **Annotation Mode** for keeping notes alongside the analysis, and **Takeaways** for recording what to carry forward. You can write Takeaways yourself or ask AI to formulate or review the text. The proposed text stays separate until you accept it.
 
 VARS starts with an editable four-quadrant Overview. Focus keeps compact statement summaries beside the selected quadrant’s supporting analysis. Quadrant and item details use Markdown, including optional VRI assessments of particular resources or capabilities.
 
 **Research** in VARS and SWOT uses the host assistant’s available search tools. Findings include sources and await approval, together with any proposed edits. A report-only result is saved as a research thought when accepted.
 
 SWOT/TOWS, PAGES, and Value Proposition Canvas review analytical proposals by collection; VARS reviews them by quadrant, including supporting details. Research and 5 Whys expansions each use one batch decision. Assessments and Six Thinking Hats reflections add observations while leaving the analytical content intact.
+
+### Issue Tree problem solving (MVP)
+
+Start with a governing question, then build an exploratory tree yourself or ask AI for a first draft. For example: “`$pensive` Open a blank Issue Tree canvas.” Add children, edit titles inline, and keep evidence, questions and rationale in node notes. Independently mark **High potential impact**, **High ability to influence** and **Needs investigation**. Full Tree gives a read-only view of the complete hierarchy.
+
+**Evaluate Decomposition** reviews meaning, reasoning and support from supplied context. **MECE Evaluation** focuses on overlapping branches, mixed dimensions and possible blind spots. General evaluations appear above the tree; the latest MECE review appears below it, with earlier reviews retained and collapsed. Both add feedback without changing the tree. **Alternative Decomposition** proposes a complete alternative hierarchy for whole-tree acceptance or rejection.
+
+The MVP supports complete JSON import/export and standalone HTML saving. It uses supplied evidence; online Research, Six Thinking Hats, Annotation Mode, Takeaways and issue tracking are outside this canvas’s current scope. Node notes and investigation marks remain available for unfinished thinking. It does not require hypotheses, guarantee exhaustive coverage or automatically identify a root cause.
 
 ## Design and architecture
 
