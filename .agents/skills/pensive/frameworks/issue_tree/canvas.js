@@ -193,9 +193,8 @@
     document.querySelectorAll('[data-ai]').forEach(node => { node.disabled = !!proposal; });
   }
   function render() { $('#framing').value = state.content.framing; renderTree(); renderDetails(); renderReview(); }
-  async function copyJson(json) {
-    try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status('Copied complete JSON to clipboard.'); }
-    catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access was blocked. Copy the selected JSON manually.'); }
+  async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
+    return ClipboardCopy.copy(json, {message, status});
   }
   try { state = W.parseState($('#canvas-state').textContent); render(); }
   catch (error) {

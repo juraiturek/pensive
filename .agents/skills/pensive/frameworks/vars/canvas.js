@@ -175,8 +175,7 @@
   function refresh() { for (const field of Vars.framing) { const input = $(`[data-framing="${field}"]`); input.readOnly = annotations.isActive(); input.value = state.content.framing[field]; resize(input); } Vars.sections.forEach(renderSection); renderThoughts(); renderProposal(); annotations.refresh(); renderFocus(); }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
     if (newStatement) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }
-    try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status(message); }
-    catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access blocked. Copy the selected JSON below.', true); }
+    return ClipboardCopy.copy(json, {message, status});
   }
   function save() {
     if (newStatement) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }

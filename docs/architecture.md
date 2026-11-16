@@ -1,5 +1,9 @@
 # Destination architecture
 
+## Shared clipboard handoff — 2026-11-15
+
+All seven framework runtimes delegate canvas/request copying to `shared/clipboard.js`, embedded by their deterministic packagers. Existing AI callbacks cover framework actions, Research, Six Hats and Takeaways where supported; framework validation and transient-draft guards remain authoritative. Copy attempts `navigator.clipboard.writeText` directly from the user action and reports success only after resolution. Rejection or an unavailable API reveals the existing manual-copy panel, preserves exact JSON, displays keyboard-copy instructions, focuses/selects the text and scrolls it into view. A subsequent successful copy hides the fallback. No permission preflight, deprecated clipboard command, host-policy override or automatic chat transfer is introduced. Previously generated HTML and distribution ZIPs need explicit rebuilding to acquire this helper.
+
 ## Issue Tree full-screen view — 2026-11-15
 
 Issue Tree has a Full screen button opening a viewport-filling native modal dialog. It reuses the existing tree renderer and org-chart geometry in a read-only mode, preserving impact/influence markings and current selection styling. The visible tree bounds scale down and center on opening and viewport resize, with no editing sidebar or mutation controls. Close and Escape restore focus to the opener; keyboard focus remains inside the modal. The view is transient and adds no schema, persisted state or dependency. Existing exported HTML needs repackaging to receive this renderer change; synchronizing embedded JSON alone preserves its older renderer.

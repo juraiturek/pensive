@@ -15,6 +15,7 @@ export async function buildCanvas(state = Tree.initialState()) {
     ['<!--pensive-style-->', styles, 'style'],
     ['<!--pensive-markdown-style-->', await readFile(new URL('../../shared/markdown.css', framework), 'utf8'), 'style'],
     ['<!--pensive-core-->', await readFile(new URL('state.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-clipboard-->', await readFile(new URL('../../shared/clipboard.js', framework), 'utf8'), 'script'],
     ['<!--pensive-json-files-->', await readFile(new URL('../../shared/json-files.js', framework), 'utf8'), 'script'],
     ['<!--pensive-markdown-->', await readFile(new URL('../../shared/markdown.js', framework), 'utf8'), 'script'],
     ['<!--pensive-runtime-->', await readFile(new URL('canvas.js', framework), 'utf8'), 'script'],

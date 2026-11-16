@@ -115,9 +115,8 @@
     for (const field of Pages.framing) { const input = $(`[data-framing="${field}"]`); input.readOnly = annotations.isActive(); input.value = state.content.framing[field]; resize(input); }
     Pages.sections.forEach(renderSection); renderChanges(); renderAI(); annotations.refresh();
   }
-  async function copyJson(json, message) {
-    try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status(message); }
-    catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access blocked. Copy the selected JSON below.', true); }
+  async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
+    return ClipboardCopy.copy(json, {message, status});
   }
   function ripplePreview() {
     const selected = Array.from(document.querySelectorAll('#ripple-sources input:checked')).map(n => n.value);

@@ -141,22 +141,8 @@
     $('#tows-toggle').setAttribute('aria-pressed', String(mode === 'tows'));
     document.querySelectorAll(`#${mode}-view textarea`).forEach(resize);
   }
-  async function copyJson(json, message, actionRequest = false) {
-    try {
-      await navigator.clipboard.writeText(json);
-      $('#clipboard-fallback').hidden = true;
-      status(message);
-    } catch {
-      $('#clipboard-fallback').hidden = false;
-      $('#clipboard-fallback label').textContent = actionRequest ? 'AI request JSON' : 'Canvas JSON';
-      $('#clipboard-fallback p').textContent = actionRequest
-        ? 'Copy this complete canvas and selected action into Codex or ChatGPT with the Pensive skill.'
-        : 'Copy this complete canvas for discussion or reuse. To request a transformation, use Strategize, Evaluate or Improve.';
-      $('#clipboard-json').value = json;
-      $('#clipboard-json').focus();
-      $('#clipboard-json').select();
-      status('Clipboard access blocked. Copy the selected JSON below.', true);
-    }
+  async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.', actionRequest = false) {
+    return ClipboardCopy.copy(json, {message, status, actionRequest});
   }
   function copyState() {
     return copyJson(JSON.stringify(Swot.validate(state), null, 2), 'Copied complete canvas JSON for discussion or reuse. Use an AI action button to request a transformation.');

@@ -1,5 +1,15 @@
 # Testing strategy
 
+## Shared clipboard fallback — 2026-11-15
+
+Added seven cross-framework offline browser tests before implementation. The first sandbox run could not launch Chromium because of macOS MachPort permissions. The elevated run reproduced missing keyboard instructions in six frameworks; the Issue Tree test fixture initially lacked a governing question and was corrected before verification. All seven final focused tests pass against rebuilt HTML.
+
+The helper attempts clipboard writing and falls back on denial or a missing API. Tests verify complete unchanged canvas/action/steering, exact selected text, focus and visibility at a 390px viewport, no false success, a successful later retry hiding the fallback, and plain-canvas export. They also exercise Research, Six Hats and Takeaways copy callbacks wherever supported. Existing framework draft-export guards are retained and pass regression coverage.
+
+Full command: `PLAYWRIGHT_BROWSERS_PATH=/tmp/pensive-playwright node --test --test-concurrency=2 tests/*.test.mjs`, with elevated Chromium process access: **349 passed, zero failures/skips**. All seven generated framework HTML files match fresh deterministic builds. The skill validator passed using temporary PyYAML 6.0.3, removed automatically afterward; JavaScript syntax and whitespace checks passed. README has no diff. No dependency was added to the project.
+
+Limits: simulated clipboard success/denial/unavailability in offline Chromium plus existing browser/state regressions; no new Claude-host, Safari/Firefox or physical keyboard/device test. Selection enables manual copying but cannot override host restrictions. Existing user canvases and Claude ZIPs were not rebuilt; no commit, push or publication.
+
 ## Dedicated MECE Evaluation action and review placement — 2026-11-15
 
 Verified elevated write access to the protected Issue Tree skill directory before source edits, using a temporary probe removed immediately. Implemented the approved [plan](plans/2026-11-15-issue-tree-mece-action.md) on local branch codex/issue-tree-mece-review, preserving prior uncommitted UX work.

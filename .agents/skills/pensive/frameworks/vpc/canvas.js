@@ -66,8 +66,7 @@
   }
   function refresh() { for (const field of Vpc.framing) { const input = $(`[data-framing="${field}"]`); input.readOnly = annotations.isActive(); input.value = state.content.framing[field]; resize(input); } Vpc.sections.forEach(renderSection); renderThoughts(); renderProposal(); annotations.refresh(); }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
-    try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status(message); }
-    catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access blocked. Copy the selected JSON below.', true); }
+    return ClipboardCopy.copy(json, {message, status});
   }
   function save() {
     try { const url = URL.createObjectURL(new Blob([Vpc.packageHtml(source, state)], { type: 'text/html;charset=utf-8' })); const link = element('a'); link.href = url; link.download = 'pensive-vpc.html'; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); status('HTML download started. Keep the downloaded file to preserve your work.'); }

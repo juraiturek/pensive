@@ -510,17 +510,7 @@
   }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
     if (document.querySelector('#tree-board form')) { status('Finish or cancel the open editor before exporting or requesting AI.', true); return; }
-    try {
-      await navigator.clipboard.writeText(json);
-      $('#clipboard-fallback').hidden = true;
-      status(message);
-    } catch {
-      $('#clipboard-fallback').hidden = false;
-      $('#clipboard-json').value = json;
-      $('#clipboard-json').focus();
-      $('#clipboard-json').select();
-      status('Clipboard access blocked. Copy the selected JSON below.', true);
-    }
+    return ClipboardCopy.copy(json, {message, status});
   }
   function view(framing) {
     $('#framing-view').hidden = !framing;

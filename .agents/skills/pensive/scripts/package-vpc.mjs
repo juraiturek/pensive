@@ -21,6 +21,7 @@ export async function buildCanvas(state = Vpc.initialState()) {
     ['<!--pensive-six-hats-->', await readFile(new URL('../../shared/six-hats.js', framework), 'utf8'), 'script'],
     ['<!--pensive-six-hats-ui-->', await readFile(new URL('../../shared/six-hats-ui.js', framework), 'utf8'), 'script'],
     ['<!--pensive-editing-->', await readFile(new URL('../../shared/canvas-editing.js', framework), 'utf8'), 'script'],
+    ['<!--pensive-clipboard-->', await readFile(new URL('../../shared/clipboard.js', framework), 'utf8'), 'script'],
     ['<!--pensive-json-files-->', await readFile(new URL('../../shared/json-files.js', framework), 'utf8'), 'script'],
     ['<!--pensive-runtime-->', await readFile(new URL('canvas.js', framework), 'utf8'), 'script']
   ]) {

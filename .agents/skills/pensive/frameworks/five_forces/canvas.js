@@ -331,21 +331,8 @@
     renderProposal();
     annotations.refresh();
   }
-  async function copyJson(
-    json,
-    message = 'Copied complete canvas JSON to clipboard.',
-  ) {
-    try {
-      await navigator.clipboard.writeText(json);
-      $('#clipboard-fallback').hidden = true;
-      status(message);
-    } catch {
-      $('#clipboard-fallback').hidden = false;
-      $('#clipboard-json').value = json;
-      $('#clipboard-json').focus();
-      $('#clipboard-json').select();
-      status('Clipboard access blocked. Copy the selected JSON below.', true);
-    }
+  async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
+    return ClipboardCopy.copy(json, {message, status});
   }
   function save() {
     try {

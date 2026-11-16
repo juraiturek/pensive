@@ -397,6 +397,40 @@ return {initialState,validate,validateContent,validateTree,find,newId,navigate,e
 });
 </script>
 <script data-implementation>
+/* One click-driven clipboard attempt with a portable manual-copy fallback. */
+const ClipboardCopy = (() => {
+  'use strict';
+  async function copy(json, {message = 'Copied complete JSON to clipboard.', status, actionRequest = false}) {
+    const panel = document.querySelector('#clipboard-fallback');
+    try {
+      await navigator.clipboard.writeText(json);
+    } catch {
+      const input = panel.querySelector('#clipboard-json');
+      let instructions = panel.querySelector('p');
+      if (!instructions) {
+        instructions = document.createElement('p');
+        input.before(instructions);
+      }
+      panel.querySelector('label').textContent = actionRequest ? 'AI request JSON' : 'Canvas JSON';
+      instructions.textContent = 'Clipboard access is unavailable or blocked. Press ⌘C on Mac or Ctrl+C on Windows/Linux to copy the selected JSON. ' + (actionRequest
+        ? 'Paste this complete canvas and selected action into your assistant with the Pensive skill.'
+        : 'Paste this JSON into your assistant with the Pensive skill for discussion or the selected action.');
+      panel.hidden = false;
+      input.value = json;
+      input.focus();
+      input.select();
+      input.scrollIntoView({block:'center'});
+      status('Clipboard access blocked or unavailable. Press ⌘C or Ctrl+C to copy the selected JSON.', true);
+      return false;
+    }
+    panel.hidden = true;
+    status(message);
+    return true;
+  }
+  return Object.freeze({copy});
+})();
+</script>
+<script data-implementation>
 /* Portable JSON files. No network or persistent filesystem permission is required. */
 const JsonFiles = (() => {
   'use strict';
@@ -694,9 +728,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
     document.querySelectorAll('[data-ai]').forEach(node => { node.disabled = !!proposal; });
   }
   function render() { $('#framing').value = state.content.framing; renderTree(); renderDetails(); renderReview(); }
-  async function copyJson(json) {
-    try { await navigator.clipboard.writeText(json); $('#clipboard-fallback').hidden = true; status('Copied complete JSON to clipboard.'); }
-    catch { $('#clipboard-fallback').hidden = false; $('#clipboard-json').value = json; $('#clipboard-json').focus(); $('#clipboard-json').select(); status('Clipboard access was blocked. Copy the selected JSON manually.'); }
+  async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
+    return ClipboardCopy.copy(json, {message, status});
   }
   try { state = W.parseState($('#canvas-state').textContent); render(); }
   catch (error) {
