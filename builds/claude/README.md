@@ -1,5 +1,7 @@
 # Pensive for Claude.ai — experimental candidate
 
+Latest local candidate (2026-11-15): `outputs/claude/pensive-claude-v0.1.0-experimental.2.zip`, built from the current seven-framework skill, including Five Forces, Issue Tree and the server-free paired-file workflow. See [current validation](VALIDATION.md) and the adjacent generated inventory. Rebuild with `python3 builds/claude/build.py --version 0.1.0-experimental.2 --output-dir outputs/claude`. The initial-candidate capability descriptions and host observations below are historical; current operational instructions are in the packaged `SKILL.md`. No fresh Claude runtime test was performed.
+
 This distribution builds from the single authoritative `.agents/skills/pensive/` directory. It does not change Pensive behavior. `0.1.0-experimental.1` is a local candidate identifier, not an approved release or a product capability version.
 
 ## Get the ZIP

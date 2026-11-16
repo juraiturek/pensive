@@ -1,4 +1,18 @@
-# Experimental candidate validation — 2026-11-07
+# Experimental candidate validation — 2026-11-15
+
+Candidate: `outputs/claude/pensive-claude-v0.1.0-experimental.2.zip` (ignored), built from the current authoritative skill.
+
+- Builder passed: 146 files; ZIP SHA-256 `23cfd8b3c4612332f964d53cc31932ea0c78b27920cba51d4eadc89b734daea6`.
+- All seven extracted framework packagers passed byte-identical blank rebuilding, initial-state JSON packaging, overwrite refusal and invalid-state rejection. ZIP integrity, deterministic archive equality, exact source-byte comparisons and all local Markdown references passed.
+- Builder now includes the operational Python history helper and checks Five Forces and Issue Tree in addition to the earlier five frameworks. The shortened package description names the seven current frameworks.
+- `node --test tests/*-state.test.mjs`: 157 passed, zero failures/skips.
+- Generic skill validator attempted but blocked by missing PyYAML; package-specific metadata/resource validation passed independently.
+- `git diff --check` passed; product README and authoritative skill source unchanged.
+- No new browser, Claude upload/runtime or live-model checks performed. No publication or push.
+
+The adjacent generated `.validation.md` contains the exact inventory and per-file hashes. The previous candidate is preserved.
+
+## Historical candidate — 2026-11-07
 
 Candidate: `pensive-claude-v0.1.0-experimental.1.zip`, generated under `outputs/claude/` (ignored).
 

@@ -12,7 +12,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / '.agents/skills/pensive'
 DESCRIPTION = ('Use Pensive for SWOT/TOWS, PAGES, Value Proposition Canvas, 5 Whys, VARS, '
-               'Six Thinking Hats, framework selection, and analytical actions on complete canvas JSON.')
+               'Five Forces, Issue Tree, research, Six Thinking Hats and analytical actions on complete canvas JSON.')
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
@@ -45,7 +45,7 @@ def main():
             continue
         if rel.parts[0] not in {'SKILL.md', 'frameworks', 'prompts', 'references', 'scripts', 'shared'}:
             raise ValueError(f'Unreviewed source root: {rel}')
-        if p.suffix not in {'.md', '.mjs', '.js', '.css', '.html', '.json', '.yaml'}:
+        if p.suffix not in {'.md', '.mjs', '.js', '.css', '.html', '.json', '.yaml', '.py'}:
             raise ValueError(f'Unreviewed file type: {rel}')
         files[rel.as_posix()] = p.read_bytes()
     original = dict(files)
@@ -78,7 +78,7 @@ def main():
                 assert dest.is_relative_to(skill.resolve()) and dest.is_file(), (p, target)
                 links += 1
         checks.append(f'{links} relative Markdown file references resolve within the extracted skill.')
-        for framework, script in [('swot', 'swot'), ('pages', 'pages'), ('vpc', 'vpc'), ('five_whys', 'five-whys'), ('vars', 'vars')]:
+        for framework, script in [('swot', 'swot'), ('pages', 'pages'), ('vpc', 'vpc'), ('five_whys', 'five-whys'), ('vars', 'vars'), ('five_forces', 'five-forces'), ('issue_tree', 'issue-tree')]:
             canvas = skill / f'frameworks/{framework}/canvas.html'
             before = canvas.read_bytes()
             command = [args.node, str(skill / f'scripts/package-{script}.mjs')]
