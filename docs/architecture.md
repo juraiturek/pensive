@@ -1,5 +1,10 @@
 # Destination architecture
 
+## Issue Tree full-screen view — 2026-11-15
+
+Issue Tree has a Full screen button opening a viewport-filling native modal dialog. It reuses the existing tree renderer and org-chart geometry in a read-only mode, preserving impact/influence markings and current selection styling. The visible tree bounds scale down and center on opening and viewport resize, with no editing sidebar or mutation controls. Close and Escape restore focus to the opener; keyboard focus remains inside the modal. The view is transient and adds no schema, persisted state or dependency. Existing exported HTML needs repackaging to receive this renderer change; synchronizing embedded JSON alone preserves its older renderer.
+
+
 ## Issue Tree MVP — 2026-11-15
 
 Issue Tree adds framework `issue_tree` using the established `1.0` full-state envelope, paired-file delivery and safe HTML state-slot packaging. Its recursive nodes own stable ID, title, substantive notes, two independent Boolean user assessments and children. Framing is one text field; `cursor` is a persisted selection path. The org-chart geometry is reused from Five Whys' full-tree overview without modifying that framework or accessing legacy sources. Desktop allocates four fifths of the workspace to the scrollable tree; detail fields occupy one fifth. Nodes stay compact; long titles remain available in their detail field and hover text.
@@ -218,3 +223,23 @@ A typed Six Hats record in the existing thoughts array holds the hat, target ref
 All four frameworks store manual notes in an optional top-level `annotations` array. Each note owns an ID, plain text, a stable target reference, and a target label captured when the note was added. Canvas, item, factor, strategy and causal-node targets reuse the identity convention from Six Hats. PAGES, SWOT/TOWS and VPC collection targets use existing section keys. The TOWS read-only factor context uses the same references as SWOT. A shared modal opens from the target control and follows the existing action-dialog pattern. Missing target IDs remain valid and are surfaced under Unavailable targets. Framework content and proposal baselines exclude the annotation collection.
 
 All four packagers embed the shared annotation state and UI source. Each framework resolves target identities and controls which analytical mutations are available in Annotation Mode. Manual annotations are supplemental interpretive context, not automatically validated analytical content. Existing AI actions preserve the collection in the submitted artifact and keep their established `thoughts` semantics. Selective use of manual notes in AI reasoning is a future extension.
+
+## Issue Tree evaluation scopes — 2026-11-15
+
+Evaluate uses an optional request-only `evaluation_scope` enum: `full` (also the legacy default) or `mece`. Native radio buttons reset to Full on opening, appear only for Evaluate, and preserve free-text guidance. Both modes append feedback without rewriting analysis. Full examines meaning, reasoning, framing fit and supplied-evidence support plus decomposition; MECE focuses on substantive overlaps and coverage. Neither performs online research. State schema remains unchanged.
+
+## Issue Tree inline naming and investigation marks — 2026-11-15
+
+Selected title activation opens a native inline textarea; new children have empty persisted titles and start inline editing with an Enter name placeholder. Enter/blur finish, Shift+Enter inserts a line break, Escape restores the original title, and composition-confirming Enter remains with the IME. Input updates state and the detail title immediately, avoiding export-only draft loss. Selection of a different node remains a separate first click; F2 supplies a keyboard shortcut.
+
+Nodes optionally carry `needsInvestigation` (Boolean; absent means unmarked for legacy imports). It is independent of high impact/influence and controlled by the user. The checkbox renders a thin circled ? at the upper-right of cards in both editor and read-only Full Tree, whose fit includes badge extents. New nodes default false. Evaluate preserves it; Alternative preserves retained-ID marks and cannot mark new concepts. Stale review compares it as part of analytical content. JSON schema, imports, requests and HTML include the optional property without changing schema_version. Legacy state is validated without injecting fields into old snapshots.
+
+## Issue Tree transient deselection — 2026-11-15
+
+Empty clicks within the tree viewport clear visible selection, hide Node details immediately and expand the editor to full width. Node/title clicks restore details; the first title click after deselection selects rather than edits. Controls and detail inputs do not deselect. Transient hasSelection is separate from the persisted cursor, preserving valid legacy navigation paths and full JSON without analytical mutation. Imports restore visible selection. Inline title drafts are committed on blur before hiding. No animation or schema change.
+
+## Dedicated Issue Tree MECE Evaluation — 2026-11-15
+
+Issue Tree exposes `mece_evaluate` alongside broad `evaluate` and whole-tree `alternative`. Both evaluation actions append `{thought}` responses; the deterministic composer writes optional evaluation-note `scope` (`full` or `mece`) from the action. Legacy evaluate/evaluation_scope requests remain valid; new buttons emit no scope selector. Scope is invalid on alternative rationale. Existing unscoped notes stay general, with no text-based inference or historical migration. Schema version remains 1.0; scoped notes require the new renderer when imported into older saved pages.
+
+General evaluation and accepted rationale use established thought cards above the tree: latest note is collapsible and initially open, earlier notes collapsed. The latest scoped MECE review appears below the tree, with prior MECE reviews collapsed. All notes remain in complete state; there is no retention cap, issue ledger, resolution tracking or Takeaways integration. Existing shared safe Markdown renders note bodies; only Issue Tree's packager embeds the existing Markdown runtime/style. Pending proposal review remains unchanged.

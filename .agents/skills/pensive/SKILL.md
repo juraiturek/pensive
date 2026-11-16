@@ -21,7 +21,7 @@ Route a saved handoff containing `storage_version`, `canvas_id`, `revision_id`, 
 
 No launch command, HTTP service or background process exists. Framework-specific packager CLI directions below apply only to initial/explicit standalone exports; normal turns use workspace file operations to update JSON and synchronize the same HTML state slot. On an artifact-only host without writable workspace access, validate/compose complete submitted state through its framework core and return updated JSON for import into the existing artifact. Do not claim native Claude artifact registration or automatic refresh unless observed.
 
-Issue Tree MVP supports creation, Evaluate Decomposition and whole-tree Alternative Decomposition review, node notes and independent impact/influence flags. It uses the paired-file workflow; shared Research, Six Hats, Annotation Mode and Takeaways are not exposed for Issue Tree.
+Issue Tree MVP supports creation, general Evaluate Decomposition, dedicated MECE Evaluation and whole-tree Alternative Decomposition review, node notes, inline title editing, independent impact/influence flags and user-marked Needs investigation badges. It uses the paired-file workflow; shared Research, Six Hats, Annotation Mode and Takeaways are not exposed for Issue Tree.
 
 ## Takeaways
 
@@ -63,7 +63,7 @@ Search uses the host's available tools, never the HTML or a Pensive backend. If 
 
 ## Create, package or explore an Issue Tree
 
-Honor explicit Issue Tree requests without requiring SCQ or another framework. Read the [Issue Tree workflow](references/issue-tree-workflow.md), [manifest](frameworks/issue_tree/framework.yaml) and selected Create/Evaluate/Alternative method. It supports exploratory factor/component decomposition of problems, opportunities and options. Evaluate appends feedback; Alternative proposes a different whole-tree decomposition for explicit review. Use framework ID `issue_tree` in the established paired-file workflow. Preserve node notes and independent user-assessed priority flags. Do not infer low from false, score, rank or prune. No item-level acceptance or Hypothesis Tree mode.
+Honor explicit Issue Tree requests without requiring SCQ or another framework. Read the [Issue Tree workflow](references/issue-tree-workflow.md), [manifest](frameworks/issue_tree/framework.yaml) and selected Create/Evaluate/MECE Evaluation/Alternative method. It supports exploratory factor/component decomposition of problems, opportunities and options. Evaluate and MECE Evaluation append scoped feedback; Alternative proposes a different whole-tree decomposition for explicit review. Use framework ID `issue_tree` in the established paired-file workflow. Preserve node notes, independent user-assessed priority flags and optional needsInvestigation marks (absent means unmarked). Do not infer low from false, score, rank or prune. No item-level acceptance or Hypothesis Tree mode.
 
 ## Create, package or analyze Five Forces
 

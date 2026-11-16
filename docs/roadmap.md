@@ -1,8 +1,12 @@
 # Implementation roadmap
 
+## Issue Tree research follow-up — 2026-11-15
+
+Full and MECE evaluation use supplied evidence only. Online Research may be considered as a future explicit action, informed by the existing VARS/SWOT Research workflow; it is outside the evaluation-scope change.
+
 ## Issue Tree user validation and follow-ups — 2026-11-15
 
-The user tested the Issue Tree in a separate conversation and confirmed that the main implementation works. Retain two UI improvements as follow-up work: align Evaluation presentation with the other canvases, and add inline node-title editing through the existing small pencil-control convention. These are not part of the consolidation commit; existing detail-panel editing remains available.
+The user tested the Issue Tree in a separate conversation and confirmed that the main implementation works. Evaluation presentation is now aligned with the established thought cards: general notes above the tree and scoped MECE reviews below, with earlier notes collapsed. MECE Evaluation has its own action/button; issue tracking and Takeaways integration remain out of scope. Inline title editing was subsequently implemented through the user-approved selected-title click gesture, alongside empty new-node names and independent Needs investigation marks; detail-panel editing remains available.
 
 
 ## Issue Tree MVP — 2026-11-15

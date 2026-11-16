@@ -101,6 +101,9 @@
           "items": {
             "$ref": "#/$defs/node"
           }
+        },
+        "needsInvestigation": {
+          "type": "boolean"
         }
       }
     },
@@ -142,8 +145,32 @@
         "text": {
           "type": "string",
           "pattern": "\\S"
+        },
+        "scope": {
+          "enum": [
+            "full",
+            "mece"
+          ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "alternative"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "scope"
+              ]
+            }
+          }
+        }
+      ]
     }
   }
 }

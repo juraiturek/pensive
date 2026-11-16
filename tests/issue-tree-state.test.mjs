@@ -24,3 +24,51 @@ test('stale proposals never overwrite manual notes, titles, priorities or framin
 test('standalone packaging preserves implementation bytes, pending review and hostile text safely',async()=>{const {s}=fixture();W.editNode(s,'root',{notes:'</script><script>alert(1)</script>&'});const pending=W.composeResult(W.buildRequest(s,{id:'alternative'}),alternative(s));const html=await buildCanvas(pending),built=await readFile(new URL('canvas.html',root),'utf8');assert.equal(await buildCanvas(),built);const json=html.match(/<script id="canvas-state" type="application\/json">([\s\S]*?)<\/script>/)[1];assert.deepEqual(W.parseState(json),pending);assert.ok(!json.includes('</script>'));assert.equal(html.slice(html.indexOf('<!--pensive-state-end-->')),built.slice(built.indexOf('<!--pensive-state-end-->')));});
 test('paired-file workflow saves requests/results to the same HTML state slot for normal refresh',async()=>{const tmp=await mkdtemp(join(tmpdir(),'issue-tree-state-'));try{const {s}=fixture(),folder=join(tmp,'analysis');const head=await initialize(folder,s);const handoff=await withStore(folder,store=>prepareRequest(store,{parent_revision_id:head.revision_id,action:{id:'alternative'}}));await withStore(folder,store=>applyResult(store,handoff,alternative(s)));const current=JSON.parse(await readFile(join(folder,'current.json'),'utf8')),html=await readFile(join(folder,'canvas.html'),'utf8');assert.ok(current.proposals.length);assert.deepEqual(JSON.parse(html.match(/<script id="canvas-state" type="application\/json">([\s\S]*?)<\/script>/)[1]),current);assert.deepEqual(current.content,s.content);}finally{await rm(tmp,{recursive:true,force:true});}});
 test('AI alternative cannot assign priority to new nodes or alter retained user judgments',()=>{const {s,a}=fixture();W.editNode(s,a,{highImpact:true});const r=alternative(s);r.tree.children[0].highInfluence=true;assert.throws(()=>W.composeResult(W.buildRequest(s,{id:'alternative'}),r),/priority/);const retained={thought:'Different lens',tree:structuredClone(s.content.tree)};retained.tree.children[0].highImpact=false;assert.throws(()=>W.composeResult(W.buildRequest(s,{id:'alternative'}),retained),/priority/);});
+test('evaluation scopes validate, preserve action in saved requests, and remain append-only',async()=>{
+ const {s}=fixture();
+ for(const scope of ['full','mece']){
+  const action={id:'evaluate',evaluation_scope:scope,comment:'Keep supplied evidence boundaries'};
+  const request=W.buildRequest(s,action); assert.deepEqual(request.action,action);
+  const result=W.composeResult(request,{thought:'Scope-specific feedback'});assert.deepEqual(result.content,s.content);
+  const tmp=await mkdtemp(join(tmpdir(),'issue-scope-'));
+  try{const folder=join(tmp,'canvas');const head=await initialize(folder,s);const handoff=await withStore(folder,store=>prepareRequest(store,{parent_revision_id:head.revision_id,action}));assert.equal(handoff.request.action.evaluation_scope,scope);await withStore(folder,store=>applyResult(store,handoff,{thought:'Scoped result'}));}finally{await rm(tmp,{recursive:true,force:true});}
+ }
+ assert.doesNotThrow(()=>W.buildRequest(s,{id:'evaluate'}));
+ assert.throws(()=>W.buildRequest(s,{id:'evaluate',evaluation_scope:'research'}));
+ assert.throws(()=>W.buildRequest(s,{id:'alternative',evaluation_scope:'mece'}));
+});
+test('empty child titles and optional investigation flags preserve legacy schema compatibility',()=>{
+ const s=fixture().s;const id=W.addChild(s,'root');const child=W.find(s,id).node;
+ assert.equal(child.title,'');assert.equal(child.needsInvestigation,false);
+ W.editNode(s,id,{needsInvestigation:true});assert.equal(W.find(s,id).node.needsInvestigation,true);assert.ok(schema(s),JSON.stringify(schema.errors));
+ assert.throws(()=>W.editNode(s,id,{needsInvestigation:'yes'}));
+ const legacy=structuredClone(s);delete W.find(legacy,id).node.needsInvestigation;assert.doesNotThrow(()=>W.validate(legacy));assert.ok(schema(legacy));
+ const bad=structuredClone(s);W.find(bad,id).node.needsInvestigation=1;assert.equal(schema(bad),false);assert.throws(()=>W.validate(bad));
+ assert.deepEqual(W.parseState(JSON.stringify(s)),s);
+});
+test('investigation flags remain user-owned through AI actions and stale alternative review',()=>{
+ const {s,a}=fixture();W.editNode(s,a,{needsInvestigation:true});
+ const evaluated=W.composeResult(W.buildRequest(s,{id:'evaluate'}),{thought:'Keep uncertainty visible'});assert.deepEqual(evaluated.content,s.content);
+ const response={thought:'Retained concepts',tree:structuredClone(s.content.tree)};
+ const pending=W.composeResult(W.buildRequest(s,{id:'alternative'}),response);W.resolveProposal(pending,'accept');assert.equal(W.find(pending,a).node.needsInvestigation,true);
+ const changed=structuredClone(response);delete changed.tree.children[0].needsInvestigation;assert.throws(()=>W.composeResult(W.buildRequest(s,{id:'alternative'}),changed));
+ const added=alternative(s);added.tree.children[0].needsInvestigation=true;assert.throws(()=>W.composeResult(W.buildRequest(s,{id:'alternative'}),added));
+ const stale=W.composeResult(W.buildRequest(s,{id:'alternative'}),response);W.editNode(stale,a,{needsInvestigation:false});assert.throws(()=>W.resolveProposal(stale,'accept'),/stale/);
+});
+test('dedicated MECE action and legacy evaluation requests derive persisted scope without content edits',async()=>{
+ const {s,a}=fixture();W.editNode(s,a,{highImpact:true,needsInvestigation:true});s.thoughts=[{id:'legacy_note',kind:'evaluation',text:'Legacy general note'}];
+ for(const [action,scope] of [[{id:'evaluate'},'full'],[{id:'evaluate',evaluation_scope:'full'},'full'],[{id:'evaluate',evaluation_scope:'mece'},'mece'],[{id:'mece_evaluate',comment:'Review coverage'},'mece']]){
+  const request=W.buildRequest(s,action),result=W.composeResult(request,{thought:'## Review\n- Branch boundary requires clarification.'});assert.deepEqual(result.content,s.content);assert.deepEqual(result.cursor,s.cursor);assert.deepEqual(result.thoughts.slice(0,-1),s.thoughts);assert.equal(result.thoughts.at(-1).scope,scope);assert.ok(schema(result),JSON.stringify(schema.errors));assert.deepEqual(request.action,action);
+  for(const extra of [{scope:'full'},{tree:s.content.tree},{content:s.content}])assert.throws(()=>W.composeResult(request,{thought:'Review',...extra}),/Unsupported/);
+  const temp=await mkdtemp(join(tmpdir(),'issue-mece-contract-'));
+  try{const folder=join(temp,'canvas'),head=await initialize(folder,s),handoff=await withStore(folder,store=>prepareRequest(store,{parent_revision_id:head.revision_id,action}));assert.deepEqual(handoff.request.action,action);const response={thought:'Scoped review'};const first=await withStore(folder,store=>applyResult(store,handoff,response));const retry=await withStore(folder,store=>applyResult(store,handoff,response));assert.equal(retry.revision_id,first.revision_id);assert.deepEqual(first.canvas.content,s.content);assert.equal(first.canvas.thoughts.at(-1).scope,scope);}finally{await rm(temp,{recursive:true,force:true});}
+ }
+ const pending=W.composeResult(W.buildRequest(s,{id:'alternative'}),alternative(s));assert.throws(()=>W.buildRequest(pending,{id:'mece_evaluate'}),/pending/);
+ for(const action of [{id:'mece_evaluate',evaluation_scope:'full'},{id:'mece_evaluate',evaluation_scope:'mece'},{id:'alternative',evaluation_scope:'mece'}])assert.throws(()=>W.buildRequest(s,action));
+});
+test('note scope schema and runtime agree while keeping old unscoped history untouched',()=>{
+ const {s}=fixture();s.thoughts=[{id:'old_eval',kind:'evaluation',text:'MECE appears in this legacy note but is not a classification'},{id:'old_rationale',kind:'alternative',text:'Accepted alternative rationale'}];const before=structuredClone(s);assert.doesNotThrow(()=>W.validate(s));assert.ok(schema(s));assert.deepEqual(s,before);
+ for(const scope of ['full','mece']){const next=structuredClone(s);next.thoughts[0].scope=scope;assert.doesNotThrow(()=>W.validate(next));assert.ok(schema(next));}
+ for(const [kind,scope] of [['evaluation','invalid'],['evaluation',null],['alternative','mece'],['alternative','full']]){const next=structuredClone(s);Object.assign(next.thoughts[0],{kind,scope});assert.throws(()=>W.validate(next));assert.equal(schema(next),false);}
+ const pending=W.composeResult(W.buildRequest(s,{id:'alternative'}),alternative(s));assert.ok(schema(pending));pending.proposals[0].thought.scope='mece';assert.throws(()=>W.validate(pending));assert.equal(schema(pending),false);
+});
