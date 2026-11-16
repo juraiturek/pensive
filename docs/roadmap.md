@@ -11,7 +11,7 @@ The user tested the Issue Tree in a separate conversation and confirmed that the
 
 ## Issue Tree MVP — 2026-11-15
 
-Feature implementation is prepared as a patch because `.agents` is read-only in this session. Includes exploratory factor/component decomposition, full-tree editing, node notes, independent impact/influence markings, persistence, Evaluate and a whole-tree Alternative proposal. Non-browser regressions pass; browser execution and the standard skill validator remain blocked by environment restrictions. Apply the patch and finish those checks before marking the MVP complete. Hypothesis Trees, advanced prioritization, collapse/comparison and cross-framework transfer remain deferred.
+Feature implementation is prepared as a patch because `.agents` is read-only in this session. Includes exploratory factor/component decomposition, full-tree editing, node notes, independent impact/influence markings, persistence, Evaluate and a whole-tree Alternative proposal. Non-browser regressions pass; browser execution and the standard skill validator remain blocked by environment restrictions. Apply the patch and finish those checks before marking the MVP complete. Hypothesis Trees, advanced prioritization, comparison and cross-framework transfer remain deferred. Selective display folding and depth presets were subsequently added on 2026-11-16.
 
 
 ## Refresh correction — 2026-11-14

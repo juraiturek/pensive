@@ -221,6 +221,37 @@ dialog textarea { display: block; font-size: .9rem; }
 .earlier-thoughts .thought { margin-top: .5rem; }
 .thought .markdown > :first-child { margin-top: 0; }
 .thought .markdown > :last-child { margin-bottom: 0; }
+
+/* Sibling movement appears only in the lower control area or its keyboard/touch focus. */
+.issue-node-controls { width: 100%; }
+.issue-node-controls::before { content: ''; position: absolute; z-index: -1; inset: -10px 0 0; }
+.issue-node-controls .issue-node-reorder { position: absolute; top: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: none; }
+.issue-node-reorder[data-direction="left"] { left: calc(50% - 66px); }
+.issue-node-reorder[data-direction="right"] { right: calc(50% - 66px); }
+.issue-node-controls:hover .issue-node-reorder { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0s .3s, visibility 0s .3s; }
+.issue-node-controls:focus-within .issue-node-reorder,
+.issue-node-controls.reorder-revealed .issue-node-reorder { opacity: 1; visibility: visible; pointer-events: auto; transition: none; }
+.issue-node-controls:hover .issue-node-reorder:disabled,
+.issue-node-controls:focus-within .issue-node-reorder:disabled,
+.issue-node-controls.reorder-revealed .issue-node-reorder:disabled { opacity: .28; background: transparent; cursor: default; }
+
+/* Full Tree orientation changes only the read-only geometry. */
+.issue-overview-header { gap: .6rem; flex-wrap: wrap; }
+.issue-overview-orientation { display: flex; gap: .25rem; margin-left: auto; }
+.issue-overview-orientation button { font-size: .8rem; padding: .4rem .65rem; }
+.issue-overview-orientation button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Folding and depth presets are temporary display controls in both views. */
+.tree-depth { display: flex; align-items: center; flex-wrap: wrap; gap: .25rem; margin: .5rem 0; }
+.tree-depth button { font-size: .8rem; padding: .35rem .55rem; }
+.tree-depth button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tree-depth-label, .tree-depth-custom { font-size: .8rem; color: var(--muted); margin-right: .25rem; }
+.tree-depth-custom[hidden] { display: none; }
+.issue-overview-header .tree-depth { margin: 0; }
+.issue-node-collapse { position: absolute; z-index: 3; left: 50%; top: calc(50% + 74px); transform: translate(-50%, -50%); width: 26px; height: 24px; padding: 0; font-size: 17px; line-height: 1; }
+.issue-collapse-stem { position: absolute; left: 50%; top: calc(50% + 43px); transform: translateX(-50%); width: 1.5px; height: 31px; background: #a7afa4; pointer-events: none; }
+[data-orientation="horizontal"] .issue-node-collapse { left: calc(50% + 144px); top: 50%; }
+[data-orientation="horizontal"] .issue-collapse-stem { left: calc(50% + 104px); top: 50%; transform: translateY(-50%); width: 40px; height: 1.5px; }
 </style>
 <style>
 .markdown{line-height:1.65;overflow-wrap:anywhere}.markdown p{white-space:pre-wrap}.markdown-table{overflow-x:auto;max-width:100%}.markdown table{border-collapse:collapse;width:100%;min-width:360px;margin:16px 0}.markdown th,.markdown td{border-bottom:1px solid #ddd;padding:10px;text-align:left;min-width:90px;overflow-wrap:normal}.markdown h3{font-size:17px}.markdown a{color:#285b46}
@@ -229,13 +260,14 @@ dialog textarea { display: block; font-size: .9rem; }
 <section class="issue-framing"><label for="framing">Framing <span title="You can structure this using Situation, Complication and Question (SCQ), from Barbara Minto’s Pyramid Principle.">ⓘ</span></label><textarea id="framing" rows="2" placeholder="Context, boundaries, and the question you want to understand…"></textarea></section>
 <div class="toolbar"><div class="ai-actions"><button type="button" data-ai="evaluate">Evaluate Decomposition</button><button type="button" data-ai="mece_evaluate">MECE Evaluation</button><button type="button" data-ai="alternative">Alternative Decomposition</button></div><div class="export-actions"><button id="full-screen" type="button">Full screen</button><button id="import" type="button">Import JSON</button><button id="copy" type="button">Export to clipboard</button><button id="save" type="button">Save to File ↗</button></div></div>
 <section id="thoughts" class="thoughts" aria-label="AI evaluation" hidden></section>
-<p class="tree-guide">Click a title to select; click the selected title again to edit inline. + adds an unnamed child. A heavy outline marks high potential impact; shading marks high ability to influence. Unmarked means not marked high. A circled ? marks needs investigation.</p>
+<div id="editor-depth" class="tree-depth" role="group" aria-label="Visible tree depth"></div>
+<p class="tree-guide">Click a title to select; click the selected title again to edit inline. + adds an unnamed child. Hover near the lower controls to reveal sibling-order arrows. A heavy outline marks high potential impact; shading marks high ability to influence. Unmarked means not marked high. A circled ? marks needs investigation.</p>
 <div class="issue-workspace"><section class="issue-tree-scroll" aria-label="Issue tree"><div id="tree-board" class="issue-tree-board"></div></section><aside id="node-details" aria-label="Selected node details"><h2>Node details</h2><label for="node-title">Name / title</label><textarea id="node-title" rows="3" placeholder="Enter name"></textarea><label for="node-notes">Notes / rationale</label><textarea id="node-notes" rows="9"></textarea><label class="checkbox-label"><input type="checkbox" id="high-impact"> High potential impact</label><label class="checkbox-label"><input type="checkbox" id="high-influence"> High ability to influence</label><label class="checkbox-label"><input type="checkbox" id="needs-investigation"> Needs investigation</label></aside></div>
 <section id="proposal-panel" class="proposal-panel" aria-label="Alternative decomposition proposal" hidden></section><section id="mece-reviews" class="thoughts" aria-label="MECE reviews" hidden></section>
 <section id="clipboard-fallback" hidden><label for="clipboard-json">Copy JSON manually</label><textarea id="clipboard-json" rows="10" readonly></textarea><button id="close-copy" type="button">Close</button></section><p id="status" class="status" role="status" aria-live="polite">Edits stay in this tab. Save or export to preserve them.</p></main><footer>Issue Tree · Pensive</footer></div>
 <dialog id="import-dialog" aria-labelledby="import-title"><form id="import-form"><h2 id="import-title">Import Issue Tree JSON</h2><label for="import-json">Complete canvas JSON</label><textarea id="import-json" rows="12"></textarea><p id="import-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-import" type="button">Cancel import</button><button type="submit">Replace canvas</button></div></form></dialog>
 <dialog id="ai-dialog" aria-labelledby="ai-title"><form id="ai-form"><h2 id="ai-title"></h2><p>Copy the complete request into your conversation with Pensive. Results remain advisory until reviewed.</p><label for="ai-guidance">Optional guidance</label><textarea id="ai-guidance" rows="4"></textarea><p id="ai-error" class="error" role="alert"></p><div class="dialog-actions"><button id="cancel-ai" type="button">Cancel</button><button type="submit">Copy AI request</button></div></form></dialog>
-<dialog id="overview-dialog" aria-labelledby="overview-title"><header class="issue-overview-header"><h2 id="overview-title">Full Tree</h2><button id="overview-close" type="button" aria-label="Close full tree view" autofocus>×</button></header><section id="overview-viewport" aria-label="Full issue tree"><div id="overview-board" class="issue-tree-board"></div></section></dialog>
+<dialog id="overview-dialog" aria-labelledby="overview-title"><header class="issue-overview-header"><h2 id="overview-title">Full Tree</h2><div class="issue-overview-orientation" role="group" aria-label="Tree orientation"><button id="overview-vertical" type="button" aria-pressed="true">Vertical</button><button id="overview-horizontal" type="button" aria-pressed="false">Horizontal</button></div><div id="overview-depth" class="tree-depth" role="group" aria-label="Visible tree depth"></div><button id="overview-close" type="button" aria-label="Close full tree view" autofocus>×</button></header><section id="overview-viewport" aria-label="Full issue tree"><div id="overview-board" class="issue-tree-board"></div></section></dialog>
 <noscript>This canvas requires JavaScript for local editing.</noscript>
 <!--pensive-state-start-->
 <script id="canvas-state" type="application/json">{
@@ -287,6 +319,7 @@ function navigate(s,id){validate(s);s.cursor=find(s,id).path;}
 function editNode(s,id,patch){validate(s);keys(patch,[],['title','notes','highImpact','highInfluence','needsInvestigation']);const candidate=clone(find(s,id).node);Object.assign(candidate,patch);validateTree(candidate);Object.assign(find(s,id).node,patch);}
 function editFraming(s,value){validate(s);text(value);s.content.framing=value;}
 function addChild(s,id,title=''){validate(s);text(title);const r=find(s,id),child=node(newId(s),title);r.node.children.push(child);s.cursor=[...r.path,child.id];return child.id;}
+function moveSibling(s,id,direction){validate(s);if(!['left','right'].includes(direction))fail('Invalid sibling move direction.');const r=find(s,id);if(!r.parent)return false;const siblings=r.parent.children,index=siblings.findIndex(n=>n.id===id),next=index+(direction==='left'?-1:1);if(next<0||next>=siblings.length)return false;[siblings[index],siblings[next]]=[siblings[next],siblings[index]];return true;}
 function deleteNode(s,id){validate(s);const r=find(s,id);if(!r.parent)fail('Cannot delete the root.');r.parent.children.splice(r.parent.children.indexOf(r.node),1);if(s.cursor.includes(id))s.cursor=r.path.slice(0,-1);}
 function validateRequest(r){keys(r,['canvas','action']);validate(r.canvas);if(r.canvas.proposals?.length)fail('Resolve pending proposal first.');keys(r.action,['id'],['comment','evaluation_scope']);if(!['evaluate','mece_evaluate','alternative'].includes(r.action.id))fail('Unsupported action.');if(r.action.comment!==undefined)text(r.action.comment);if(r.action.evaluation_scope!==undefined&&(r.action.id!=='evaluate'||!['full','mece'].includes(r.action.evaluation_scope)))fail('Invalid evaluation scope.');if(!r.canvas.content.tree.title.trim())fail('State the governing problem before AI review.');return r;}
 function buildRequest(s,action){return clone(validateRequest({canvas:s,action}));}
@@ -295,22 +328,21 @@ function composeResult(request,response){validateRequest(request);const alternat
 function canonical(v){if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';return JSON.stringify(v);}
 function resolveProposal(s,decision){validate(s);if(!['accept','reject'].includes(decision))fail('Unknown review decision.');const p=s.proposals?.[0];if(!p)fail('No pending proposal.');if(decision==='reject'){delete s.proposals;return;}if(canonical(s.content)!==canonical(p.base_content))fail('Proposal is stale after content or framing edits. Reject and request a fresh alternative.');const candidate=clone(s);candidate.content.tree=clone(p.tree);candidate.cursor=[p.tree.id];candidate.thoughts=[...(candidate.thoughts||[]),clone(p.thought)];delete candidate.proposals;validate(candidate);Object.assign(s,candidate);delete s.proposals;}
 function parseState(json){return validate(JSON.parse(json));}
-  function overview(s) {
+  function overview(s, orientation = 'vertical', collapsedIds = []) {
     validate(s);
+    if (!['vertical', 'horizontal'].includes(orientation)) fail('Invalid overview orientation.');
+    if (!Array.isArray(collapsedIds) || collapsedIds.some(id => typeof id !== 'string')) fail('Invalid collapsed node IDs.');
+    const collapsed = new Set(collapsedIds), descendants = new Map();
+    const horizontal = orientation === 'horizontal';
     const tree = s.content.tree,
       widths = new Map(),
       stack = [[tree, false]];
     while (stack.length) {
       const [n, visited] = stack.pop();
-      if (visited)
-        widths.set(
-          n.id,
-          Math.max(
-            1,
-            n.children.reduce((sum, c) => sum + widths.get(c.id), 0),
-          ),
-        );
-      else {
+      if (visited) {
+        descendants.set(n.id, n.children.reduce((sum, c) => sum + 1 + descendants.get(c.id), 0));
+        widths.set(n.id, collapsed.has(n.id) ? 1 : Math.max(1, n.children.reduce((sum, c) => sum + widths.get(c.id), 0)));
+      } else {
         stack.push([n, true]);
         for (const c of n.children) stack.push([c, false]);
       }
@@ -322,8 +354,8 @@ function parseState(json){return validate(JSON.parse(json));}
     let maxDepth = 0;
     while (todo.length) {
       const { n, parent, depth, start } = todo.pop(),
-        x = 122 + (start + widths.get(n.id) / 2 - 0.5) * 228,
-        y = 52 + depth * 148;
+        x = horizontal ? 122 + depth * 288 : 122 + (start + widths.get(n.id) / 2 - 0.5) * 228,
+        y = horizontal ? 52 + (start + widths.get(n.id) / 2 - 0.5) * 112 : 52 + depth * 148;
       maxDepth = Math.max(maxDepth, depth);
       const row = {
         id: n.id,
@@ -334,6 +366,9 @@ function parseState(json){return validate(JSON.parse(json));}
         y,
         depth,
         is_root: !parent,
+        has_children: n.children.length > 0,
+        is_collapsed: n.children.length > 0 && collapsed.has(n.id),
+        hidden_descendants: collapsed.has(n.id) ? descendants.get(n.id) : 0,
 
         is_active_strand: s.cursor.includes(n.id),
         is_cursor_tip: n.id === s.cursor.at(-1),
@@ -347,15 +382,18 @@ function parseState(json){return validate(JSON.parse(json));}
           y1 = p.y + 43,
           y2 = y - 43,
           mid = (y1 + y2) / 2;
+        const x1 = p.x + 104, x2 = x - 104, midX = (x1 + x2) / 2;
         edges.push({
           parent_id: parent,
           child_id: n.id,
-          path: `M ${p.x.toFixed(2)} ${y1.toFixed(2)} L ${p.x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${y2.toFixed(2)}`,
+          path: horizontal
+            ? `M ${x1.toFixed(2)} ${p.y.toFixed(2)} L ${midX.toFixed(2)} ${p.y.toFixed(2)} L ${midX.toFixed(2)} ${y.toFixed(2)} L ${x2.toFixed(2)} ${y.toFixed(2)}`
+            : `M ${p.x.toFixed(2)} ${y1.toFixed(2)} L ${p.x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${y2.toFixed(2)}`,
         });
       }
       let next = start;
       const children = [];
-      for (const c of n.children) {
+      for (const c of collapsed.has(n.id) ? [] : n.children) {
         children.push({ n: c, parent: n.id, depth: depth + 1, start: next });
         next += widths.get(c.id);
       }
@@ -364,8 +402,8 @@ function parseState(json){return validate(JSON.parse(json));}
     return {
       nodes,
       edges,
-      board_width: Math.max(960, widths.get(tree.id) * 228 + 244),
-      board_height: Math.max(320, (maxDepth + 1) * 148 + 104),
+      board_width: Math.max(960, horizontal ? (maxDepth + 1) * 288 + 244 : widths.get(tree.id) * 228 + 244),
+      board_height: Math.max(320, horizontal ? widths.get(tree.id) * 112 + 104 : (maxDepth + 1) * 148 + 104),
     };
   }
   function packageHtml(html, s) {
@@ -393,7 +431,7 @@ function parseState(json){return validate(JSON.parse(json));}
     );
   }
 
-return {initialState,validate,validateContent,validateTree,find,newId,navigate,editNode,editFraming,addChild,deleteNode,overview,validateRequest,buildRequest,composeResult,resolveProposal,parseState,packageHtml};
+return {initialState,validate,validateContent,validateTree,find,newId,navigate,editNode,editFraming,addChild,deleteNode,moveSibling,overview,validateRequest,buildRequest,composeResult,resolveProposal,parseState,packageHtml};
 });
 </script>
 <script data-implementation>
@@ -538,7 +576,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
   'use strict';
   const W = IssueTree, $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction, hasSelection = true;
+  let state, requestedAction, hasSelection = true, overviewOrientation = 'vertical', depthPreset = 'all';
+  const collapsedIds = new Set();
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
     if (cls) node.className = cls;
@@ -554,6 +593,36 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
     const node = el('button', '', text); node.type = 'button';
     if (label) node.setAttribute('aria-label', label);
     node.addEventListener('click', () => run(fn)); return node;
+  }
+  function updateDepthControls() {
+    document.querySelectorAll('[data-depth-preset]').forEach(control => control.setAttribute('aria-pressed', String(control.dataset.depthPreset === depthPreset)));
+    document.querySelectorAll('.tree-depth-custom').forEach(label => { label.hidden = depthPreset !== null; });
+  }
+  function renderVisibleTrees() {
+    const visible = new Set(W.overview(state, 'vertical', [...collapsedIds]).nodes.map(node => node.id));
+    if (hasSelection && !visible.has(state.cursor.at(-1))) hasSelection = false;
+    renderTree(); renderDetails(); updateDepthControls();
+    if ($('#overview-dialog').open) { renderTree($('#overview-board'), true); fitOverview(); }
+  }
+  function setDepthPreset(value) {
+    collapsedIds.clear(); depthPreset = value;
+    if (value !== 'all') {
+      const stack = [{node:state.content.tree, depth:0}];
+      while (stack.length) {
+        const {node, depth} = stack.pop();
+        if (node.children.length && depth >= Number(value)) collapsedIds.add(node.id);
+        node.children.forEach(child => stack.push({node:child, depth:depth+1}));
+      }
+    }
+    renderVisibleTrees();
+  }
+  for (const id of ['editor-depth','overview-depth']) {
+    const group = $('#' + id); group.append(el('span', 'tree-depth-label', 'Show'));
+    for (const [value,label] of [['1','Level 1'],['2','Level 2'],['3','Level 3'],['all','All']]) {
+      const control = button(label, () => setDepthPreset(value));
+      control.dataset.depthPreset = value; control.setAttribute('aria-pressed', String(value === 'all')); group.append(control);
+    }
+    const custom = el('span', 'tree-depth-custom', 'Custom'); custom.hidden = true; group.append(custom);
   }
   function selected() { return W.find(state, state.cursor.at(-1)).node; }
   function edited() { status('Unsaved edits in this tab. Save or export to preserve your tree.'); }
@@ -576,8 +645,14 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
       choose.classList.toggle('unnamed', !node.title.trim());
       choose.title = node.title || 'Enter name';
       const controls = editor.parentElement.querySelector('.issue-node-controls');
-      controls.children[0].setAttribute('aria-label', 'Add child to ' + (node.title || 'Untitled'));
-      controls.children[1]?.setAttribute('aria-label', 'Delete ' + (node.title || 'Untitled'));
+      controls.querySelector('[data-node-action="add"]').setAttribute('aria-label', 'Add child to ' + (node.title || 'Untitled'));
+      controls.querySelector('[data-node-action="delete"]')?.setAttribute('aria-label', 'Delete ' + (node.title || 'Untitled'));
+      for (const arrow of controls.querySelectorAll('.issue-node-reorder')) arrow.setAttribute('aria-label', 'Move ' + (node.title || 'Untitled') + ' ' + arrow.dataset.direction);
+      const collapse = editor.parentElement.querySelector('.issue-node-collapse');
+      if (collapse) {
+        const label = collapsedIds.has(id) ? `Expand subtree for ${node.title || 'Untitled'} (${collapse.dataset.hiddenCount} hidden nodes)` : `Collapse subtree for ${node.title || 'Untitled'}`;
+        collapse.setAttribute('aria-label', label); collapse.title = label;
+      }
       editor.replaceWith(choose);
       if (focus) choose.focus({preventScroll:true});
     }
@@ -594,7 +669,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
     choose.replaceWith(editor); editor.focus({preventScroll:true}); editor.select();
   }
   function renderTree(board = $('#tree-board'), readOnly = false) {
-    const view = W.overview(state);
+    const view = W.overview(state, readOnly ? overviewOrientation : 'vertical', [...collapsedIds]);
+    board.dataset.orientation = readOnly ? overviewOrientation : 'vertical';
     board.replaceChildren();
     board.style.width = view.board_width + 'px';
     board.style.height = view.board_height + 'px';
@@ -614,6 +690,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
         const marker = el('span', 'issue-investigation-marker', '?');
         marker.title = 'Needs investigation'; marker.setAttribute('role', 'img');
         marker.setAttribute('aria-label', 'Needs investigation'); box.append(marker);
+      }
+      if (row.has_children) {
+        if (row.is_collapsed) box.append(el('span', 'issue-collapse-stem'));
+        const collapse = button(row.is_collapsed ? '◉' : '◎', () => {
+          if (collapsedIds.has(node.id)) collapsedIds.delete(node.id); else collapsedIds.add(node.id);
+          depthPreset = null; renderVisibleTrees();
+          board.querySelector(`[data-collapse-id="${node.id}"]`)?.focus({preventScroll:true});
+        }, row.is_collapsed ? `Expand subtree for ${node.title || 'Untitled'} (${row.hidden_descendants} hidden nodes)` : `Collapse subtree for ${node.title || 'Untitled'}`);
+        collapse.className = 'issue-node-collapse'; collapse.dataset.collapseId = node.id; collapse.dataset.hiddenCount = row.hidden_descendants;
+        collapse.setAttribute('aria-expanded', String(!row.is_collapsed)); collapse.title = collapse.getAttribute('aria-label'); box.append(collapse);
       }
       if (readOnly) {
         box.title = node.title || 'Untitled';
@@ -635,6 +721,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
       const controls = el('div', 'issue-node-controls');
       controls.append(button('+', () => {
         const id = W.addChild(state, node.id);
+        if (collapsedIds.delete(node.id) || (depthPreset !== null && depthPreset !== 'all' && W.find(state, node.id).path.length > Number(depthPreset))) depthPreset = null;
         state.cursor = W.find(state, id).path; hasSelection = true;
         render(); edited(); editTitle(id);
         document.querySelector(`[data-node-id="${id}"]`).scrollIntoView({block:'nearest', inline:'nearest'});
@@ -643,11 +730,37 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
         if (node.children.length && !confirm('Delete this node and all its descendants?')) return;
         W.deleteNode(state, node.id); hasSelection = true; render(); edited();
       }, 'Delete ' + (node.title || 'Untitled')));
+      controls.children[0].dataset.nodeAction = 'add';
+      if (node.id !== state.content.tree.id) controls.children[1].dataset.nodeAction = 'delete';
+      controls.addEventListener('pointerdown', event => {
+        if (event.pointerType !== 'touch') return;
+        document.querySelectorAll('.issue-node-controls.reorder-revealed').forEach(row => row.classList.remove('reorder-revealed'));
+        controls.classList.add('reorder-revealed');
+      });
+      const parent = W.find(state, node.id).parent;
+      const siblings = parent?.children || [], index = siblings.findIndex(sibling => sibling.id === node.id);
+      for (const [direction, glyph] of [['left','‹'], ['right','›']]) {
+        const arrow = button(glyph, () => {
+          if (!W.moveSibling(state, node.id, direction)) return;
+          renderTree(); renderDetails(); edited();
+          const moved = document.querySelector(`[data-node-id="${node.id}"]`);
+          const same = moved.querySelector(`[data-direction="${direction}"]`);
+          const focus = !same.disabled ? same : moved.querySelector('.issue-node-reorder:not(:disabled)') || moved.querySelector('.issue-node-select');
+          focus.focus({preventScroll:true});
+          moved.scrollIntoView({block:'nearest', inline:'nearest'});
+        }, 'Move ' + (node.title || 'Untitled') + ' ' + direction);
+        arrow.className = 'issue-node-reorder'; arrow.dataset.direction = direction;
+        arrow.disabled = !parent || (direction === 'left' ? index === 0 : index === siblings.length - 1);
+        controls.append(arrow);
+      }
       box.addEventListener('click', event => {
-        if (event.target !== box) return;
+        if (event.target !== box && event.target !== controls) return;
+        const touchRevealed = controls.classList.contains('reorder-revealed');
         hasSelection = true; state.cursor = W.find(state, node.id).path;
         renderTree(); renderDetails();
-        document.querySelector(`[data-node-id="${node.id}"] .issue-node-select`).focus({preventScroll:true});
+        const selectedBox = document.querySelector(`[data-node-id="${node.id}"]`);
+        if (touchRevealed) selectedBox.querySelector('.issue-node-controls').classList.add('reorder-revealed');
+        selectedBox.querySelector('.issue-node-select').focus({preventScroll:true});
       });
       box.append(choose, controls); board.append(box);
     }
@@ -659,9 +772,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
     let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
     for (const node of board.querySelectorAll('.issue-node')) {
       left = Math.min(left, node.offsetLeft - node.offsetWidth / 2);
-      right = Math.max(right, node.offsetLeft + node.offsetWidth / 2 + (node.querySelector('.issue-investigation-marker') ? 15 : 0));
+      right = Math.max(right, node.offsetLeft + node.offsetWidth / 2 + Math.max(node.querySelector('.issue-investigation-marker') ? 15 : 0, overviewOrientation === 'horizontal' && node.querySelector('.issue-node-collapse') ? 53 : 0));
       top = Math.min(top, node.offsetTop - node.offsetHeight / 2 - (node.querySelector('.issue-investigation-marker') ? 15 : 0));
-      bottom = Math.max(bottom, node.offsetTop + node.offsetHeight / 2);
+      bottom = Math.max(bottom, node.offsetTop + node.offsetHeight / 2 + (overviewOrientation === 'vertical' && node.querySelector('.issue-node-collapse') ? 43 : 0));
     }
     const width = right - left, height = bottom - top;
     const scale = Math.max(0, Math.min(1, (viewport.clientWidth - 32) / width, (viewport.clientHeight - 32) / height));
@@ -718,7 +831,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
       panel.append(el('h2', '', 'Proposed alternative decomposition'), el('p', '', proposal.thought.text));
       const preview = el('div', 'issue-proposal-tree'); preview.append(proposalTree(proposal.tree)); panel.append(preview);
       const actions = el('div', 'dialog-actions');
-      actions.append(button('Reject alternative', () => { W.resolveProposal(state, 'reject'); render(); edited(); }), button('Accept whole alternative', () => { W.resolveProposal(state, 'accept'); render(); edited(); }));
+      actions.append(button('Reject alternative', () => { W.resolveProposal(state, 'reject'); render(); edited(); }), button('Accept whole alternative', () => { W.resolveProposal(state, 'accept'); collapsedIds.clear(); depthPreset = 'all'; render(); edited(); }));
       panel.append(actions);
     }
     const thoughts = state.thoughts || [];
@@ -727,7 +840,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
     renderThoughtGroup($('#mece-reviews'), thoughts.filter(isMece), 'Latest MECE review', 'Earlier MECE reviews');
     document.querySelectorAll('[data-ai]').forEach(node => { node.disabled = !!proposal; });
   }
-  function render() { $('#framing').value = state.content.framing; renderTree(); renderDetails(); renderReview(); }
+  function render() { $('#framing').value = state.content.framing; renderVisibleTrees(); renderReview(); }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
     return ClipboardCopy.copy(json, {message, status});
   }
@@ -750,8 +863,19 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
   $('#overview-close').addEventListener('click', () => $('#overview-dialog').close());
   $('#overview-dialog').addEventListener('close', () => $('#full-screen').focus({preventScroll:true}));
   $('#overview-dialog').addEventListener('keydown', event => {
-    if (event.key === 'Tab') { event.preventDefault(); $('#overview-close').focus(); }
+    if (event.key !== 'Tab') return;
+    const controls = [...$('#overview-dialog').querySelectorAll('button:not(:disabled)')];
+    const index = controls.indexOf(document.activeElement);
+    if (event.shiftKey && index <= 0) { event.preventDefault(); controls.at(-1).focus(); }
+    else if (!event.shiftKey && (index < 0 || index === controls.length - 1)) { event.preventDefault(); controls[0].focus(); }
   });
+  for (const orientation of ['vertical','horizontal']) {
+    $('#overview-' + orientation).addEventListener('click', () => {
+      overviewOrientation = orientation;
+      for (const option of ['vertical','horizontal']) $('#overview-' + option).setAttribute('aria-pressed', String(option === orientation));
+      renderTree($('#overview-board'), true); fitOverview();
+    });
+  }
   new ResizeObserver(fitOverview).observe($('#overview-viewport'));
   $('#framing').addEventListener('input', () => run(() => { W.editFraming(state, $('#framing').value); edited(); }));
   for (const [id, key, bool] of [['node-title','title',false], ['node-notes','notes',false], ['high-impact','highImpact',true], ['high-influence','highInfluence',true], ['needs-investigation','needsInvestigation',true]]) {
@@ -774,7 +898,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = PensiveMar
     try {
       const next = W.parseState($('#import-json').value);
       if (!confirm('Replace the current canvas? Save or export first to preserve it.')) return;
-      state = next; hasSelection = true; render(); $('#import-dialog').close(); status('Imported complete Issue Tree canvas.');
+      state = next; hasSelection = true; collapsedIds.clear(); depthPreset = 'all'; render(); $('#import-dialog').close(); status('Imported complete Issue Tree canvas.');
     } catch (error) { $('#import-error').textContent = error.message; }
   });
   for (const action of document.querySelectorAll('[data-ai]')) action.addEventListener('click', () => {

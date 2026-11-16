@@ -1,0 +1,9 @@
+# Issue Tree visible depth and subtree folding
+
+Add shared, display-only Show Level 1 / Level 2 / All presets in editor and Full Tree. Root is depth 0; preset 1 shows direct children, preset 2 one layer further. Presets collapse branching nodes at/under the chosen boundary. All clears folds. Manual per-node expansion/collapse creates a Custom view without adding a fourth preset. Both views share folds; horizontal orientation remains Full Tree only.
+
+Parents get a native bottom-right display button: ◎ expanded, ◉ collapsed. Accessible labels/title report expansion action and hidden descendant count; leaves have no folding button. Expanding after a limited preset reveals one layer at a time because deeper boundary folds remain. Folding is not deletion. Geometry must compact around visible nodes and edges in either orientation; Full Tree auto-fit includes the display controls.
+
+Keep folds in a transient Set of node IDs, never in analytical JSON, requests, saved HTML or history. Initial/reloaded/imported/replaced trees show All. If a selected node becomes hidden, clear visible selection/details but preserve the saved valid cursor; all content remains in exports. Adding beneath a folded node reveals the new child and enters inline editing. Reordering preserves folds by ID; delete still confirms actual descendants. Full Tree permits view controls but no analytical edits.
+
+Tests: filtered geometry/counts/edges/compaction, both orientations and pure state; preset synchronization and keyboard; manual selective folds/counts; hidden selection; new-child reveal; full requests/JSON/HTML while folded; reload defaults; fit after folding; unchanged notes/flags/IDs. Preserve existing uncommitted work. Build framework HTML, run focused/full regression, skill validation and independent review. Inspect actual 80-node Level 1/2 views and rebuild the active canvas with saved analysis unchanged. No distribution/commit implied.

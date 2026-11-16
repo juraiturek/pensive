@@ -3,7 +3,8 @@
   'use strict';
   const W = IssueTree, $ = selector => document.querySelector(selector);
   const source = '<!doctype html>\n' + document.documentElement.outerHTML;
-  let state, requestedAction, hasSelection = true;
+  let state, requestedAction, hasSelection = true, overviewOrientation = 'vertical', depthPreset = 'all';
+  const collapsedIds = new Set();
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
     if (cls) node.className = cls;
@@ -19,6 +20,36 @@
     const node = el('button', '', text); node.type = 'button';
     if (label) node.setAttribute('aria-label', label);
     node.addEventListener('click', () => run(fn)); return node;
+  }
+  function updateDepthControls() {
+    document.querySelectorAll('[data-depth-preset]').forEach(control => control.setAttribute('aria-pressed', String(control.dataset.depthPreset === depthPreset)));
+    document.querySelectorAll('.tree-depth-custom').forEach(label => { label.hidden = depthPreset !== null; });
+  }
+  function renderVisibleTrees() {
+    const visible = new Set(W.overview(state, 'vertical', [...collapsedIds]).nodes.map(node => node.id));
+    if (hasSelection && !visible.has(state.cursor.at(-1))) hasSelection = false;
+    renderTree(); renderDetails(); updateDepthControls();
+    if ($('#overview-dialog').open) { renderTree($('#overview-board'), true); fitOverview(); }
+  }
+  function setDepthPreset(value) {
+    collapsedIds.clear(); depthPreset = value;
+    if (value !== 'all') {
+      const stack = [{node:state.content.tree, depth:0}];
+      while (stack.length) {
+        const {node, depth} = stack.pop();
+        if (node.children.length && depth >= Number(value)) collapsedIds.add(node.id);
+        node.children.forEach(child => stack.push({node:child, depth:depth+1}));
+      }
+    }
+    renderVisibleTrees();
+  }
+  for (const id of ['editor-depth','overview-depth']) {
+    const group = $('#' + id); group.append(el('span', 'tree-depth-label', 'Show'));
+    for (const [value,label] of [['1','Level 1'],['2','Level 2'],['3','Level 3'],['all','All']]) {
+      const control = button(label, () => setDepthPreset(value));
+      control.dataset.depthPreset = value; control.setAttribute('aria-pressed', String(value === 'all')); group.append(control);
+    }
+    const custom = el('span', 'tree-depth-custom', 'Custom'); custom.hidden = true; group.append(custom);
   }
   function selected() { return W.find(state, state.cursor.at(-1)).node; }
   function edited() { status('Unsaved edits in this tab. Save or export to preserve your tree.'); }
@@ -41,8 +72,14 @@
       choose.classList.toggle('unnamed', !node.title.trim());
       choose.title = node.title || 'Enter name';
       const controls = editor.parentElement.querySelector('.issue-node-controls');
-      controls.children[0].setAttribute('aria-label', 'Add child to ' + (node.title || 'Untitled'));
-      controls.children[1]?.setAttribute('aria-label', 'Delete ' + (node.title || 'Untitled'));
+      controls.querySelector('[data-node-action="add"]').setAttribute('aria-label', 'Add child to ' + (node.title || 'Untitled'));
+      controls.querySelector('[data-node-action="delete"]')?.setAttribute('aria-label', 'Delete ' + (node.title || 'Untitled'));
+      for (const arrow of controls.querySelectorAll('.issue-node-reorder')) arrow.setAttribute('aria-label', 'Move ' + (node.title || 'Untitled') + ' ' + arrow.dataset.direction);
+      const collapse = editor.parentElement.querySelector('.issue-node-collapse');
+      if (collapse) {
+        const label = collapsedIds.has(id) ? `Expand subtree for ${node.title || 'Untitled'} (${collapse.dataset.hiddenCount} hidden nodes)` : `Collapse subtree for ${node.title || 'Untitled'}`;
+        collapse.setAttribute('aria-label', label); collapse.title = label;
+      }
       editor.replaceWith(choose);
       if (focus) choose.focus({preventScroll:true});
     }
@@ -59,7 +96,8 @@
     choose.replaceWith(editor); editor.focus({preventScroll:true}); editor.select();
   }
   function renderTree(board = $('#tree-board'), readOnly = false) {
-    const view = W.overview(state);
+    const view = W.overview(state, readOnly ? overviewOrientation : 'vertical', [...collapsedIds]);
+    board.dataset.orientation = readOnly ? overviewOrientation : 'vertical';
     board.replaceChildren();
     board.style.width = view.board_width + 'px';
     board.style.height = view.board_height + 'px';
@@ -79,6 +117,16 @@
         const marker = el('span', 'issue-investigation-marker', '?');
         marker.title = 'Needs investigation'; marker.setAttribute('role', 'img');
         marker.setAttribute('aria-label', 'Needs investigation'); box.append(marker);
+      }
+      if (row.has_children) {
+        if (row.is_collapsed) box.append(el('span', 'issue-collapse-stem'));
+        const collapse = button(row.is_collapsed ? '◉' : '◎', () => {
+          if (collapsedIds.has(node.id)) collapsedIds.delete(node.id); else collapsedIds.add(node.id);
+          depthPreset = null; renderVisibleTrees();
+          board.querySelector(`[data-collapse-id="${node.id}"]`)?.focus({preventScroll:true});
+        }, row.is_collapsed ? `Expand subtree for ${node.title || 'Untitled'} (${row.hidden_descendants} hidden nodes)` : `Collapse subtree for ${node.title || 'Untitled'}`);
+        collapse.className = 'issue-node-collapse'; collapse.dataset.collapseId = node.id; collapse.dataset.hiddenCount = row.hidden_descendants;
+        collapse.setAttribute('aria-expanded', String(!row.is_collapsed)); collapse.title = collapse.getAttribute('aria-label'); box.append(collapse);
       }
       if (readOnly) {
         box.title = node.title || 'Untitled';
@@ -100,6 +148,7 @@
       const controls = el('div', 'issue-node-controls');
       controls.append(button('+', () => {
         const id = W.addChild(state, node.id);
+        if (collapsedIds.delete(node.id) || (depthPreset !== null && depthPreset !== 'all' && W.find(state, node.id).path.length > Number(depthPreset))) depthPreset = null;
         state.cursor = W.find(state, id).path; hasSelection = true;
         render(); edited(); editTitle(id);
         document.querySelector(`[data-node-id="${id}"]`).scrollIntoView({block:'nearest', inline:'nearest'});
@@ -108,11 +157,37 @@
         if (node.children.length && !confirm('Delete this node and all its descendants?')) return;
         W.deleteNode(state, node.id); hasSelection = true; render(); edited();
       }, 'Delete ' + (node.title || 'Untitled')));
+      controls.children[0].dataset.nodeAction = 'add';
+      if (node.id !== state.content.tree.id) controls.children[1].dataset.nodeAction = 'delete';
+      controls.addEventListener('pointerdown', event => {
+        if (event.pointerType !== 'touch') return;
+        document.querySelectorAll('.issue-node-controls.reorder-revealed').forEach(row => row.classList.remove('reorder-revealed'));
+        controls.classList.add('reorder-revealed');
+      });
+      const parent = W.find(state, node.id).parent;
+      const siblings = parent?.children || [], index = siblings.findIndex(sibling => sibling.id === node.id);
+      for (const [direction, glyph] of [['left','‹'], ['right','›']]) {
+        const arrow = button(glyph, () => {
+          if (!W.moveSibling(state, node.id, direction)) return;
+          renderTree(); renderDetails(); edited();
+          const moved = document.querySelector(`[data-node-id="${node.id}"]`);
+          const same = moved.querySelector(`[data-direction="${direction}"]`);
+          const focus = !same.disabled ? same : moved.querySelector('.issue-node-reorder:not(:disabled)') || moved.querySelector('.issue-node-select');
+          focus.focus({preventScroll:true});
+          moved.scrollIntoView({block:'nearest', inline:'nearest'});
+        }, 'Move ' + (node.title || 'Untitled') + ' ' + direction);
+        arrow.className = 'issue-node-reorder'; arrow.dataset.direction = direction;
+        arrow.disabled = !parent || (direction === 'left' ? index === 0 : index === siblings.length - 1);
+        controls.append(arrow);
+      }
       box.addEventListener('click', event => {
-        if (event.target !== box) return;
+        if (event.target !== box && event.target !== controls) return;
+        const touchRevealed = controls.classList.contains('reorder-revealed');
         hasSelection = true; state.cursor = W.find(state, node.id).path;
         renderTree(); renderDetails();
-        document.querySelector(`[data-node-id="${node.id}"] .issue-node-select`).focus({preventScroll:true});
+        const selectedBox = document.querySelector(`[data-node-id="${node.id}"]`);
+        if (touchRevealed) selectedBox.querySelector('.issue-node-controls').classList.add('reorder-revealed');
+        selectedBox.querySelector('.issue-node-select').focus({preventScroll:true});
       });
       box.append(choose, controls); board.append(box);
     }
@@ -124,9 +199,9 @@
     let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
     for (const node of board.querySelectorAll('.issue-node')) {
       left = Math.min(left, node.offsetLeft - node.offsetWidth / 2);
-      right = Math.max(right, node.offsetLeft + node.offsetWidth / 2 + (node.querySelector('.issue-investigation-marker') ? 15 : 0));
+      right = Math.max(right, node.offsetLeft + node.offsetWidth / 2 + Math.max(node.querySelector('.issue-investigation-marker') ? 15 : 0, overviewOrientation === 'horizontal' && node.querySelector('.issue-node-collapse') ? 53 : 0));
       top = Math.min(top, node.offsetTop - node.offsetHeight / 2 - (node.querySelector('.issue-investigation-marker') ? 15 : 0));
-      bottom = Math.max(bottom, node.offsetTop + node.offsetHeight / 2);
+      bottom = Math.max(bottom, node.offsetTop + node.offsetHeight / 2 + (overviewOrientation === 'vertical' && node.querySelector('.issue-node-collapse') ? 43 : 0));
     }
     const width = right - left, height = bottom - top;
     const scale = Math.max(0, Math.min(1, (viewport.clientWidth - 32) / width, (viewport.clientHeight - 32) / height));
@@ -183,7 +258,7 @@
       panel.append(el('h2', '', 'Proposed alternative decomposition'), el('p', '', proposal.thought.text));
       const preview = el('div', 'issue-proposal-tree'); preview.append(proposalTree(proposal.tree)); panel.append(preview);
       const actions = el('div', 'dialog-actions');
-      actions.append(button('Reject alternative', () => { W.resolveProposal(state, 'reject'); render(); edited(); }), button('Accept whole alternative', () => { W.resolveProposal(state, 'accept'); render(); edited(); }));
+      actions.append(button('Reject alternative', () => { W.resolveProposal(state, 'reject'); render(); edited(); }), button('Accept whole alternative', () => { W.resolveProposal(state, 'accept'); collapsedIds.clear(); depthPreset = 'all'; render(); edited(); }));
       panel.append(actions);
     }
     const thoughts = state.thoughts || [];
@@ -192,7 +267,7 @@
     renderThoughtGroup($('#mece-reviews'), thoughts.filter(isMece), 'Latest MECE review', 'Earlier MECE reviews');
     document.querySelectorAll('[data-ai]').forEach(node => { node.disabled = !!proposal; });
   }
-  function render() { $('#framing').value = state.content.framing; renderTree(); renderDetails(); renderReview(); }
+  function render() { $('#framing').value = state.content.framing; renderVisibleTrees(); renderReview(); }
   async function copyJson(json, message = 'Copied complete canvas JSON to clipboard.') {
     return ClipboardCopy.copy(json, {message, status});
   }
@@ -215,8 +290,19 @@
   $('#overview-close').addEventListener('click', () => $('#overview-dialog').close());
   $('#overview-dialog').addEventListener('close', () => $('#full-screen').focus({preventScroll:true}));
   $('#overview-dialog').addEventListener('keydown', event => {
-    if (event.key === 'Tab') { event.preventDefault(); $('#overview-close').focus(); }
+    if (event.key !== 'Tab') return;
+    const controls = [...$('#overview-dialog').querySelectorAll('button:not(:disabled)')];
+    const index = controls.indexOf(document.activeElement);
+    if (event.shiftKey && index <= 0) { event.preventDefault(); controls.at(-1).focus(); }
+    else if (!event.shiftKey && (index < 0 || index === controls.length - 1)) { event.preventDefault(); controls[0].focus(); }
   });
+  for (const orientation of ['vertical','horizontal']) {
+    $('#overview-' + orientation).addEventListener('click', () => {
+      overviewOrientation = orientation;
+      for (const option of ['vertical','horizontal']) $('#overview-' + option).setAttribute('aria-pressed', String(option === orientation));
+      renderTree($('#overview-board'), true); fitOverview();
+    });
+  }
   new ResizeObserver(fitOverview).observe($('#overview-viewport'));
   $('#framing').addEventListener('input', () => run(() => { W.editFraming(state, $('#framing').value); edited(); }));
   for (const [id, key, bool] of [['node-title','title',false], ['node-notes','notes',false], ['high-impact','highImpact',true], ['high-influence','highInfluence',true], ['needs-investigation','needsInvestigation',true]]) {
@@ -239,7 +325,7 @@
     try {
       const next = W.parseState($('#import-json').value);
       if (!confirm('Replace the current canvas? Save or export first to preserve it.')) return;
-      state = next; hasSelection = true; render(); $('#import-dialog').close(); status('Imported complete Issue Tree canvas.');
+      state = next; hasSelection = true; collapsedIds.clear(); depthPreset = 'all'; render(); $('#import-dialog').close(); status('Imported complete Issue Tree canvas.');
     } catch (error) { $('#import-error').textContent = error.message; }
   });
   for (const action of document.querySelectorAll('[data-ai]')) action.addEventListener('click', () => {

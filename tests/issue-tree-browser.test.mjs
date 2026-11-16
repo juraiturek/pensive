@@ -11,8 +11,8 @@ const W = createRequire(import.meta.url)(fileURLToPath(new URL('state.js', root)
 let browser, temp;
 before(async () => { temp = await mkdtemp(join(tmpdir(), 'issue-tree-browser-')); browser = await chromium.launch(); });
 after(async () => { await browser?.close(); if (temp) await rm(temp, {recursive:true,force:true}); });
-async function open(t, state = W.initialState(), viewport = {width:1440,height:1000}) {
-  const context = await browser.newContext({offline:true,acceptDownloads:true,viewport});
+async function open(t, state = W.initialState(), viewport = {width:1440,height:1000}, options = {}) {
+  const context = await browser.newContext({offline:true,acceptDownloads:true,viewport,...options});
   const page = await context.newPage(), errors = [], requests = [];
   page.on('pageerror', error => errors.push(error.message));
   context.on('request', r => { if (/^https?:/.test(r.url())) requests.push(r.url()); });
@@ -135,7 +135,7 @@ test('full-screen view fits every node on open and resize, preserves state, and 
   }
   await checkFit();
   await page.keyboard.press('Tab');
-  assert.equal(await page.getByRole('button', {name:'Close full tree view'}).evaluate(n => n === document.activeElement), true);
+  assert.equal(await page.locator('#overview-board .issue-node-collapse').first().evaluate(n => n === document.activeElement), true);
   await page.setViewportSize({width:390,height:844}); await checkFit();
   await page.screenshot({path:'test-results/issue-tree-fullscreen-narrow.png'});
   await page.keyboard.press('Escape');
@@ -249,4 +249,60 @@ test('scoped reviews separate above and below tree with retained, safely rendere
 test('legacy-only and empty review groups do not create an empty MECE panel',async t=>{
  const blank=await open(t,treeState());assert.equal(await blank.locator('#thoughts').isVisible(),false);assert.equal(await blank.locator('#mece-reviews').isVisible(),false);
  const s=treeState();s.thoughts=[{id:'legacy',kind:'evaluation',text:'MECE in old text is not scope metadata'}];const page=await open(t,s);assert.equal(await page.locator('#thoughts').isVisible(),true);assert.equal(await page.locator('#mece-reviews').isVisible(),false);assert.deepEqual(await exported(page),s);
+});
+test('sibling arrows reveal in lower controls, move whole subtrees and persist with read-only overview',async t=>{
+ const s=treeState(),a=W.addChild(s,'root','First'),b=W.addChild(s,'root','Second'),c=W.addChild(s,'root','Third');W.addChild(s,a,'Nested');W.navigate(s,b);const page=await open(t,s),box=id=>page.locator(`[data-node-id="${id}"]`),left=id=>box(id).getByRole('button',{name:/^Move .* left$/,includeHidden:true}),right=id=>box(id).getByRole('button',{name:/^Move .* right$/,includeHidden:true});
+ assert.equal(await right(b).evaluate(n=>getComputedStyle(n).opacity),'0');await box(b).locator('.issue-node-select').hover();assert.equal(await right(b).evaluate(n=>getComputedStyle(n).opacity),'0');await box(b).locator('.issue-node-controls').hover();assert.equal(await right(b).isVisible(),false);assert.match(await right(b).evaluate(n=>getComputedStyle(n).transitionDelay),/0\.3s/);await right(b).waitFor({state:'visible'});assert.equal(await right(b).evaluate(n=>getComputedStyle(n).opacity),'1');assert.equal(await left(a).isDisabled(),true);assert.equal(await right(c).isDisabled(),true);assert.equal(await left('root').isDisabled(),true);assert.equal(await right('root').isDisabled(),true);
+ const before=await exported(page);await box(a).locator('.issue-node-controls').hover();await right(a).click();let current=await exported(page);assert.deepEqual(current.content.tree.children.map(n=>n.id),[b,a,c]);assert.deepEqual(current.cursor,before.cursor);assert.deepEqual(current.content.tree.children[1],before.content.tree.children[0]);
+ await box(a).getByRole('button',{name:'Add child to First',exact:true}).focus();await box(a).getByRole('button',{name:'Move First left',exact:true}).focus();await page.keyboard.press('Enter');current=await exported(page);assert.deepEqual(current.content.tree.children.map(n=>n.id),[a,b,c]);
+ await box(b).locator('.issue-node-controls').dispatchEvent('pointerdown',{pointerType:'touch',bubbles:true});assert.equal(await right(b).evaluate(n=>getComputedStyle(n).opacity),'1');
+ await right(b).click();assert.deepEqual((await exported(page)).content.tree.children.map(n=>n.id),[a,c,b]);
+ const beforeSave=await exported(page),download=page.waitForEvent('download');await page.locator('#save').click();const file=join(temp,'reordered.html');await(await download).saveAs(file);await page.goto(pathToFileURL(file).href);assert.deepEqual(await exported(page),beforeSave);
+ await page.getByRole('button',{name:'Full screen',exact:true}).click();assert.equal(await page.locator('#overview-dialog .issue-node-reorder').count(),0);await page.getByRole('button',{name:'Close full tree view'}).click();
+ await box(b).locator('.issue-node-select').click();await page.locator('.issue-node-title-editor').fill('Renamed');await page.locator('.issue-node-title-editor').press('Enter');assert.equal(await box(b).getByRole('button',{name:'Move Renamed left',exact:true,includeHidden:true}).count(),1);assert.equal(await box(b).getByRole('button',{name:'Delete Renamed',exact:true}).count(),1);
+});
+test('touch lower-area reveal and disabled only-child arrows retain node selection',async t=>{
+ const s=treeState(),a=W.addChild(s,'root','First'),b=W.addChild(s,'root','Second'),nested=W.addChild(s,a,'Only child');W.navigate(s,b);
+ const page=await open(t,s,{width:578,height:723},{hasTouch:true});
+ const box=id=>page.locator(`[data-node-id="${id}"]`);
+ await box(a).locator('.issue-node-controls').tap({position:{x:10,y:12}});assert.equal(await page.locator('#node-title').inputValue(),'First');
+ assert.equal(await box(a).getByRole('button',{name:'Move First right',exact:true}).evaluate(n=>getComputedStyle(n).opacity),'1');assert.equal(await box(a).getByRole('button',{name:'Move First left',exact:true}).evaluate(n=>getComputedStyle(n).opacity),'0.28');
+ await box(a).getByRole('button',{name:'Move First right',exact:true}).tap();assert.deepEqual((await exported(page)).content.tree.children.map(n=>n.id),[b,a]);
+ await box(nested).locator('.issue-node-controls').tap({position:{x:10,y:12}});const arrows=box(nested).locator('.issue-node-reorder');assert.equal(await arrows.count(),2);for(const arrow of await arrows.all())assert.equal(await arrow.isDisabled(),true);
+});
+test('Full Tree orientation toggle is display-only, fits both axes and permits keyboard access',async t=>{
+ const s=treeState();for(let i=0;i<8;i++){const parent=W.addChild(s,'root','Branch '+i);for(let j=0;j<8;j++)W.addChild(s,parent,`Factor ${i}.${j}`);}const page=await open(t,s);const before=await exported(page),editorBefore=await page.locator('#tree-board').innerHTML();
+ await page.getByRole('button',{name:'Full screen',exact:true}).click();const vertical=page.getByRole('button',{name:'Vertical',exact:true}),horizontal=page.getByRole('button',{name:'Horizontal',exact:true});assert.equal(await vertical.getAttribute('aria-pressed'),'true');await vertical.focus();await page.keyboard.press('Tab');assert.equal(await horizontal.evaluate(n=>n===document.activeElement),true);await page.keyboard.press('Enter');assert.equal(await horizontal.getAttribute('aria-pressed'),'true');
+ async function fit(){await page.waitForFunction(()=>{const v=document.querySelector('#overview-viewport').getBoundingClientRect();return [...document.querySelectorAll('#overview-board .issue-node')].every(n=>{const r=n.getBoundingClientRect();return r.left>=v.left&&r.right<=v.right&&r.top>=v.top&&r.bottom<=v.bottom;});});}
+ await fit();assert.equal(await page.locator('#overview-board .issue-node').count(),73);const coords=await page.locator('#overview-board .issue-node').evaluateAll(nodes=>nodes.map(n=>({left:parseFloat(n.style.left),top:parseFloat(n.style.top)})));assert.ok(coords[1].left>coords[0].left);assert.equal(await page.locator('#overview-board input,#overview-board textarea,#overview-board .issue-node-controls,#overview-board .issue-node-select').count(),0);
+ await page.setViewportSize({width:390,height:844});await fit();await vertical.click();await fit();assert.equal(await vertical.getAttribute('aria-pressed'),'true');await horizontal.click();await fit();await page.keyboard.press('Escape');assert.equal(await page.locator('#overview-dialog').isVisible(),false);assert.deepEqual(await exported(page),before);assert.equal(await page.locator('#tree-board').innerHTML(),editorBefore);
+ await page.getByRole('button',{name:'Full screen',exact:true}).click();assert.equal(await horizontal.getAttribute('aria-pressed'),'true');await page.getByRole('button',{name:'Close full tree view',exact:true}).click();
+ const download=page.waitForEvent('download');await page.locator('#save').click();const file=join(temp,'orientation-display-only.html');await(await download).saveAs(file);await page.goto(pathToFileURL(file).href);assert.deepEqual(await exported(page),before);await page.getByRole('button',{name:'Full screen',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Vertical',exact:true}).getAttribute('aria-pressed'),'true');
+});
+test('depth presets and selective folds synchronize both views without losing hidden state',async t=>{
+ const s=treeState(),a=W.addChild(s,'root','A'),b=W.addChild(s,'root','B'),aa=W.addChild(s,a,'AA'),aaa=W.addChild(s,aa,'AAA');W.addChild(s,b,'BB');W.navigate(s,aaa);const page=await open(t,s),before=await exported(page);const editor=page.locator('#tree-board');
+ await page.locator('#editor-depth').getByRole('button',{name:'Level 1',exact:true}).click();assert.equal(await editor.locator('.issue-node').count(),3);assert.equal(await page.locator('#node-details').isVisible(),false);assert.deepEqual(await exported(page),before);
+ await editor.getByRole('button',{name:/Expand subtree for A /}).click();assert.equal(await editor.locator('.issue-node').count(),4);assert.equal(await editor.getByRole('button',{name:/Expand subtree for AA /}).count(),1);assert.equal(await page.locator('#editor-depth .tree-depth-custom').isVisible(),true);
+ await page.getByRole('button',{name:'Full screen',exact:true}).click();const overview=page.locator('#overview-board');assert.equal(await overview.locator('.issue-node').count(),4);assert.equal(await overview.locator('.issue-node-controls,textarea,input').count(),0);
+ await page.locator('#overview-depth').getByRole('button',{name:'Level 2',exact:true}).click();assert.equal(await overview.locator('.issue-node').count(),5);await overview.getByRole('button',{name:/Expand subtree for AA /}).click();assert.equal(await overview.locator('.issue-node').count(),6);await page.getByRole('button',{name:'Horizontal',exact:true}).click();assert.equal(await overview.locator('.issue-node').count(),6);await page.locator('#overview-depth').getByRole('button',{name:'Level 3',exact:true}).click();assert.equal(await overview.locator('.issue-node').count(),6);assert.equal(await page.locator('#editor-depth').getByRole('button',{name:'Level 3',exact:true}).getAttribute('aria-pressed'),'true');
+ await page.keyboard.press('Escape');assert.equal(await editor.locator('.issue-node').count(),6);await page.locator('#editor-depth').getByRole('button',{name:'All',exact:true}).click();assert.equal(await editor.locator('.issue-node').count(),6);assert.deepEqual(await exported(page),before);
+ await editor.getByRole('button',{name:'Collapse subtree for A',exact:true}).click();assert.equal(await editor.locator('.issue-node').count(),4);assert.equal(await editor.getByRole('button',{name:/Expand subtree for A .*2 hidden/}).count(),1);
+ await page.locator('[data-ai="mece_evaluate"]').click();await page.getByRole('button',{name:'Copy AI request',exact:true}).click();const req=JSON.parse(await page.evaluate(()=>navigator.clipboard.readText()));assert.deepEqual(req.canvas,before);
+ const download=page.waitForEvent('download');await page.locator('#save').click();const file=join(temp,'folded-state.html');await(await download).saveAs(file);await page.goto(pathToFileURL(file).href);assert.deepEqual(await exported(page),before);assert.equal(await editor.locator('.issue-node').count(),6);
+});
+test('adding beneath a collapsed parent reveals the new node and preserves existing descendants',async t=>{
+ const s=treeState(),a=W.addChild(s,'root','A');W.addChild(s,a,'Existing child');const page=await open(t,s);await page.locator('#editor-depth').getByRole('button',{name:'Level 1',exact:true}).click();await page.getByRole('button',{name:'Add child to A',exact:true}).click();assert.equal(await page.locator('.issue-node-title-editor').count(),1);assert.equal(await page.locator('.issue-node-title-editor').evaluate(n=>n===document.activeElement),true);await page.locator('.issue-node-title-editor').fill('New child');await page.locator('.issue-node-title-editor').press('Enter');const current=await exported(page);assert.deepEqual(W.find(current,a).node.children.map(n=>n.title),['Existing child','New child']);assert.equal(await page.locator('#tree-board .issue-node').count(),4);
+});
+test('adding the first child at a preset boundary changes the display to Custom',async t=>{
+ for(const level of [1,2,3]){
+  const s=treeState();let parent=W.addChild(s,'root','A');for(let depth=2;depth<=level;depth++)parent=W.addChild(s,parent,'A'.repeat(depth));const title=W.find(s,parent).node.title,page=await open(t,s);await page.locator('#editor-depth').getByRole('button',{name:'Level '+level,exact:true}).click();await page.getByRole('button',{name:'Add child to '+title,exact:true}).click();assert.equal(await page.locator('.issue-node-title-editor').count(),1);assert.equal(await page.locator('#editor-depth .tree-depth-custom').isVisible(),true);assert.equal(await page.locator('#editor-depth [aria-pressed="true"]').count(),0);
+ }
+});
+test('fold controls sit on outgoing connectors with hanging stems when collapsed',async t=>{
+ const s=treeState();W.addChild(s,'root','Child');const page=await open(t,s),before=await exported(page);const root=page.locator('#tree-board [data-node-id="root"]'),fold=root.locator('.issue-node-collapse');
+ const a=await root.boundingBox(),b=await fold.boundingBox();assert.ok(b.y>a.y+a.height+10);assert.ok(Math.abs(b.x+b.width/2-(a.x+a.width/2))<1);
+ await fold.click();assert.equal(await root.locator('.issue-collapse-stem').count(),1);assert.deepEqual(await exported(page),before);
+ await page.getByRole('button',{name:'Full screen',exact:true}).click();await page.getByRole('button',{name:'Horizontal',exact:true}).click();await page.setViewportSize({width:390,height:844});
+ await page.waitForFunction(()=>{const v=document.querySelector('#overview-viewport').getBoundingClientRect(),b=document.querySelector('#overview-board .issue-node-collapse').getBoundingClientRect();return b.left>=v.left&&b.top>=v.top&&b.right<=v.right&&b.bottom<=v.bottom});
+ const node=await page.locator('#overview-board .issue-node').boundingBox(),control=await page.locator('#overview-board .issue-node-collapse').boundingBox();assert.ok(control.x>node.x+node.width);assert.ok(Math.abs(control.y+control.height/2-(node.y+node.height/2))<1);assert.equal(await page.locator('#overview-board .issue-collapse-stem').count(),1);
 });

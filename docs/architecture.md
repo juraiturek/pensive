@@ -247,3 +247,21 @@ Empty clicks within the tree viewport clear visible selection, hide Node details
 Issue Tree exposes `mece_evaluate` alongside broad `evaluate` and whole-tree `alternative`. Both evaluation actions append `{thought}` responses; the deterministic composer writes optional evaluation-note `scope` (`full` or `mece`) from the action. Legacy evaluate/evaluation_scope requests remain valid; new buttons emit no scope selector. Scope is invalid on alternative rationale. Existing unscoped notes stay general, with no text-based inference or historical migration. Schema version remains 1.0; scoped notes require the new renderer when imported into older saved pages.
 
 General evaluation and accepted rationale use established thought cards above the tree: latest note is collapsible and initially open, earlier notes collapsed. The latest scoped MECE review appears below the tree, with prior MECE reviews collapsed. All notes remain in complete state; there is no retention cap, issue ledger, resolution tracking or Takeaways integration. Existing shared safe Markdown renders note bodies; only Issue Tree's packager embeds the existing Markdown runtime/style. Pending proposal review remains unchanged.
+
+## Issue Tree sibling order — 2026-11-16
+
+`moveSibling(state, id, left|right)` swaps adjacent entries within a parent's children array and carries descendants intact. Root/boundary cases return false without mutation; invalid directions/IDs fail. Cursor, notes, flags and IDs remain unchanged. Existing serialization and full-content proposal stale checks already include array order; no schema change or reparenting is added.
+
+The lower +/× row reveals absolute-positioned ‹/› buttons on hover or keyboard focus, without shifting existing controls. Touch on the lower row reveals them and preserves reveal when the row selects a node. Disabled boundary/only-child/root arrows are dim when revealed. Successful movement restores focus to an enabled control and scrolls the moved card into view; other selection is preserved. Explicit action identifiers keep inline-rename accessibility labels independent of button order. Full Tree stays read-only.
+
+## Full Tree orientation — 2026-11-16
+
+Issue Tree overview geometry accepts vertical (default, unchanged top-down coordinates) or horizontal (root left, descendants right) orientation. Horizontal siblings follow existing child order top-to-bottom; cards remain upright and orthogonal edges join card sides. The editor always requests vertical geometry.
+
+Full Tree header buttons choose the local display orientation and expose pressed state. It survives closing/reopening in the same page but is absent from analytical JSON, requests, history and saved HTML snapshots; reload starts vertical. Existing auto-fit uses actual card/badge bounds in either layout and reruns on resize. Keyboard Tab/Shift+Tab wrap within the native dialog's available controls, and Escape restores the opener. No zoom/pan, data editing, schema or hierarchy change is introduced.
+
+## Display depth and selective folding — 2026-11-16
+
+Issue Tree shares transient depth/fold settings between its editor and Full Tree. Root is level 0; Level 1/2 presets fold all branching nodes at or beyond the boundary, All clears folds, and individual ◎/◉ controls produce Custom views. Filtered overview geometry still traverses complete data to count hidden descendants, but renders/compacts only visible nodes and edges in either orientation.
+
+Folds are a local ID Set, absent from analytical state/schema/requests/history/saved HTML. Hidden descendants remain in complete exports. If display filtering hides the selected cursor, details and visible selection clear without mutating cursor. Import or acceptance of a replacement hierarchy resets All. Add-child opens the target, selects and reveals the draft; adding past a preset boundary changes the label to Custom even when the target was previously a leaf. Sibling moves preserve folds by ID; deletion applies to real source descendants. Full Tree remains analytically read-only, with display controls reachable through the modal's generic keyboard wrap.

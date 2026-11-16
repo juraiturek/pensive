@@ -72,3 +72,24 @@ test('note scope schema and runtime agree while keeping old unscoped history unt
  for(const [kind,scope] of [['evaluation','invalid'],['evaluation',null],['alternative','mece'],['alternative','full']]){const next=structuredClone(s);Object.assign(next.thoughts[0],{kind,scope});assert.throws(()=>W.validate(next));assert.equal(schema(next),false);}
  const pending=W.composeResult(W.buildRequest(s,{id:'alternative'}),alternative(s));assert.ok(schema(pending));pending.proposals[0].thought.scope='mece';assert.throws(()=>W.validate(pending));assert.equal(schema(pending),false);
 });
+test('sibling moves swap adjacent subtrees only and preserve selection, identities, notes and flags',()=>{
+ const {s,a,b,c}=fixture();W.editNode(s,a,{notes:'Keep subtree notes',highImpact:true,needsInvestigation:true});W.navigate(s,c);const before=structuredClone(s);assert.equal(W.moveSibling(s,a,'right'),true);assert.deepEqual(s.content.tree.children.map(n=>n.id),[b,a]);assert.deepEqual(s.content.tree.children[1],before.content.tree.children[0]);assert.deepEqual(s.cursor,before.cursor);assert.equal(W.moveSibling(s,a,'left'),true);assert.deepEqual(s,before);
+ for(const [id,dir] of [[a,'left'],[b,'right'],[c,'left'],[c,'right'],['root','left'],['root','right']]){assert.equal(W.moveSibling(s,id,dir),false);assert.deepEqual(s,before);}
+ assert.throws(()=>W.moveSibling(s,a,'up'));assert.deepEqual(s,before);assert.throws(()=>W.moveSibling(s,'missing','left'));assert.deepEqual(s,before);assert.ok(schema(s));
+ const pending=W.composeResult(W.buildRequest(s,{id:'alternative'}),alternative(s));W.moveSibling(pending,a,'right');assert.throws(()=>W.resolveProposal(pending,'accept'),/stale/);W.resolveProposal(pending,'reject');assert.deepEqual(pending.content.tree.children.map(n=>n.id),[b,a]);
+});
+test('overview horizontal geometry keeps upright non-overlapping cards, order and state',()=>{
+ const {s,a,b,c}=fixture(),before=structuredClone(s);const vertical=W.overview(s),horizontal=W.overview(s,'horizontal');assert.deepEqual(W.overview(s,'vertical'),vertical);assert.deepEqual(s,before);
+ const byId=new Map(horizontal.nodes.map(n=>[n.id,n]));assert.ok(byId.get(a).x>byId.get('root').x);assert.ok(byId.get(c).x>byId.get(a).x);assert.ok(byId.get(a).y<byId.get(b).y);assert.ok(byId.get(b).y-byId.get(a).y>=86);
+ for(const n of horizontal.nodes){assert.ok(n.x-104>=0&&n.x+104<=horizontal.board_width);assert.ok(n.y-43>=0&&n.y+43<=horizontal.board_height);}
+ for(const edge of horizontal.edges){const p=byId.get(edge.parent_id),n=byId.get(edge.child_id);assert.ok(edge.path.startsWith(`M ${(p.x+104).toFixed(2)} ${p.y.toFixed(2)}`));assert.ok(edge.path.endsWith(`L ${(n.x-104).toFixed(2)} ${n.y.toFixed(2)}`));}
+ assert.throws(()=>W.overview(s,'diagonal'));assert.deepEqual(s,before);
+});
+test('folded overview compacts visible geometry in both orientations without changing analytical state',()=>{
+ const {s,a,b,c}=fixture();const d=W.addChild(s,a,'Another child');const before=structuredClone(s);
+ for(const orientation of ['vertical','horizontal']){
+  const full=W.overview(s,orientation),folded=W.overview(s,orientation,[a]);assert.equal(folded.nodes.length,3);assert.equal(folded.edges.length,2);assert.deepEqual(folded.nodes.map(n=>n.id),['root',a,b]);const row=folded.nodes.find(n=>n.id===a);assert.equal(row.is_collapsed,true);assert.equal(row.hidden_descendants,2);assert.equal(row.has_children,true);assert.equal(folded.nodes.find(n=>n.id===b).has_children,false);
+  assert.equal(W.overview(s,orientation,['root']).nodes.length,1);assert.equal(W.overview(s,orientation,['root']).nodes[0].hidden_descendants,4);assert.ok(folded.nodes.every(n=>!folded.edges.some(e=>e.child_id===c||e.child_id===d)));assert.deepEqual(W.overview(s,orientation,[]),full);
+ }
+ assert.deepEqual(s,before);assert.throws(()=>W.overview(s,'vertical','not-an-array'));
+});

@@ -21,3 +21,17 @@ Click a node title to select, then click its selected title again to edit inline
 `needsInvestigation` is a user-owned independent Boolean; omission on older nodes means unmarked. New nodes default false. The detail checkbox controls a thin circled ? at the upper-right of editor and Full Tree cards. Preserve this field through AI actions and packaging. Alternative must preserve its value on retained IDs and leave new IDs false/unmarked. It is not an automatic research action or a verified factual finding. Investigation changes make a pending Alternative stale, like other content changes.
 
 Click empty tree space to clear visible selection and hide Node details, expanding the tree viewport. Clicking a node restores selection/details; the first click after deselection selects without editing. This is transient UI state: the valid saved cursor remains the last navigation path, and no analytical state or schema changes. Inline drafts are preserved on blur.
+
+## Sibling order
+
+Hover over a node's lower control area to reveal ‹ and › around +/×. Keyboard focus within the controls also reveals them; touch the lower area to reveal on touch devices. Each move swaps one adjacent sibling within the same parent's children, carrying the whole subtree. Boundaries, root and only-child cases disable the corresponding arrows and dim them when revealed. No reparenting or automatic ranking. Selection, notes, IDs and all flags are preserved. Full Tree has no movement controls.
+
+Existing children-array order carries movement through requests, JSON import/export and HTML saving; schema remains unchanged. Reordering invalidates a pending Alternative through the existing complete-content stale guard. It never accepts a proposal or infers user priorities.
+
+Full Tree offers Vertical (top-down default) and Horizontal (root left, descendants right) display layouts. Cards and text remain upright; siblings read top-to-bottom in horizontal view. The choice is transient per page, retained on close/reopen but not included in state, requests or saved HTML. Editing remains vertical and Full Tree remains read-only. Both layouts refit on resize and retain priority/investigation markings.
+
+## Display depth and selective folding
+
+Both editor and Full Tree offer Show Level 1 / Level 2 / Level 3 / All. Root is level 0. Level 1 shows root and direct children; Level 2 adds their children; Level 3 adds one further layer. Deeper branching nodes are folded, not removed. All clears folds. A per-parent ◎ button on its outgoing connector collapses descendants; ◉ hangs on a short stem when collapsed and indicates content to expand, with hidden descendant count in its accessible label/title. Leaves have no fold control. Manual folds produce a Custom view. Expanding after a preset reveals one additional layer; deeper folds can be opened selectively.
+
+Display folds are transient and shared between both views in the page. Geometry compacts around visible nodes in either orientation; editor stays vertical. Hidden content remains in complete JSON, requests and HTML. Reload/import/accepted new hierarchy starts All; no view field is added to schema/history. If a selected node becomes hidden, visible selection/details clear while the valid saved cursor remains unchanged. Adding under a folded parent opens it for inline editing. IDs retain folds across sibling moves; deletion still applies to all actual descendants. Full Tree controls remain view-only and never edit analytical content.

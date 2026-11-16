@@ -11,7 +11,7 @@ semantics:
   notes: Substantive node content, not annotations or AI feedback.
   investigation: Optional independent user mark (needsInvestigation); absent means unmarked, not a factual assessment or research action.
   prioritization: Independent user judgments; false means not marked high, including unassessed.
-manual_capabilities: [edit_framing, edit_nodes, edit_notes, add_child, delete_subtree, select_node, edit_inline_title, mark_investigation, prioritize, import_validated_json, export_complete_json, save_standalone_html]
+manual_capabilities: [edit_framing, edit_nodes, edit_notes, add_child, delete_subtree, reorder_siblings, filter_visible_depth, fold_subtrees, select_node, edit_inline_title, mark_investigation, prioritize, import_validated_json, export_complete_json, save_standalone_html]
 ai_actions:
   create:
     method: prompts/create.md

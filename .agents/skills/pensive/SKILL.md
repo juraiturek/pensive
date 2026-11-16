@@ -21,7 +21,7 @@ Route a saved handoff containing `storage_version`, `canvas_id`, `revision_id`, 
 
 No launch command, HTTP service or background process exists. Framework-specific packager CLI directions below apply only to initial/explicit standalone exports; normal turns use workspace file operations to update JSON and synchronize the same HTML state slot. On an artifact-only host without writable workspace access, validate/compose complete submitted state through its framework core and return updated JSON for import into the existing artifact. Do not claim native Claude artifact registration or automatic refresh unless observed.
 
-Issue Tree MVP supports creation, general Evaluate Decomposition, dedicated MECE Evaluation and whole-tree Alternative Decomposition review, node notes, inline title editing, independent impact/influence flags and user-marked Needs investigation badges. It uses the paired-file workflow; shared Research, Six Hats, Annotation Mode and Takeaways are not exposed for Issue Tree.
+Issue Tree MVP supports creation, general Evaluate Decomposition, dedicated MECE Evaluation and whole-tree Alternative Decomposition review, node notes, inline title editing, sibling ordering, display-depth presets and selective subtree folding, independent impact/influence flags and user-marked Needs investigation badges. It uses the paired-file workflow; shared Research, Six Hats, Annotation Mode and Takeaways are not exposed for Issue Tree.
 
 ## Takeaways
 

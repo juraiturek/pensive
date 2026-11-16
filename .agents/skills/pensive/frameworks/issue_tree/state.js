@@ -26,6 +26,7 @@ function navigate(s,id){validate(s);s.cursor=find(s,id).path;}
 function editNode(s,id,patch){validate(s);keys(patch,[],['title','notes','highImpact','highInfluence','needsInvestigation']);const candidate=clone(find(s,id).node);Object.assign(candidate,patch);validateTree(candidate);Object.assign(find(s,id).node,patch);}
 function editFraming(s,value){validate(s);text(value);s.content.framing=value;}
 function addChild(s,id,title=''){validate(s);text(title);const r=find(s,id),child=node(newId(s),title);r.node.children.push(child);s.cursor=[...r.path,child.id];return child.id;}
+function moveSibling(s,id,direction){validate(s);if(!['left','right'].includes(direction))fail('Invalid sibling move direction.');const r=find(s,id);if(!r.parent)return false;const siblings=r.parent.children,index=siblings.findIndex(n=>n.id===id),next=index+(direction==='left'?-1:1);if(next<0||next>=siblings.length)return false;[siblings[index],siblings[next]]=[siblings[next],siblings[index]];return true;}
 function deleteNode(s,id){validate(s);const r=find(s,id);if(!r.parent)fail('Cannot delete the root.');r.parent.children.splice(r.parent.children.indexOf(r.node),1);if(s.cursor.includes(id))s.cursor=r.path.slice(0,-1);}
 function validateRequest(r){keys(r,['canvas','action']);validate(r.canvas);if(r.canvas.proposals?.length)fail('Resolve pending proposal first.');keys(r.action,['id'],['comment','evaluation_scope']);if(!['evaluate','mece_evaluate','alternative'].includes(r.action.id))fail('Unsupported action.');if(r.action.comment!==undefined)text(r.action.comment);if(r.action.evaluation_scope!==undefined&&(r.action.id!=='evaluate'||!['full','mece'].includes(r.action.evaluation_scope)))fail('Invalid evaluation scope.');if(!r.canvas.content.tree.title.trim())fail('State the governing problem before AI review.');return r;}
 function buildRequest(s,action){return clone(validateRequest({canvas:s,action}));}
@@ -34,22 +35,21 @@ function composeResult(request,response){validateRequest(request);const alternat
 function canonical(v){if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+canonical(v[k])).join(',')+'}';return JSON.stringify(v);}
 function resolveProposal(s,decision){validate(s);if(!['accept','reject'].includes(decision))fail('Unknown review decision.');const p=s.proposals?.[0];if(!p)fail('No pending proposal.');if(decision==='reject'){delete s.proposals;return;}if(canonical(s.content)!==canonical(p.base_content))fail('Proposal is stale after content or framing edits. Reject and request a fresh alternative.');const candidate=clone(s);candidate.content.tree=clone(p.tree);candidate.cursor=[p.tree.id];candidate.thoughts=[...(candidate.thoughts||[]),clone(p.thought)];delete candidate.proposals;validate(candidate);Object.assign(s,candidate);delete s.proposals;}
 function parseState(json){return validate(JSON.parse(json));}
-  function overview(s) {
+  function overview(s, orientation = 'vertical', collapsedIds = []) {
     validate(s);
+    if (!['vertical', 'horizontal'].includes(orientation)) fail('Invalid overview orientation.');
+    if (!Array.isArray(collapsedIds) || collapsedIds.some(id => typeof id !== 'string')) fail('Invalid collapsed node IDs.');
+    const collapsed = new Set(collapsedIds), descendants = new Map();
+    const horizontal = orientation === 'horizontal';
     const tree = s.content.tree,
       widths = new Map(),
       stack = [[tree, false]];
     while (stack.length) {
       const [n, visited] = stack.pop();
-      if (visited)
-        widths.set(
-          n.id,
-          Math.max(
-            1,
-            n.children.reduce((sum, c) => sum + widths.get(c.id), 0),
-          ),
-        );
-      else {
+      if (visited) {
+        descendants.set(n.id, n.children.reduce((sum, c) => sum + 1 + descendants.get(c.id), 0));
+        widths.set(n.id, collapsed.has(n.id) ? 1 : Math.max(1, n.children.reduce((sum, c) => sum + widths.get(c.id), 0)));
+      } else {
         stack.push([n, true]);
         for (const c of n.children) stack.push([c, false]);
       }
@@ -61,8 +61,8 @@ function parseState(json){return validate(JSON.parse(json));}
     let maxDepth = 0;
     while (todo.length) {
       const { n, parent, depth, start } = todo.pop(),
-        x = 122 + (start + widths.get(n.id) / 2 - 0.5) * 228,
-        y = 52 + depth * 148;
+        x = horizontal ? 122 + depth * 288 : 122 + (start + widths.get(n.id) / 2 - 0.5) * 228,
+        y = horizontal ? 52 + (start + widths.get(n.id) / 2 - 0.5) * 112 : 52 + depth * 148;
       maxDepth = Math.max(maxDepth, depth);
       const row = {
         id: n.id,
@@ -73,6 +73,9 @@ function parseState(json){return validate(JSON.parse(json));}
         y,
         depth,
         is_root: !parent,
+        has_children: n.children.length > 0,
+        is_collapsed: n.children.length > 0 && collapsed.has(n.id),
+        hidden_descendants: collapsed.has(n.id) ? descendants.get(n.id) : 0,
 
         is_active_strand: s.cursor.includes(n.id),
         is_cursor_tip: n.id === s.cursor.at(-1),
@@ -86,15 +89,18 @@ function parseState(json){return validate(JSON.parse(json));}
           y1 = p.y + 43,
           y2 = y - 43,
           mid = (y1 + y2) / 2;
+        const x1 = p.x + 104, x2 = x - 104, midX = (x1 + x2) / 2;
         edges.push({
           parent_id: parent,
           child_id: n.id,
-          path: `M ${p.x.toFixed(2)} ${y1.toFixed(2)} L ${p.x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${y2.toFixed(2)}`,
+          path: horizontal
+            ? `M ${x1.toFixed(2)} ${p.y.toFixed(2)} L ${midX.toFixed(2)} ${p.y.toFixed(2)} L ${midX.toFixed(2)} ${y.toFixed(2)} L ${x2.toFixed(2)} ${y.toFixed(2)}`
+            : `M ${p.x.toFixed(2)} ${y1.toFixed(2)} L ${p.x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${mid.toFixed(2)} L ${x.toFixed(2)} ${y2.toFixed(2)}`,
         });
       }
       let next = start;
       const children = [];
-      for (const c of n.children) {
+      for (const c of collapsed.has(n.id) ? [] : n.children) {
         children.push({ n: c, parent: n.id, depth: depth + 1, start: next });
         next += widths.get(c.id);
       }
@@ -103,8 +109,8 @@ function parseState(json){return validate(JSON.parse(json));}
     return {
       nodes,
       edges,
-      board_width: Math.max(960, widths.get(tree.id) * 228 + 244),
-      board_height: Math.max(320, (maxDepth + 1) * 148 + 104),
+      board_width: Math.max(960, horizontal ? (maxDepth + 1) * 288 + 244 : widths.get(tree.id) * 228 + 244),
+      board_height: Math.max(320, horizontal ? widths.get(tree.id) * 112 + 104 : (maxDepth + 1) * 148 + 104),
     };
   }
   function packageHtml(html, s) {
@@ -132,5 +138,5 @@ function parseState(json){return validate(JSON.parse(json));}
     );
   }
 
-return {initialState,validate,validateContent,validateTree,find,newId,navigate,editNode,editFraming,addChild,deleteNode,overview,validateRequest,buildRequest,composeResult,resolveProposal,parseState,packageHtml};
+return {initialState,validate,validateContent,validateTree,find,newId,navigate,editNode,editFraming,addChild,deleteNode,moveSibling,overview,validateRequest,buildRequest,composeResult,resolveProposal,parseState,packageHtml};
 });

@@ -66,3 +66,34 @@
 .earlier-thoughts .thought { margin-top: .5rem; }
 .thought .markdown > :first-child { margin-top: 0; }
 .thought .markdown > :last-child { margin-bottom: 0; }
+
+/* Sibling movement appears only in the lower control area or its keyboard/touch focus. */
+.issue-node-controls { width: 100%; }
+.issue-node-controls::before { content: ''; position: absolute; z-index: -1; inset: -10px 0 0; }
+.issue-node-controls .issue-node-reorder { position: absolute; top: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: none; }
+.issue-node-reorder[data-direction="left"] { left: calc(50% - 66px); }
+.issue-node-reorder[data-direction="right"] { right: calc(50% - 66px); }
+.issue-node-controls:hover .issue-node-reorder { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 0s .3s, visibility 0s .3s; }
+.issue-node-controls:focus-within .issue-node-reorder,
+.issue-node-controls.reorder-revealed .issue-node-reorder { opacity: 1; visibility: visible; pointer-events: auto; transition: none; }
+.issue-node-controls:hover .issue-node-reorder:disabled,
+.issue-node-controls:focus-within .issue-node-reorder:disabled,
+.issue-node-controls.reorder-revealed .issue-node-reorder:disabled { opacity: .28; background: transparent; cursor: default; }
+
+/* Full Tree orientation changes only the read-only geometry. */
+.issue-overview-header { gap: .6rem; flex-wrap: wrap; }
+.issue-overview-orientation { display: flex; gap: .25rem; margin-left: auto; }
+.issue-overview-orientation button { font-size: .8rem; padding: .4rem .65rem; }
+.issue-overview-orientation button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Folding and depth presets are temporary display controls in both views. */
+.tree-depth { display: flex; align-items: center; flex-wrap: wrap; gap: .25rem; margin: .5rem 0; }
+.tree-depth button { font-size: .8rem; padding: .35rem .55rem; }
+.tree-depth button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tree-depth-label, .tree-depth-custom { font-size: .8rem; color: var(--muted); margin-right: .25rem; }
+.tree-depth-custom[hidden] { display: none; }
+.issue-overview-header .tree-depth { margin: 0; }
+.issue-node-collapse { position: absolute; z-index: 3; left: 50%; top: calc(50% + 74px); transform: translate(-50%, -50%); width: 26px; height: 24px; padding: 0; font-size: 17px; line-height: 1; }
+.issue-collapse-stem { position: absolute; left: 50%; top: calc(50% + 43px); transform: translateX(-50%); width: 1.5px; height: 31px; background: #a7afa4; pointer-events: none; }
+[data-orientation="horizontal"] .issue-node-collapse { left: calc(50% + 144px); top: 50%; }
+[data-orientation="horizontal"] .issue-collapse-stem { left: calc(50% + 104px); top: 50%; transform: translateY(-50%); width: 40px; height: 1.5px; }
